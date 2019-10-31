@@ -1,0 +1,35 @@
+export interface MonthlySummary {
+    monthlySummaryRecordID: number,
+    masterPatientID: number,
+    mmiS_ID: string,
+    memberMonth: string,
+    variance: number,
+    paymentError: number,
+    baseCapitationAmount: number,
+    patientPayAmountN: number,
+    patientPayAmountSCO: number,
+    paidCapitationAmount: number,
+    ccaRateCellID: number,
+    ccaRegionID: number,
+    ccaRateCell: string,
+    ccaRegion: string,
+    ccaPatientPay: number,
+    ccaPatientSpendDown: number,
+    ccaRateCardID: number,
+    ccaAmount: number,
+    ccaNetAmount: number,
+    mmisRateCellID: number,
+    mmisRegionID: number,
+    mmisRateCell: string,
+    mmisRegion: string,
+    mmisPatientPay: number,
+    mmisPatientSpendDown: number,
+    mmisRateCardID: number,
+    mmisAmount: number,
+    mmisNetAmount: number,
+}
+
+export interface MemberRevYear {
+    memberYear: number,
+    gap: number
+}

@@ -1,0 +1,115 @@
+table {
+    width: 100%;
+    /* min-width: 1000px; */
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-container {
+    /* max-height:  calc(100vh - 150px);  */
+    height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
+    overflow: auto;
+}
+
+.mat-header-cell,
+.mat-cell {
+    white-space: nowrap;
+    padding: 0 4px;
+}
+
+.table-wrapper {
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.24), 0 0 2px rgba(0, 0, 0, 0.12);
+}
+
+mat-paginator {
+    position: relative;
+    bottom: 0;
+}
+
+.overlay {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+#loding-wrapper {
+    background: rgba(255, 255, 255, 0.77);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    z-index: 299;
+}
+
+mat-spinner {
+    width: 100px;
+    height: 100px;
+    top: calc(50% - 50px);
+    right: 0;
+    margin: auto;
+}
+
+.mat-header-cell-wrap {
+    /* white-space: normal;
+    word-break: break-word; */
+    /* min-width: 60px; */
+}
+
+.mat-row:hover,
+.lookup-highlight {
+    /* background: navajowhite; */
+    background: #d6e2e8;
+    transition: background-color .1s linear;
+}
+
+
+/* temp solution for stickey end */
+
+.mat-column-absoluteVarianceSum {
+    right: 0px !important;
+    max-width: 106px !important;
+    min-width: 106px !important;
+}
+
+.mat-column-maxAging {
+    right: 106px !important;
+    max-width: 60px !important;
+    padding-left: 8px;
+    /* text-align: right; */
+}
+
+.mat-column-totalDiscrepancies {
+    right: 166px !important;
+    max-width: 60px !important;
+    padding-left: 8px;
+    /* text-align: right; */
+}
+
+.mat-column-totalAssigned {
+    right: 226px !important;
+    max-width: 84px !important;
+    padding-left: 8px;
+    /* text-align: right; */
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.text-hightlight {
+    color: #fff;
+    background-color: #629eb3;
+}
+
+.numeric-change {
+    color: #31708e;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.numeric {
+    transition: font-size color font-weight .2s 1s;
+}

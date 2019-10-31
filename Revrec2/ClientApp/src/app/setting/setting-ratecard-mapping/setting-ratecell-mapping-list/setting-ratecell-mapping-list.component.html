@@ -1,0 +1,66 @@
+<div class="setting-ratecard-list-container">
+    <div class="table-container">
+        <table mat-table matSort (matSortChange)="onSort($event)" [dataSource]="pagedData" class="mat-elevation-z8">
+
+            <!--- Note that these columns can be defined in any order.
+                The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- MMIS Rate Cell Column -->
+            <ng-container matColumnDef="mmisRateCell">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> MMIS 8200 RateCell </th>
+                <td mat-cell *matCellDef="let element"> {{element.mmisRateCell}} </td>
+            </ng-container>
+
+            <!-- Product Column -->
+            <ng-container matColumnDef="mmisProduct">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Product </th>
+                <td mat-cell *matCellDef="let element"> {{element.mmisProduct}} </td>
+            </ng-container>
+
+            <!-- CCA Rate Cell Column -->
+            <ng-container matColumnDef="ccaRateCell">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> CCA RateCell </th>
+                <td mat-cell *matCellDef="let element">
+
+                    <div [ngClass]="{'cell-display': isAuthorized('update')}" (click)="$event.stopPropagation() ;  isAuthorized('update') &&
+                            onMappingItemFieldClicked(element, 'ccaRateCell')" *ngIf="editedElement != element || editedField != 'ccaRateCell'">
+                        <div class='cell-display-info'>
+                            {{element.ccaRateCell}}
+                            <mat-chip-list *ngIf='element.ccaRateCell === "" || element.ccaRateCell === null'>
+                                <mat-chip (click)="$event.stopPropagation() ;  isAuthorized('update') &&
+                                onMappingItemFieldClicked(element, 'ccaRateCell')" selected color="primary">Unmapped</mat-chip>
+                            </mat-chip-list>
+                        </div>
+                        <div class='cell-display-icon'>
+                            <i class="material-icons-outlined">create</i>
+                        </div>
+                    </div>
+                    <div class="cell-input-field" *ngIf="editedElement && editedElement == element && editedField == 'ccaRateCell'">
+                        <!-- No lable needed  -->
+                        <mat-form-field appClickOutside (clickOutside)="onEditDismiss('update')" class='cell-input-select'>
+                            <mat-select [(ngModel)]='element.ccaRateCellID' name="rateCell">
+                                <mat-option (click)='$event.stopPropagation(); onSelect(rateCell)' *ngFor="let rateCell of getOptions(element.mmisProduct)" [value]="rateCell.ccaRateCellID">
+                                    {{rateCell.ccaRateCell}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Active Column -->
+            <ng-container matColumnDef="activeFlag">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Active </th>
+                <td mat-cell *matCellDef="let element"> {{element.activeFlag}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                {{dataSource}}
+            </tr>
+        </table>
+        <mat-card class='pagination-container'>
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageState.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
+        </mat-card>
+    </div>
+</div>

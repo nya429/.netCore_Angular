@@ -1,0 +1,10 @@
+<div  class='commentary-list-container'>
+    <div *ngFor='let commentary of commentaryList'>
+      <div class="commentary-item-container">
+          <app-commentary-list-item
+          [source]='commentary'
+        ></app-commentary-list-item>
+      </div>
+
+    </div>
+</div>

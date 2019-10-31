@@ -1,0 +1,195 @@
+<div class="overlay">
+    <form [formGroup]="searchForm">
+        <mat-card class="table-toolbar" style="padding: 0px" fxLayout="row" fxLayoutAlign="space begin begin">
+
+            <section fxLayout="row" fxLayoutAlign="begin begin">
+                <button mat-button color="accent" [disabled]='!selection.hasValue()' mat-raised-button (click)="actionClicked.emit() && $event.stopPropagation()">Update</button>
+            </section>
+            <mat-divider vertical></mat-divider>
+
+            <!-- <section fxLayout="row" fxLayoutAlign="begin center">
+                <button mat-button color="secondary" (click)="test()">BUTTON</button>
+            </section>
+            <mat-divider vertical></mat-divider> -->
+
+            <!-- FIXME added this when have button -->
+            <!-- style="padding: 12px 24px 6px/12px 24px;" -->
+            <section style="padding: 12px 24px" fxLayout="row" fxLayoutAlign="space begin begin">
+
+                <!-- style='margin-top: 6px;' -->
+                <mat-slide-toggle formControlName="includeZeroDiscrepancy" class="example-margin" color="primary" [checked]="'checked'" aria-label='Show 0 Discrepancy'>
+                    Show All - Include Resolved
+                </mat-slide-toggle>
+
+                <!--   Show/Hide Columns  -->
+                <!-- <button mat-icon-button [matMenuTriggerFor]="menu" fxFlexAlign="center">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="onClick()">Rating Category</button>
+                    <button mat-menu-item (click)="onClick()">Date of Birth</button>
+                </mat-menu> -->
+
+
+            </section>
+            <mat-divider vertical></mat-divider>
+            <section fxLayoutAlign="end center">
+                <button mat-icon-button fxFlexAlign="begin begin">
+                    <mat-icon>clear</mat-icon>
+                </button>
+            </section>
+
+
+        </mat-card>
+        <mat-divider></mat-divider>
+
+        <div #table class="table-wrapper">
+            <div class="table-container">
+                <table mat-table matSort [dataSource]="pagedData" (matSortChange)="onSort($event)" class="mat-elevation-z8">
+
+                    <!-- - Note that these columns can be defined in any order.
+                           The actual rendered columns are set as a property on the row definition" -->
+                    <!-- Position Column -->
+                    <!-- <ng-container matColumnDef="position">
+                        <th mat-header-cell *matHeaderCellDef> No. </th>
+                        <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+                    </ng-container> -->
+
+                    <ng-container matColumnDef="select" sticky>
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()">
+                            </mat-checkbox>
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? onMemebrSelect(row) : null" [checked]="selection.isSelected(row)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <!--  Name Column -->
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-form-field style='width: 150px;'>
+                                <input matInput type="text" placeholder="Name" formControlName="Name">
+                                <!-- [matAutocomplete]="auto" -->
+                                <!-- <mat-autocomplete #auto="matAutocomplete">
+                                <mat-option *ngFor="let option of options" [value]="option">{{option}}
+                                </mat-option>
+                            </mat-autocomplete> -->
+                            </mat-form-field>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <div *ngIf="searchForm.get('Name').value.length > 0 && searchForm.get('Name').valid">
+                                <div *appHighLight="searchForm.value.Name; text: element; highlightedText as text">
+                                    <span>{{text.before}}</span>
+                                    <strong class='text-hightlight'>{{text.match1}}</strong>
+                                    <span>{{text.seg1}}</span>
+                                    <strong class='text-hightlight'>{{text.match2}}</strong>
+                                    <span>{{text.after}}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="searchForm.get('Name').value.length===0 || !searchForm.get('Name').valid">
+                                {{element.memberFirstName | titlecase}} {{element.memberLastName | titlecase}}
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <!-- <ng-container matColumnDef="dob">
+                       <th mat-header-cell *matHeaderCellDef> Date of Birth </th>
+                        <td mat-cell *matCellDef="let element"> {{element.dob | agepipe}} </td>
+                   </ng-container> -->
+
+                    <!-- MMIS's MMIS_ID Column -->
+                    <ng-container matColumnDef="mmiS_MMIS_ID">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-form-field style='width: 110px;'>
+                                <input matInput type="number" placeholder="MMIS ID" formControlName="MMIS_ID">
+                            </mat-form-field>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <a>{{element.mmiS_MMIS_ID}}</a>
+                        </td>
+                    </ng-container>
+                    <!-- matTooltip="Display Member Information" -->
+                    <!-- CCA_ID Column -->
+                    <ng-container matColumnDef="ccaid">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <mat-form-field style='width: 90px;'>
+                                <input matInput type="number" placeholder="CCA ID" formControlName="CCAID">
+                            </mat-form-field>
+                        </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.ccaid }}</td>
+                    </ng-container>
+
+                    <!--  Product Column -->
+                    <ng-container matColumnDef="product">
+                        <th mat-header-cell *matHeaderCellDef> Product </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.product }} </td>
+                    </ng-container>
+
+                    <!--  Eligibility Column -->
+                    <ng-container matColumnDef="eligibility">
+                        <th mat-header-cell *matHeaderCellDef> Eligibility </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.memberEnrollmentStatus }} </td>
+                    </ng-container>
+
+                    <!--  Enrollment Column -->
+                    <ng-container matColumnDef="enrollment">
+                        <th mat-header-cell *matHeaderCellDef> Enrollment </th>
+                        <td mat-cell *matCellDef="let element"> {{element.enrollStartDate | sqlDateFormat}} - {{element.enrollEndDate | sqlDateFormat}}</td>
+                    </ng-container>
+
+                    <!--  RatingCategory Column -->
+                    <ng-container matColumnDef="rating_category">
+                        <th mat-header-cell *matHeaderCellDef> Rating Category </th>
+                        <td mat-cell *matCellDef="let element"> {{element.ratingCategory}}({{element.region}})</td>
+                    </ng-container>
+
+                    <!--  Total Discrepancies Column -->
+                    <ng-container matColumnDef="totalDiscrepancies" stickyEnd>
+                        <th matTooltip="Total Discrepancies Count" mat-header-cell *matHeaderCellDef mat-sort-header>
+                            <div class='mat-header-cell-wrap'>Total</div>
+                        </th>
+                        <td [ngClass]="{'numeric-change':element.masterPatientID === numbericChangePatientId, 'numeric': !numbericChangePatientId}" mat-cell *matCellDef="let element"> {{element.totalDiscrepancies}} </td>
+                    </ng-container>
+
+                    <!--  Total Discrepancies Column -->
+                    <ng-container matColumnDef="totalAssigned" stickyEnd>
+                        <th matTooltip="Assigned Discrepancies Count" mat-header-cell *matHeaderCellDef mat-sort-header>
+                            <div class='mat-header-cell-wrap'>Assigned</div>
+                        </th>
+                        <td [ngClass]="{'numeric-change':element.masterPatientID === numbericChangePatientId, 'numeric': !numbericChangePatientId}" mat-cell *matCellDef="let element"> {{element.totalAssigned}} </td>
+                    </ng-container>
+
+                    <!--  Max Aging Column -->
+                    <ng-container matColumnDef="maxAging" stickyEnd>
+                        <th matTooltip="Max Aging" mat-header-cell *matHeaderCellDef mat-sort-header>
+                            <div class='mat-header-cell-wrap'>Aging</div>
+                        </th>
+                        <td [ngClass]="{'numeric-change':element.masterPatientID === numbericChangePatientId, 'numeric': !numbericChangePatientId}" mat-cell *matCellDef="let element"> {{element.maxAging}} </td>
+                    </ng-container>
+
+                    <!--  Absolute Variance Sum Column -->
+                    <ng-container matColumnDef="absoluteVarianceSum" stickyEnd>
+                        <th matTooltip="Sum of Absolute Variances" mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+                        <td [ngClass]="{'numeric-change':element.masterPatientID === numbericChangePatientId, 'numeric': !numbericChangePatientId}" mat-cell *matCellDef="let element"> {{element.absoluteVarianceSum | currency}} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;let i = index" (click)='onMMISClick(row)' style="cursor: pointer;" [ngClass]="{'lookup-highlight': isHighlight(row.masterPatientID)}"></tr>
+
+                    <!-- 'lookup-de-highlight': isDeHighlight(i) -->
+                </table>
+            </div>
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageState.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
+        </div>
+        <div *ngIf='membersLoading || containerSourceLookUp' id='loding-wrapper'>
+            <mat-spinner></mat-spinner>
+            <!-- *ngIf='!isPatrick()' -->
+            <!-- Patrick Eastern Egg -->
+            <!-- <div *ngIf='isPatrick()' class="progress-nyan">
+                <div id='patrick'>{{getPatrick()}}</div>
+            </div> -->
+        </div>
+    </form>
+</div>

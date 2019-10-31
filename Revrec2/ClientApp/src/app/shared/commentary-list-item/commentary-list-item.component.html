@@ -1,0 +1,38 @@
+<mat-card class='commentary-list-item-container'>
+    <!-- <div class="master-commentary-container"
+  [ngClass]="{'commentary-edit-highlightable': editable(commentary.name)}"
+  (click)='onCommentEdit(commentary)'>
+  <div  
+    class='header-text'
+    fxLayout="row">
+    <div class="header-text-title">
+      <strong>{{commentary.name}}</strong>
+    </div> 
+    <mat-card-subtitle>
+      {{commentary.created_at | signtime}}
+    </mat-card-subtitle>
+    <button mat-icon-button
+      class='header-action-icon'>
+      <i class="material-icons-outlined">create</i> Edit
+    </button>
+  </div>
+
+  <mat-card-content style='margin-bottom: 0;'>
+    {{commentary.content}}
+  </mat-card-content>
+</div> -->
+    <app-commentary-item [actionUser]='actionUser' [source]='masterComment'></app-commentary-item>
+    <div class="sub-commentary-list-container" *ngIf='masterComment.subComments && masterComment.subComments.length > 0'>
+        <div *ngFor="let subComment of masterComment.subComments">
+            <app-commentary-item [actionUser]='actionUser' [source]='subComment'></app-commentary-item>
+        </div>
+    </div>
+
+    <mat-card-actions align="start">
+        <button mat-button *ngIf='!isInputRender()' color='primary' (click)="$event.stopPropagation() ; onRenderInput()">
+            <i class="material-icons-outlined">reply</i> Reply
+        </button>
+        <app-commentary-input *ngIf='isInputRender()' appClickOutside (clickOutside)="onInputDismiss($event)" (onCommentChange)="onCommentChanged($event)" (onCommentSubmit)="onCommentSubmited($event)"></app-commentary-input>
+    </mat-card-actions>
+
+</mat-card>

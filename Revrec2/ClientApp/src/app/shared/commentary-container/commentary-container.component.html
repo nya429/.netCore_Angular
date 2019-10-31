@@ -1,0 +1,29 @@
+<mat-card class='host'>
+    <div class="commentary-tool-bar">
+        <div class="commentary-tool-bar-info">
+            Discrepancy Comments
+        </div>
+        <div class="commentary-tool-bar-action">
+            <button mat-icon-button id="commentary-tool-bar-action-close" (click)='$event.stopPropagation(); onDismissClick()'>
+          <i class="material-icons-outlined">close</i>
+        </button>
+        </div>
+    </div>
+    <div #commentaryEf class='member-discrepancy-tip' [ngStyle]="{'max-height.px': inputEfHeight,
+    'height.px': inputEfHeight}">
+        <div class='commentary-list-container'>
+            <div *ngFor='let comment of sourceComments'>
+                <div class="commentary-item-container">
+                    <app-commentary-list-item [actionUser]='actionUser' [source]='comment'></app-commentary-list-item>
+                </div>
+            </div>
+            <div *ngIf='sourceComments.length === 0'>
+                No Comments
+            </div>
+        </div>
+    </div>
+    <mat-divider></mat-divider>
+    <div #inputEf class='input-container'>
+        <app-commentary-input (onCommentSubmit)="onCommentSubmited($event)" (onCommentHeightChanged)="onInputChange($event)"></app-commentary-input>
+    </div>
+</mat-card>

@@ -1,0 +1,23 @@
+/* .section-setting-title {
+    height: 149px;
+} */
+
+.section-setting-content {
+    height: calc(100vh - 214px);
+    position: relative;
+    overflow: auto;
+}
+
+
+
+.title {
+    margin-left: 14px;
+    padding: 30px;
+    color: #777777;
+}
+
+a {
+    font-size: 16px;
+    font-weight: bolder;
+    text-decoration: none;
+}

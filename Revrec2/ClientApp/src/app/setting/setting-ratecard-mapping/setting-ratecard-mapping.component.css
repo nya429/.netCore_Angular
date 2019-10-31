@@ -1,0 +1,17 @@
+.setting-ratecardmapping-container {
+    position: relative;
+    padding: 24px;
+}
+
+.setting-ratecard-mapping-actions-conatiner {
+    padding: 1.25em 24px 0 24px;
+}
+
+.setting-ratecard-mapping-actions-conatiner mat-form-field {
+    padding: 0 24px;
+    width: 180px;
+}
+
+.mat-form-field-action {
+    display: inline-block;
+}

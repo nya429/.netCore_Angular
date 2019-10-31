@@ -1,0 +1,267 @@
+<div class="overlay">
+    <!-- 
+         @important containerH - 56
+      -->
+    <div [ngStyle]="{'max-height.px': containerH - 56, 'height.px': containerH - 56}" #table class="table-container">
+        <!-- <table mat-table matSort [dataSource]="pagedDataMOCK" (matSortChange)="onSort($event)" class="mat-elevation-z8"> -->
+        <table mat-table matSort [dataSource]="pagedData" (matSortChange)="onSort($event)" class="mat-elevation-z8">
+            <!--- Note that these columns can be defined in any order.
+                The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- Position Column -->
+            <!-- <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef> No. </th>
+            <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+          </ng-container> -->
+
+            <!-- <ng-container matColumnDef="select" sticky>
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? onMemebrSelect(row) : null" [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container> -->
+
+            <!--  Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-form-field>
+                        <input type="text" placeholder="Search By Name" aria-label="Number" matInput [formControl]="myControl" [matAutocomplete]="auto">
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <mat-option *ngFor="let option of options" [value]="option">{{option}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </th>
+                <!-- <td mat-cell *matCellDef="let element;"> {{element.firstName}} {{element.lastName}} </td> -->
+                <td mat-cell *matCellDef="let element;"> </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!-- MMIS ID Column -->
+            <ng-container matColumnDef="mmis_id">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-form-field>
+                        <input type="text" placeholder="MMIS" aria-label="Number" matInput [formControl]="myControl">
+                    </mat-form-field>
+                </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.mmis_id}} </td> -->
+                <td mat-cell *matCellDef="let element"> {{element.mmiS_ID}} </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!-- CCA ID Column -->
+            <ng-container matColumnDef="cca_id">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-form-field>
+                        <input type="text" placeholder="CCA ID" aria-label="Number" matInput [formControl]="myControl">
+                    </mat-form-field>
+                </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.cca_id}}</td> -->
+                <td mat-cell *matCellDef="let element"> {{element.ccaid}}</td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!--  Program Column -->
+            <ng-container matColumnDef="program">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Program </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.program}} </td> -->
+                <td mat-cell *matCellDef="let element">{{element.product}}</td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!--  Month Column -->
+            <ng-container matColumnDef="month" sticky>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-table-border-right'> Month </th>
+                <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.month}} </td> -->
+                <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.memberMonth | sqlDateFormat}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'>Total: </td>
+            </ng-container>
+
+            <!--  Org_ratecell Column -->
+            <ng-container matColumnDef="org_ratecell">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org ratecell </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.org_ratecell}} </td> -->
+                <td mat-cell *matCellDef="let element"> {{element.ccaRateCell}} </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!--  org_region Column -->
+            <ng-container matColumnDef="org_region">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org region </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.org_region}}</td> -->
+                <td mat-cell *matCellDef="let element"> {{element.ccaRegion}}</td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+            <!--  org_premium Column -->
+            <ng-container matColumnDef="org_premium">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org premium </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.org_premium.toFixed(2) | currency}}</td>
+                <td mat-footer-cell *matFooterCellDef> {{getTotalMock('org_premium') | currency}} </td> -->
+                <td mat-cell *matCellDef="let element"> {{element.ccaAmount| currency}}</td>
+                <td mat-footer-cell *matFooterCellDef> {{getTotal('ccaAmount') | currency}} </td>
+            </ng-container>
+
+            <!--  org_pp Column -->
+            <ng-container matColumnDef="org_pp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org patient pay </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.org_pp.toFixed(2) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef> {{getTotalMock('org_pp') | currency}} </td> -->
+
+                <td mat-cell *matCellDef="let element"> {{element.ccaPatientPay | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef> {{getTotal('ccaPatientPay') | currency}} </td>
+            </ng-container>
+
+            <!--  org_sp Column -->
+            <ng-container matColumnDef="org_sp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-right'> org spend down </th>
+                <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.org_sp.toFixed(2) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'> {{getTotalMock('org_sp') | currency}} </td> -->
+                <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{(element.ccaPatientSpendDown) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'> {{getTotal('ccaPatientSpendDown') | currency}} </td>
+
+            </ng-container>
+
+            <!--  org_expect Column -->
+            <ng-container matColumnDef="org_expect">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-right'> org expected </th>
+                <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{(element.org_premium - element.org_sp - element.org_pp).toFixed(2) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'> {{getTotalMock('org_premium') - getTotalMock('org_sp') - getTotalMock('org_pp') | currency}} </td> -->
+
+                <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.ccaNetAmount | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'> {{getTotal('ccaNetAmount') | currency}} </td>
+            </ng-container>
+
+            <!--  payor_ratecell Column -->
+            <ng-container matColumnDef="payor_ratecell">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor ratecell </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.payor_ratecell}} </td> -->
+                <td mat-cell *matCellDef="let element"> {{element.mmisRateCell}} </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+
+            <!--  payor_region Column -->
+            <ng-container matColumnDef="payor_region">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor region </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.payor_region}} </td> -->
+                <td mat-cell *matCellDef="let element"> {{element.mmisRegion}} </td>
+                <td mat-footer-cell *matFooterCellDef></td>
+            </ng-container>
+
+
+
+            <!--  payor_premium Column -->
+            <ng-container matColumnDef="payor_premium">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor premium </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.payor_premium.toFixed(2) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef>{{getTotalMock('payor_premium') | currency}}</td> -->
+                <td mat-cell *matCellDef="let element"> {{element.mmisAmount | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef>{{getTotal('mmisAmount') | currency}}</td>
+            </ng-container>
+
+            <!--  payor_pp Column -->
+            <ng-container matColumnDef="payor_pp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor patient pay </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.payor_pp.toFixed(2) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef>{{getTotalMock('payor_pp') | currency}}</td> -->
+                <td mat-cell *matCellDef="let element"> {{element.mmisPatientPay | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef>{{getTotal('mmisPatientPay') | currency}}</td>
+            </ng-container>
+
+            <!--  payor_sp Column -->
+            <ng-container matColumnDef="payor_sp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-right'> payor spend down </th>
+                <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.payor_sp.toFixed(2) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'>{{getTotalMock('payor_sp') | currency}}</td> -->
+                <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.mmisPatientSpendDown | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'>{{getTotal('mmisPatientSpendDown') | currency}}</td>
+            </ng-container>
+
+            <!--  payor_paid Column -->
+            <ng-container matColumnDef="payor_paid">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-left'> payor paid </th>
+                <!-- <td mat-cell *matCellDef="let element"> {{element.payor_paid.toFixed(2) | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-left'> {{getTotalMock('payor_paid') | currency}} </td> -->
+                <td mat-cell *matCellDef="let element"> {{element.paidCapitationAmount | currency}} </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-left'> {{getTotal('paidCapitationAmount') | currency}} </td>
+            </ng-container>
+
+
+            <!--  unexplained Column -->
+            <ng-container matColumnDef="unexplained">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-left'> payment error </th>
+                <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
+                    <mat-chip [toolTipDisplay]="isBubbleLightedMOCK(element, 'pe')" [awesomeTooltip]="{tipType: 'pe', content: element}" [selected]="isBubbleLightedMOCK(element, 'pe')" color="primary"> {{(element.payor_paid - (element.payor_premium - element.payor_sp - element.payor_pp)).toFixed(2) | currency}} </mat-chip>
+
+                </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-left'>
+                    <mat-chip>
+                        {{getTotalMock('payor_paid') - (getTotalMock('payor_premium') - getTotalMock('payor_sp') - getTotalMock('payor_pp')) | currency}}
+                    </mat-chip>
+                </td> -->
+
+                <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
+                    <mat-chip-list>
+
+                        <mat-chip [toolTipDisplay]="isBubbleLighted(element, 'pe')" [awesomeTooltip]="{tipType: 'payment_error', content: element}" [selected]="isBubbleLighted(element, 'pe')" color="primary"> {{element.paymentError| currency}} </mat-chip>
+                    </mat-chip-list>
+
+                </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-left'>
+                    <mat-chip-list>
+                        <mat-chip>
+                            {{getTotal('paymentError') | currency}}
+                        </mat-chip>
+                    </mat-chip-list>
+                </td>
+            </ng-container>
+
+            <!--  amount Column -->
+            <ng-container matColumnDef="variance" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-table-border-left'> variance </th>
+                <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
+                    <mat-chip [toolTipDisplay]="isBubbleLightedMOCK(element, 'va')" [selected]="isBubbleLightedMOCK(element, 'va')" [awesomeTooltip]="{tipType: 'va', content: element}" color="accent">
+                        {{element.variance.toFixed(2) | currency}}
+                    </mat-chip>
+                </td> -->
+                <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
+                    <mat-chip-list>
+                        <mat-chip [toolTipDisplay]="isBubbleLighted(element, 'va')" [selected]="isBubbleLighted(element, 'va')" [awesomeTooltip]="{tipType: 'payment_variance', content: element}" color="accent">
+                            {{element.variance | currency}}
+                        </mat-chip>
+                    </mat-chip-list>
+                </td>
+                <td mat-footer-cell *matFooterCellDef class='mat-table-border-left'>
+                    <mat-chip>
+                        {{getTotal('variance') | currency}}
+                    </mat-chip>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns;let i = index" [ngClass]="{'row-de-tone': isNonRevenueMonthMock(row)}"></tr> -->
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;let i = index" [ngClass]="{'row-de-tone': isNonRevenueMonth(row)}"></tr>
+            <tr mat-footer-row *matFooterRowDef="displayedColumns; sticky: true"></tr>
+            <!-- [ngClass]="{'lookup-highlight': isHighlight(i),
+          'lookup-de-highlight': isDeHighlight(i)}"></tr> -->
+        </table>
+    </div>
+    <mat-paginator [hidePageSize]='true' [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageState.pageIndex" [length]="pageState.count" [pageSize]="pageState.pageSize" (page)="onPage($event)" color='warm'></mat-paginator>
+
+    <div *ngIf='isLookup' id='loding-wrapper'>
+        <mat-spinner></mat-spinner>
+    </div>
+</div>
+
+<!-- <div class="member-tip-overlay" *ngIf='showCommentary'>
+    <app-commentary-container (commentaryDismissed)='onCommentaryDismissed()' [containerH]='containerH'></app-commentary-container>
+</div> -->
+
+<!-- appClickOutside -->
+<!-- (clickOutside)='showCommentary = false' -->

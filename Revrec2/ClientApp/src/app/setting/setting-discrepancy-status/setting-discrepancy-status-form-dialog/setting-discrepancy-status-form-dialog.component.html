@@ -1,0 +1,32 @@
+<div class="bulk-update-container">
+    <h2 mat-dialog-title>{{ stateOptions[data.type].title }} Discrepancy Status</h2>
+    <form [formGroup]="form">
+        <div>
+            <p *ngIf="data.type === 'bulk_update' && data.selection.hasValue()"> {{data.selection.selected.length}} discrepancy status been selected</p>
+            <mat-divider></mat-divider>
+            <br>
+            <div class="create-field" *ngIf="data.type === 'create'">
+                <mat-form-field class='bulk-update-field'>
+                    <input matInput type="text" placeholder="Status" formControlName="discrepancyStatus">
+                </mat-form-field>
+            </div>
+            <mat-form-field class='bulk-update-field'>
+                <mat-select placeholder="Category" formControlName="discrepancyCategory" name="category">
+                    <mat-option (click)='$event.stopPropagation()' *ngFor="let category of getOption('discrepancyCategory')" [value]="category">
+                        {{category.discrepancyCategory}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <section class='mat-form-field-narrow'>
+                <mat-slide-toggle formControlName="activeFlag" class="example-margin" color="primary" [checked]="'checked'">
+                    Active
+                </mat-slide-toggle>
+            </section>
+        </div>
+        <div mat-dialog-actions>
+            <button mat-button (click)="onClose()">Cancel</button>
+            <button mat-button (click)="onSave()">Save</button>
+        </div>
+    </form>
+</div>

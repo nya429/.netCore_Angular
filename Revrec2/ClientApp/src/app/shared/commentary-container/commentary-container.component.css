@@ -1,0 +1,27 @@
+.commentary-tool-bar {
+    padding: 20px;
+    position: relative;
+}
+
+.commentary-tool-bar-action {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+}
+
+.member-discrepancy-tip {
+    overflow: auto;
+    padding: 12px;
+}
+
+.input-container {
+    padding: 0 12px 8px 12px;
+}
+
+.host {
+    padding: 0;
+}
+
+.commentary-item-container {
+    padding: 8px;
+}

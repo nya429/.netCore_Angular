@@ -1,0 +1,40 @@
+<div class="setting-user-container">
+    <div class="app-setting-user-list">
+        <mat-card class='setting-user-actions-conatiner'>
+            <form [formGroup]="searchForm">
+                <span>Find by: &nbsp;</span>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="Name" formControlName="userNameAD">
+                    <!-- [matAutocomplete]="auto1" -->
+                    <!-- <mat-autocomplete #auto1="matAutocomplete">
+                        <mat-option *ngFor="let description of getOption('description')" [value]="description">{{description}}
+                        </mat-option>
+                    </mat-autocomplete> -->
+                </mat-form-field>
+                <!-- <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="Category" formControlName="category" [matAutocomplete]="auto2">
+                    <mat-autocomplete #auto2="matAutocomplete">
+                        <mat-option *ngFor="let category of getOption('category')" [value]="category">{{category}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field> -->
+            </form>
+        </mat-card>
+
+
+
+        <br>
+        <!-- (userSelected)='onUserSelected($event)' -->
+        <app-setting-user-list [source]='dataSource' [sourcePaged]="pagedSource" (onPagedAndSorted)="onListPagedSorted($event)" (onUpdated)="onUpdate($event)"></app-setting-user-list>
+    </div>
+</div>
+
+
+
+<div class="setting-user-button-container">
+    <button (click)="openDialog('create')" mat-fab color="primary">
+        <i class="material-icons">
+            add
+        </i>
+    </button>
+</div>

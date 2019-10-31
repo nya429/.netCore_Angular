@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <module name="member">
+    <endpoint name="GetMemberListByConAsync">1111</endpoint>
+    <endpoint name="GetMemberInfoByConAsync">1111</endpoint>
+    <endpoint name="GetMemberByNameByConAsync">1111</endpoint>
+    <endpoint name="UpdateDiscrepancyForMultipleMembersByConAsync">1011</endpoint>
+    <endpoint name="UpdateMultipleDiscrepanciesBYFiltersByConAsync">1011</endpoint>
+  </module>
+  <module name="discrepancy">
+    <endpoint name="GetDiscrepancyByIdByConAsync">1011</endpoint>
+    <endpoint name="GetDiscrepancyRecordListByConAsync">1011</endpoint>
+    <endpoint name="GetMonthlySummaryRecordMemberYearsByConAsync">1011</endpoint>
+    <endpoint name="GetMonthlySummaryRecordMemberMonthsByConAsync">1011</endpoint>
+    <endpoint name="UpdateDiscrepancyByIDAsync">1011</endpoint>
+    <endpoint name="UpdateMultipleDiscrepanciesByIdListByConAsync">1011</endpoint>
+    <endpoint name="GetDiscrepancyCommentListByIdByConAsync">1011</endpoint>
+    <endpoint name="UpdateDiscrepancyCommentByIDAsync">1011</endpoint>
+    <endpoint name="UpdateMultipleDiscrepanciesByFiltersByConAsync">1011</endpoint>
+  </module>
+  <module name="user">
+    <endpoint name="CreateNewUserByAsync">1110</endpoint>
+    <endpoint name="UpdateUserByUserIdAsync">1110</endpoint>
+    <endpoint name="GetUsersListByConAsync">1110</endpoint>
+    <endpoint name="GetUserRecordByIdByConAsync">1110</endpoint>
+    <endpoint name="GetUserDropDownOptionsByConAsync">1111</endpoint>
+    <endpoint name="GetUserRecordByADNameByConAsync">1111</endpoint>
+  </module>
+  <module name="ratecard">
+    <endpoint name="GetRateCardListByConAsync">1011</endpoint>
+    <endpoint name="CreateRateCardAsync">1010</endpoint>
+    <endpoint name="UpdateRateCardAync">1010</endpoint>
+  </module>
+  <module name="ratecellmap">
+    <endpoint name="GetRateCellMapListByConAsync">1000</endpoint>
+    <endpoint name="GetRateCellMapCountByConAsync">1000</endpoint>
+    <endpoint name="UpdateRateCellMapByIDAsync">1000</endpoint>
+  </module>
+  <module name="regionmap">
+    <endpoint name="GetRegionMapListByConAsync">1000</endpoint>
+    <endpoint name="GetRegionMapCountByConAsync">1000</endpoint>
+    <endpoint name="UpdateRegionMapByIDAsync">1000</endpoint>
+  </module>
+  <module name="discrepancyStatues">
+    <endpoint name="GetDiscrepancyStatusesListByConAsync">1010</endpoint>
+    <endpoint name="CreateDiscrepancyStatusAsync">1010</endpoint>
+    <endpoint name="UpdateDiscrepancyStatusByIDAsync">1010</endpoint>
+    <endpoint name="GetDiscrepancyStatusOptions">1011</endpoint>
+  </module>
+  <module name="discrepancyCateogry">
+    <endpoint name="GetDiscrepancyCategoryListByConAsync">1010</endpoint>
+    <endpoint name="CreateDiscreapancyCategoryAsync">1010</endpoint>
+    <endpoint name="UpdateDiscrepancyCategoryByIDAsync">1010</endpoint>
+    <endpoint name="GetDiscrepancyCategoryOptions">1011</endpoint>
+  </module>
+</configuration>

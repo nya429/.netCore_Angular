@@ -1,0 +1,159 @@
+.cursor-pointer {
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    /* min-width: 1000px; */
+}
+
+.table-container {
+    /* max-height:  calc(100vh - 150px);  */
+    max-height: calc(100vh - 210px);
+    height: calc(100vh - 210px);
+    overflow: auto;
+}
+
+.mat-header-cell,
+.mat-cell,
+.mat-footer-row {
+    white-space: nowrap;
+    padding: 0 4px;
+    overflow: hidden;
+}
+
+.table-wrapper {
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.24), 0 0 2px rgba(0, 0, 0, 0.12);
+}
+
+mat-paginator {
+    position: relative;
+    bottom: 0;
+}
+
+.overlay {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+#loding-wrapper {
+    background: rgba(255, 255, 255, 0.77);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    z-index: 199;
+}
+
+mat-spinner {
+    width: 100px;
+    height: 100px;
+    top: calc(50% - 50px);
+    right: 0;
+    margin: auto;
+}
+
+.mat-standard-chip {
+    padding: 3px 9px;
+}
+
+.member-tip-overlay {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 104;
+}
+
+.material-icons-outlined {
+    font-size: 20px;
+}
+
+
+/* disable mat-placeholder script */
+
+.mat-icon-button {
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    color: #777;
+}
+
+
+/* in-cell full-width display */
+
+.mat-form-field {
+    width: 100%;
+}
+
+.cell-display-info {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    transition: .2s;
+}
+
+.cell-display-icon {
+    position: relative;
+    opacity: 0;
+    height: 21px;
+    width: 21px;
+    margin-top: -20px;
+    float: right;
+    transition: .2s;
+}
+
+.cell-display:hover {
+    background-color: #eaf1f3;
+    width: 100%;
+}
+
+.cell-display:hover>.cell-display-info {
+    width: calc(100% - 21px);
+}
+
+.cell-display:hover>.cell-display-icon,
+.cell-display:active>.cell-display-icon {
+    color: #777;
+    opacity: 1;
+}
+
+.cell-input-field {
+    width: 100%;
+}
+
+.mat-header-cell-wrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    /* word-break: break-word; */
+    min-width: 60px;
+    max-width: 90px;
+}
+
+.mat-table-border-right {
+    border-right: 1px solid #e0e0e0;
+    padding-right: 4px;
+}
+
+.mat-table-border-left {
+    padding-left: 4px;
+    border-left: 1px solid #e0e0e0;
+}
+
+tr.mat-footer-row {
+    font-weight: bold;
+}
+
+.mat-footer-cell {
+    border-top: 1px solid #e0e0e0;
+}
+
+table.mat-table {
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+.row-de-tone>td {
+    color: #999999;
+}

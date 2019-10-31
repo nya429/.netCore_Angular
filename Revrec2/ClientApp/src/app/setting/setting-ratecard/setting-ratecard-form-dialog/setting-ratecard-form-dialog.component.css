@@ -1,0 +1,24 @@
+mat-form-field  {
+    padding-left: 24px;
+}
+
+.value-hightlight {
+    color: #467e99;
+    font-size: 18px;
+}
+
+.mat-form-field-narrow {
+    width: 150px;
+} 
+
+.mat-dialog-actions {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.dialog-container {
+    position: relative;
+    height: 100%;
+    width:100%;
+}

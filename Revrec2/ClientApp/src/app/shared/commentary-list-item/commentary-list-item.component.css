@@ -1,0 +1,16 @@
+.sub-commentary-list-container {
+    margin-top: 16px;
+    margin-left: 16px;
+    padding: 16px;
+    background-color: #F5F5F6;
+    border-radius: 2.5px;
+}
+
+.sub-commentary-list-item-container {
+    margin-bottom: 16px;
+}
+
+.commentary-list-item-container {
+    box-shadow: none;
+    border-bottom: 1px solid #eaeaea;
+}

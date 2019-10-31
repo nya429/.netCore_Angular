@@ -1,0 +1,76 @@
+<div class="setting-ratecards-container">
+    <div class="app-setting-ratecard-list">
+        <mat-card class='setting-rate-cards-actions-conatiner'>
+            <form [formGroup]="searchForm">
+                <span>Find by: &nbsp;</span>
+                <!-- <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="RateCell" formControlName="ccaRateCell" [matAutocomplete]="auto1">
+                    <mat-autocomplete #auto1="matAutocomplete">
+                        <mat-option *ngFor="let ratecell of getOptionMOCK('rateCell')" [value]="ratecell">{{ratecell}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="Region" formControlName="ccaRegion" [matAutocomplete]="auto2">
+                    <mat-autocomplete #auto2="matAutocomplete">
+                        <mat-option *ngFor="let region of getOptionMOCK('region')" [value]="region">{{region}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field> -->
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="RateCell" formControlName="ccaRateCell" [matAutocomplete]="auto1">
+                    <mat-autocomplete #auto1="matAutocomplete">
+                        <mat-option *ngFor="let ratecell of getOptions('rateCell')" [value]="ratecell.ccaRateCell">{{ratecell.ccaRateCell}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="Region" formControlName="ccaRegion" [matAutocomplete]="auto2">
+                    <mat-autocomplete #auto2="matAutocomplete">
+                        <mat-option *ngFor="let region of getOptions('region')" [value]="region.ccaRegion">{{region.ccaRegion}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input [errorStateMatcher]="errorMatcher" #startDateInputEl matInput placeholder="Start Date" formControlName="startDate" [matDatepicker]="picker1" (keyup)="fireWhenEmpty(startDateInputEl, 'startDate')">
+                    <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                        date input format error
+                    </mat-error>
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input [errorStateMatcher]="errorMatcher" #endDateInputEl matInput placeholder="End Date" formControlName="endDate" [matDatepicker]="picker2" (keyup)="fireWhenEmpty(endDateInputEl, 'endDate')">
+                    <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                        date input format error
+                    </mat-error>
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+            </form>
+        </mat-card>
+        <br>
+        <app-setting-ratecard-list [sourcePaged]="pagedSource" [updatePermissions]="updatePermissions" (onPagedAndSorted)='onListPagedSorted($event)' (rateCardSelected)='onRateCardSelected($event)'></app-setting-ratecard-list>
+    </div>
+</div>
+
+<div class="setting-ratecards-button-container">
+    <div fxLayout="column " fxLayoutAlign="begin begin " fxLayoutGap="20px">
+        <div @button-edit-slide *ngIf="isAuthorized('update') && selection.hasValue()">
+            <button (click)="openDialog( 'bulk_update')" mat-fab color="primary">
+              <i class="material-icons ">
+                edit
+              </i>
+          </button>
+        </div>
+        <div *ngIf="isAuthorized('create')">
+            <button (click)="openDialog('create')" mat-fab color="primary">
+              <i class="material-icons">
+                add
+              </i>
+            </button>
+        </div>
+    </div>
+</div>

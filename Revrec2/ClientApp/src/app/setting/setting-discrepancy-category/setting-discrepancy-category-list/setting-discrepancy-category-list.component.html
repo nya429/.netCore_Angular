@@ -1,0 +1,61 @@
+<div class="setting-discrepancy-category-list-container">
+    <div class="table-container">
+
+        <table mat-table matSort (matSortChange)="onSort($event)" [dataSource]="pagedData" class="mat-elevation-z8">
+
+            <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- Selection Column -->
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? onMemebrSelect(row) : null" [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <!-- Category Column -->
+            <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
+                <td mat-cell *matCellDef="let element"> {{ element.discrepancyCategory }} </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+                <td mat-cell *matCellDef="let element"> {{ element.discrepancyCategoryDescription }} </td>
+            </ng-container>
+
+            <!-- Display Column -->
+            <ng-container matColumnDef="display">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Display </th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-slide-toggle color="primary" [disabled]="!isAuthorized('update')" [(ngModel)]="element.discrepancyCategoryDisplay" (click)="onItemToggleClick(element, 'discrepancyCategoryDisplay')">
+                    </mat-slide-toggle>
+                </td>
+            </ng-container>
+
+
+            <!-- Active Column -->
+            <ng-container matColumnDef="active">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Active </th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-slide-toggle color="primary" [disabled]="!isAuthorized('update')" [(ngModel)]="element.activeFlag" (click)="onItemToggleClick(element, 'activeFlag')">
+                    </mat-slide-toggle>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                {{dataSource}}
+            </tr>
+        </table>
+        <mat-card class='pagination-container'>
+            <mat-paginator [pageIndex]="pageState.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
+        </mat-card>
+    </div>
+</div>

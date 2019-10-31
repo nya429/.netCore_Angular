@@ -1,0 +1,13 @@
+.mat-form-field-action {
+    display: inline-block;
+}
+
+.mat-form-field-narrow {
+    width: 115px;
+    padding-right: 10px;
+}
+
+.mat-form-field-normal {
+    width: 140px;
+    padding-right: 10px;
+}

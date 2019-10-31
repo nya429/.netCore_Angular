@@ -1,0 +1,14 @@
+table {
+    min-width: 800px;
+    width: 100%;
+}
+
+.table-container,
+.pagination-container {
+    width: 1000px;
+    padding: 0;
+}
+
+mat-checkbox {
+    padding-right: 24px;
+}

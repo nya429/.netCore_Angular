@@ -1,0 +1,54 @@
+<mat-nav-list style='width:134.72px' fxLayout="column" fxLayoutAlign="begin begin">
+    <section>
+        <img id="logo" src="../../../assets/logo.png" alt="">
+    </section>
+    <!-- Second -->
+    <mat-divider></mat-divider>
+    <section>
+        <a mat-list-item routerLink="/reports" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
+            <div class="link-wrapper">
+                <mat-icon class="nav-icon">bar_chart</mat-icon>
+                <span class="nav-caption">Report</span>
+            </div>
+        </a>
+        <a mat-list-item routerLink="/members" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
+            <div class="link-wrapper">
+                <mat-icon class="nav-icon">group</mat-icon>
+                <span class="nav-caption">Members</span>
+            </div>
+        </a>
+        <a mat-list-item routerLink="/discrepancies" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
+            <div class="link-wrapper">
+                <mat-icon class="nav-icon">restore_page</mat-icon>
+                <span class="nav-caption">Discrepancy</span>
+            </div>
+        </a>
+        <a mat-list-item routerLink="/worklist" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
+            <div class="link-wrapper">
+                <mat-icon class="nav-icon">styles</mat-icon>
+                <span class="nav-caption">Work List</span>
+            </div>
+        </a>
+
+        <a mat-list-item routerLink="/settings" class="router-link" routerLinkActive="router-link-active" (click)="onClose() ">
+            <div class="link-wrapper">
+                <mat-icon class="nav-icon">input</mat-icon>
+                <span class="nav-caption">Admin</span>
+            </div>
+        </a>
+    </section>
+    <!-- Third -->
+    <section fxFlex='grow' fxLayout="column" fxLayoutAlign="end begin" *ngIf='isAuth()'>
+        <!-- <mat-list-item>
+      <button mat-icon-button (click)="onClose()">
+        <mat-icon>eject</mat-icon>
+        <span class="nav-caption">Logout</span>
+      </button>
+    </mat-list-item> -->
+        <a mat-list-item routerLink="/FAQs" (click)="onClose()">
+            <mat-icon>help_outline</mat-icon>
+            <span class="nav-caption">FAQs</span>
+        </a>
+
+    </section>
+</mat-nav-list>

@@ -1,0 +1,47 @@
+/* .member-list-container {
+    max-height:  calc(100vh - 138px); 
+    overflow: auto;
+} */
+
+.ng-transision {
+    /* display: absolute; */
+    transition: max-width 300ms linear;
+    will-change: transform;
+}
+
+#member-info-toggle {
+    z-index: 112;
+    background-color: #fff;
+    color: #777;
+    position: absolute;
+    top: 95px;
+}
+
+#member-info-toggle:focus {
+    outline: 0;
+}
+
+.ng-slide-in {
+    transform: translateX(300px);
+    transition: transform 300ms linear;
+}
+
+.info-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.288);
+    z-index: 190;
+}
+
+.info-container {
+    position: relative;
+    height: 80%;
+    width: 90%;
+    left: 0;
+    right: 0;
+    top: calc(10vh + 33px);
+    bottom: 0;
+    margin: auto;
+}

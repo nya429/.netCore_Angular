@@ -1,0 +1,19 @@
+.info-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.288);
+    z-index: 190;
+}
+
+.info-container {
+    position: relative;
+    height: 80%;
+    width: 90%;
+    left: 0;
+    right: 0;
+    top: calc(10vh + 33px);
+    bottom: 0;
+    margin: auto;
+}

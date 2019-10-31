@@ -1,0 +1,19 @@
+.bulk-update-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.bulk-update-field {
+    width: 100%;
+}
+
+.mat-dialog-actions {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+textarea {
+    min-height: 65px;
+}

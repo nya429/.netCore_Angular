@@ -1,0 +1,90 @@
+<div class="dialog-container">
+
+    <h2>Create Rate Card</h2>
+    <mat-vertical-stepper [linear]="true" #stepper>
+        <mat-step [stepControl]="firstForm">
+            <form [formGroup]="firstForm">
+                <ng-template matStepLabel>{{ this.firstForm.valid ? "Selected: " : "Select Product"}}
+                    <span class="value-hightlight"> {{ this.firstForm.valid ? 
+            this.firstForm.value.product : ""}}</span>
+                </ng-template>
+                <mat-form-field>
+                    <mat-label>Select Product</mat-label>
+                    <mat-select formControlName="product" mat-select required>
+                        <mat-option *ngFor="let product of getOptions('product')" [value]="product">{{product}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="secondForm">
+            <form [formGroup]="secondForm">
+                <ng-template matStepLabel>{{ this.secondForm.valid ? "Selected: " : "Select RatingCategory"}}
+                    <span class="value-hightlight">{{ this.secondForm.valid ? 
+              this.secondForm.value.rateCell.ccaRateCell + " (" + this.secondForm.value.region.ccaRegion + ")" : ""}}</span>
+                </ng-template>
+                <mat-form-field>
+                    <!-- <input matInput required type="text" placeholder="RateCell" formControlName="rateCell" [matAutocomplete]="auto1">
+                    <mat-autocomplete #auto1="matAutocomplete">
+                        <mat-option *ngFor="let ratecell of getOptions('rateCell')" [value]="ratecell.ccaRateCellID">{{ratecell.ccaRateCell}}
+                        </mat-option>
+                    </mat-autocomplete> -->
+
+                    <mat-label>Select RateCell</mat-label>
+                    <mat-select formControlName="rateCell" mat-select required>
+                        <mat-option *ngFor="let ratecell of getOptions('rateCell')" [value]="ratecell">{{ratecell.ccaRateCell}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field>
+                    <!-- <input matInput required type="text" placeholder="Region" formControlName="region" [matAutocomplete]="auto2">
+                    <mat-autocomplete #auto2="matAutocomplete">
+                        <mat-option *ngFor="let region of getOptions('region')" [value]="region">{{region.ccaRegion}}
+                        </mat-option>
+                    </mat-autocomplete> -->
+
+                    <mat-label>Select Region</mat-label>
+                    <mat-select formControlName="region" mat-select required>
+                        <mat-option *ngFor="let region of getOptions('region')" [value]="region">{{region.ccaRegion}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+        <mat-step [stepControl]="thirdForm">
+            <form [formGroup]="thirdForm">
+                <ng-template matStepLabel>Fill Rate and Effective Time</ng-template>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <span matPrefix>$ &nbsp;</span>
+                    <input type="number" matInput required placeholder="Rate" appTwoDigitDecimaNumber formControlName="rate">
+                </mat-form-field>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput required placeholder="Start Date" formControlName="startDate" [matDatepicker]="picker1">
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput required placeholder="End Date" formControlName="endDate" [matDatepicker]="picker2">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+                <div>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button (click)="stepper.reset()">Reset</button>
+                </div>
+            </form>
+        </mat-step>
+    </mat-vertical-stepper>
+    <div mat-dialog-actions>
+        <button mat-button (click)="onClose()">Cancel</button>
+        <button mat-button color='primary' [disabled]='!isFormsValid()' (click)="onSave()">Save</button>
+    </div>
+</div>

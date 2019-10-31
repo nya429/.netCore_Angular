@@ -1,0 +1,128 @@
+<div class="discrepancy-container" fxLayout="row" fxLayoutAlign="begin begin" fxLayoutGap="20px" style=" max-height: calc(100vh - 94px); padding:15px;">
+    <div fxFlex="100" class="discrepancy-list-container">
+        <mat-card class='setting-rate-cards-actions-conatiner'>
+            <form [formGroup]="searchForm">
+                <span>Find by: &nbsp;</span>
+                <mat-form-field class='mat-form-field-normal'>
+                    <mat-label>Products</mat-label>
+                    <mat-select formControlName="programs" mat-select multiple>
+                        <mat-option *ngFor="let product of getOptions('product')" [value]="product">{{product}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button matTooltip="Clear filter" mat-icon-button [disabled]="searchForm.get('programs').pristine" (click)="searchForm.get('programs').reset()">
+                    <i class="material-icons">
+                        clear
+                    </i>
+                </button>
+                <mat-form-field class='mat-form-field-normal'>
+                    <mat-label>Months</mat-label>
+                    <mat-select formControlName="months" mat-select multiple>
+                        <mat-option *ngFor="let month of monthOptions" [value]="month">{{month}}
+                        </mat-option>
+                    </mat-select>
+
+                </mat-form-field>
+                <button matTooltip="Clear filter" mat-icon-button [disabled]="searchForm.get('months').pristine" (click)="searchForm.get('months').reset()">
+                    <i class="material-icons">
+                        clear
+                    </i>
+                </button>
+                <mat-form-field class='mat-form-field-normal'>
+                    <mat-label>CCARateCells</mat-label>
+                    <mat-select formControlName="ccaRateCellIds" mat-select multiple>
+                        <mat-option *ngFor="let ratecell of getOptions('rateCell')" [value]="ratecell.ccaRateCellID">{{ratecell.ccaRateCell}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button matTooltip="Clear filter" mat-icon-button [disabled]="searchForm.get('ccaRateCellIds').pristine" (click)="searchForm.get('ccaRateCellIds').reset()">
+                    <i class="material-icons">
+                        clear
+                    </i>
+                </button>
+                <mat-form-field class='mat-form-field-normal'>
+                    <mat-label>Statuses</mat-label>
+                    <mat-select formControlName="discrepancyStatusIDs" mat-select multiple>
+                        <mat-option *ngFor="let discrepancyStatus of getOptions('discrepancyStatus')" [value]="discrepancyStatus.discrepancyStatusID">
+                            <strong style="color: #224e63">{{discrepancyStatus.discrepancyCategory.slice(0,1)}} : </strong>{{discrepancyStatus.discrepancyStatus}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button matTooltip="Clear filter" mat-icon-button [disabled]="searchForm.get('discrepancyStatusIDs').pristine" (click)="searchForm.get('discrepancyStatusIDs').reset()">
+                    <i class="material-icons">
+                        clear
+                    </i>
+                </button>
+                <mat-form-field class='mat-form-field-normal'>
+                    <mat-label>Assigned Users</mat-label>
+                    <mat-select formControlName="assigneeIDs" mat-select multiple>
+                        <mat-option *ngFor="let user of getOptions('assigned_User')" [value]="user.userID">{{user.userNameAD}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button matTooltip="Clear filter" mat-icon-button [disabled]="searchForm.get('assigneeIDs').pristine" (click)="searchForm.get('assigneeIDs').reset()">
+                    <i class="material-icons">
+                        clear
+                    </i>
+                </button>
+                <!-- <mat-slide-toggle style='margin-top:6px;' formControlName="includeResolved" class="example-margin" color="primary" [checked]="checked" aria-label='Show 0 Discrepancy'>
+                    Show Resolved
+                </mat-slide-toggle>
+                <mat-slide-toggle style='margin-top:6px;' formControlName="hasComment" class="example-margin" color="primary" [checked]="checked" aria-label='Show 0 Discrepancy'>
+                    Show Commented
+                </mat-slide-toggle> -->
+                <br>
+                <span>Discovered Date: &nbsp;</span>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <!-- [errorStateMatcher]="errorMatcher" -->
+                    <input #startDateInputEl matInput placeholder="Start" formControlName="discoverDateStart" [matDatepicker]="picker1" (keyup)="fireWhenEmpty(startDateInputEl, 'discoverDateStart')">
+                    <mat-error *ngIf="searchForm.get('discoverDateStart').getError('matDatepickerParse')">
+                        date input format error
+                    </mat-error>
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+                <span> - </span>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <!-- [errorStateMatcher]="errorMatcher" -->
+                    <input #endDateInputEl matInput placeholder="End" formControlName="discoverDateEnd" [matDatepicker]="picker2" (keyup)="fireWhenEmpty(endDateInputEl, 'discoverDateEnd')">
+                    <mat-error *ngIf="searchForm.get('discoverDateEnd').getError('matDatepickerParse')">
+                        date input format error
+                    </mat-error>
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+                <span>Resolved Date: &nbsp;</span>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <!-- [errorStateMatcher]="errorMatcher" -->
+                    <input #startDateInputEl1 matInput placeholder="Start" formControlName="resolutionDateStart" [matDatepicker]="picker3" (keyup)="fireWhenEmpty(startDateInputEl1, 'resolutionDateStart')">
+                    <mat-error *ngIf="searchForm.get('resolutionDateStart').getError('matDatepickerParse')">
+                        date input format error
+                    </mat-error>
+                    <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                    <mat-datepicker #picker3 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+                <span> - </span>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <!-- [errorStateMatcher]="errorMatcher" -->
+                    <input #endDateInputEl1 matInput placeholder="End" formControlName="resolutionDateEnd" [matDatepicker]="picker4" (keyup)="fireWhenEmpty(endDateInputEl1, 'resolutionDateEnd')">
+                    <mat-error *ngIf="searchForm.get('resolutionDateEnd').getError('matDatepickerParse')">
+                        date input format error
+                    </mat-error>
+                    <mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
+                    <mat-datepicker #picker4 startView="year"></mat-datepicker>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+            </form>
+        </mat-card>
+        <br>
+        <mat-card style='padding: 0;'>
+            <div class="discrepancy-list-container-wrapper" #reconList style=" height: calc(100vh - 94px - 209px);">
+                <app-discrepancy-list [source]='discrepancyList' [isLookup]='isLookup' [sourcePaged]="pagedSourceDiscrepancy" [isSubList]='false' [containerH]='contentHeight' (onPagedAndSorted)="onListPagedSorted($event)" (onLocalSearch)="onLocalSearch($event)"></app-discrepancy-list>
+                <!-- (onUpdated)="onUpdate($event)" -->
+            </div>
+        </mat-card>
+    </div>
+</div>

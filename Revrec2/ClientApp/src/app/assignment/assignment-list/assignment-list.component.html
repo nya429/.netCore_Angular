@@ -1,0 +1,146 @@
+<div class="overlay">
+    <mat-card style=' padding: 0;'>
+        <form [formGroup]="searchForm">
+            <div class="table-toolbar" style="padding: 0px" fxLayout="row" fxLayoutAlign="space begin begin">
+                <section fxflex fxLayout="row" fxLayoutAlign="begin begin">
+                    <div class="panel-title" style='white-space: nowrap;'>
+                        My Tasks
+                    </div>
+                </section>
+                <!-- <mat-divider vertical></mat-divider> -->
+                <!-- <section
+      fxflex
+      fxLayout="row"
+      fxLayoutAlign="begin begin">
+    My Working List
+    </section> -->
+                <!-- <mat-divider vertical></mat-divider> -->
+                <section style="padding: 12px 12px 6px 24px;" fxFlex='grow' fxLayout="row" fxLayoutAlign="end center">
+                    <button matTooltip='Refresh Results' (click)='onRefresh()' mat-icon-button color="secondary">
+                            <mat-icon>refresh</mat-icon>
+                   </button>
+
+                    <button matTooltip='Search' mat-icon-button [matMenuTriggerFor]="searchMenu" fxFlexAlign="center">
+                            <mat-icon>search</mat-icon>
+                   </button>
+                    <mat-menu #searchMenu="matMenu" class="customize">
+                        <mat-form-field (click)="$event.stopPropagation()" id='searchMenu'>
+                            <input autocomplete="off" (click)="$event.stopPropagation()" matInput type="text" placeholder="Find by Name/CCA/MMIS ID" formControlName="universalInput">
+
+
+
+                            <!-- [matAutocomplete]="auto" -->
+                            <!-- <mat-autocomplete #auto="matAutocomplete">
+                                    <mat-option *ngFor="let option of options" [value]="option">{{option}}
+                                    </mat-option>
+                                </mat-autocomplete> -->
+                        </mat-form-field>
+                        <!-- Name Partial No-Result -->
+                        <!-- <div class='name-result-non-item' *ngIf='searchForm.valid && searchForm.value.universalInput.length != 0 && memebrNameResults.length === 0'>No matching member</div> -->
+
+                        <!-- Name Partial Reuslt -->
+                        <!-- <mat-list-item class="sg-vertical-sub-menu" *ngFor="let memberName of memebrNameResults">
+                            <div mat-menu-item (click)="$event.stopPropagation()" style='font-size:14px;'>
+                                <div *appHighLight="searchForm.value.Name; text: memberName; highlightedText as text">
+                                    <span>{{text.before}}</span>
+                                    <strong class='text-hightlight'>{{text.match1}}</strong>
+                                    <span>{{text.seg1}}</span>
+                                    <strong class='text-hightlight'>{{text.match2}}</strong>
+                                    <span>{{text.after}}</span>
+                                </div>
+                            </div>
+                        </mat-list-item> -->
+                    </mat-menu>
+
+                    <button matTooltip='More Actions' mat-icon-button [matMenuTriggerFor]="moreActionMenu" fxFlexAlign="center">
+                       <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu (click)="$event.stopPropagation()" #moreActionMenu="matMenu">
+                        <mat-list (click)="$event.stopPropagation()">
+                            <h3 mat-subheader> Sort By</h3>
+                            <mat-list-item *ngFor="let option of sortOptions">
+                                <button mat-menu-item (click)="$event.stopPropagation(); sort(option.column)" style='font-size:14px;'>{{option.symbol}}
+                                    <mat-icon *ngIf="option.column === pageState.sortBy && pageState.orderBy === 1"  mat-list-icon>arrow_downward</mat-icon>
+                                    <mat-icon *ngIf="option.column === pageState.sortBy && pageState.orderBy === 0" mat-list-icon>arrow_upward</mat-icon>
+                                </button>
+                            </mat-list-item>
+                        </mat-list>
+                        <mat-divider></mat-divider>
+                        <!-- <mat-list (click)="$event.stopPropagation()">
+                            <h3 mat-subheader> Filter </h3>
+                            <mat-list-item (click)="$event.stopPropagation()">
+                                <mat-slide-toggle style='margin-top:6px;' formControlName="includeZeroDiscrepancy" class="example-margin" color="primary" [checked]="checked" aria-label='Show 0 Discrepancy'>
+                                    Show All - Include Resolved
+                                </mat-slide-toggle>
+                            </mat-list-item>
+                        </mat-list> -->
+                    </mat-menu>
+                </section>
+
+                <!-- <mat-divider vertical></mat-divider> -->
+                <!-- <section
+        fxLayout="row"
+        fxLayoutAlign="begin begin">
+          <button mat-button  color="secondary" (click)="actionClicked.emit() && $event.stopPropagation()">Action</button>
+        </section> -->
+
+            </div>
+            <mat-divider></mat-divider>
+
+
+            <div #table class="table-wrapper">
+                <div class="table-container">
+                    <table mat-table matSort [dataSource]="pagedData" (matSortChange)="sort($event)" class="mat-elevation-z1">
+
+
+                        <!--  Column 1 -->
+                        <ng-container matColumnDef="column1">
+                            <th mat-header-cell *matHeaderCellDef> Column1 </th>
+                            <td mat-cell *matCellDef="let element">
+                                <div fxLayout="column" style='padding-right: 5px;' fxLayoutAlign="begin begin">
+                                    <div fxFlex='60' style='font-size:14px;'>
+                                        {{element.memberFirstName | titlecase}} {{element.memberLastName | titlecase}} ({{element.mmiS_MMIS_ID}})
+                                    </div>
+                                    <div fxFlex='40' style='font-size:12px;color: rgba(0, 0, 0, 0.54);'>
+                                        {{element.memberEnrollmentStatus}}
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <!--  Column 2 -->
+                        <ng-container matColumnDef="column2">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> C2 </th>
+                            <td mat-cell *matCellDef="let element" matTooltip="Max Aging"> {{element.maxAging}} </td>
+                        </ng-container>
+
+                        <!--  Column 3 -->
+                        <ng-container matColumnDef="column3">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> C3 </th>
+                            <td mat-cell *matCellDef="let element">
+                                <div fxLayout="column" fxLayoutAlign="end end">
+                                    <div fxFlex='60' style='font-size:14px;' matTooltip="Sum of Absolute Variances"> {{element.absoluteVarianceSum | currency }}
+
+                                    </div>
+                                    <div fxFlex='40' style='font-size:12px;' matTooltip="Assigned / Total Discrepancies">
+                                        {{element.totalAssigned}} / {{element.totalDiscrepancies}}
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+
+
+                        <!-- <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr> -->
+                        <tr mat-row class='cursor-pointer' *matRowDef="let row; columns: displayedColumns;let i = index" (click)='onWorkListItemClick(row)' [ngClass]="{'lookup-highlight': isHighlight(row.masterPatientID)}"></tr>
+
+                        <!-- 'lookup-de-highlight': isDeHighlight(i) -->
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="pageSizeOptions " [pageIndex]="pageState.pageIndex " [length]="pageState.count " [pageSize]="pageSize " (page)="onPage($event) " color='warm' showFirstLastButtons></mat-paginator>
+            </div>
+        </form>
+    </mat-card>
+    <div *ngIf="membersLoading || containerSourceLookUp" id='loding-wrapper'>
+        <mat-spinner></mat-spinner>
+    </div>
+</div>

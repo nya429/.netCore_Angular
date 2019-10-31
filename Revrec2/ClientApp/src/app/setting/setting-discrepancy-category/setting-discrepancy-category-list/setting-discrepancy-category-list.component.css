@@ -1,0 +1,10 @@
+table {
+    min-width: 800px;
+    width: 100%;
+}
+
+.table-container,
+.pagination-container {
+    /* width: 800px; */
+    padding: 0;
+}

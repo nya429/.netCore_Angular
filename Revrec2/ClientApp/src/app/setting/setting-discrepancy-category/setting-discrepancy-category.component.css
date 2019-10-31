@@ -1,0 +1,23 @@
+.setting-discrepancy-category-container {
+    position: relative;
+    padding: 24px;
+}
+
+.setting-discrepancy-category-button-container {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+}
+
+.setting-discrepancy-category-actions-conatiner {
+    padding: 1.25em 24px 0 24px;
+}
+
+.app-setting-discrepancy-category-list {
+    width: 800px;
+}
+
+.mat-form-field-narrow {
+    width: 170px;
+    padding-right: 10px;
+}

@@ -1,0 +1,66 @@
+table {
+    width: 100%;
+}
+
+.table-container,
+.pagination-container {
+    padding: 0;
+}
+
+.mat-form-field {
+    width: 100%;
+}
+
+.cell-dispaly {
+    cursor: pointer;
+}
+
+.cell-display-info {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+    transition: .2s;
+    /* @Temp solution t */
+    min-height: 20px;
+}
+
+.cell-display-icon {
+    position: relative;
+    opacity: 0;
+    height: 21px;
+    width: 21px;
+    margin-top: -20px;
+    float: right;
+    transition: .2s;
+}
+
+.cell-display:hover {
+    background-color: #eaf1f3;
+    width: 100%;
+}
+
+.cell-display:hover>.cell-display-info {
+    width: calc(100% - 21px);
+}
+
+.cell-display:hover>.cell-display-icon,
+.cell-display:active>.cell-display-icon {
+    color: #777;
+    opacity: 1;
+}
+
+.cell-input-field {
+    width: 100%;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.mat-cell {
+    width: 25%;
+}
+
+mat-chip {
+    padding: 0 12px;
+}

@@ -1,0 +1,12 @@
+<section class='report-title'>
+    <div class='title'>
+        <h3>Revrec Report</h3>
+    </div>
+    <nav mat-tab-nav-bar>
+        <a mat-tab-link *ngFor="let link of links" (click)="onNavigate(link.segment)" [routerLink]="link.segment" [active]="activeLink == link.segment"> {{link.description}} </a>
+    </nav>
+</section>
+
+<section class='report-content'>
+    <router-outlet></router-outlet>
+</section>

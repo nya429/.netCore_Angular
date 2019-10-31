@@ -1,0 +1,29 @@
+.info-overlay {
+    position: relative;
+    height: calc(100vh - 64px);
+    width: 100%;
+}
+
+.info-container {
+    width: 50%;
+    margin: auto;
+    top: 10%;
+}
+
+.info-content {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.info-subtitle {
+    padding-top: 10px;
+    font-weight: bolder;
+    font-size: 16px;
+    color: #555;
+}
+
+#logo {
+    margin: auto;
+    max-width: 80%;
+    max-height: 100%;
+}

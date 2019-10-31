@@ -1,0 +1,35 @@
+<div class="bulk-update-container">
+    <h2 mat-dialog-title> Add User</h2>
+    <form [formGroup]="form">
+        <div>
+            <mat-divider></mat-divider>
+            <br>
+            <div class="create-field" *ngIf="data.type === 'create'">
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="First Name" formControlName="FirstName">
+                </mat-form-field>
+
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="Last Name" formControlName="LastName">
+                </mat-form-field>
+            </div>
+
+            <div class="create-field" *ngIf="data.type === 'create'">
+                <mat-form-field>
+                    <input matInput type="text" placeholder="Email" formControlName="Email">
+                </mat-form-field>
+            </div>
+
+            <section class='create-field'>
+                <mat-checkbox color="primary" [disabled]="" [checked]="" formControlName="Admin">Admin</mat-checkbox>
+                <mat-checkbox color="primary" [disabled]="" [checked]="" formControlName="Supervisor">Supervisor</mat-checkbox>
+                <mat-checkbox color="primary" [disabled]="" [checked]="" formControlName="Helpdesk">Helpdesk</mat-checkbox>
+                <mat-checkbox color="primary" [disabled]="" [checked]="" formControlName="Specialist">Specialist</mat-checkbox>
+            </section>
+        </div>
+        <div mat-dialog-actions>
+            <button mat-button (click)="onClose()">Cancel</button>
+            <button mat-button (click)="onSave()">Save</button>
+        </div>
+    </form>
+</div>

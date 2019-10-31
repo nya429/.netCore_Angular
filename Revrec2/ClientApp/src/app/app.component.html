@@ -1,0 +1,32 @@
+<!-- <app-header  (sidenavToggle)="sidenav.toggle()"></app-header> -->
+<mat-sidenav-container>
+    <!-- represents the added side content -->
+    <!-- [opened]="xsQuery.matches ? false : true" -->
+    <mat-sidenav #sidenav [mode]="xsQuery.matches ? 'over' : 'side'" [opened]="false" [fixedInViewport]=false role="navigation">
+        <app-sidenav-list *ngIf="isAuthed()" (closeSidenav)="sidenav.close()" [xsMatched]="xsQuery.matches ? false : true ">
+        </app-sidenav-list>
+    </mat-sidenav>
+    <!-- represents the main content, -->
+    <mat-sidenav-content>
+        <app-header (sidenavToggle)="sidenav.toggle() "></app-header>
+        <!-- [@fadeAnimation]="getState()" -->
+        <main>
+            <!-- *ngIf='!authed || !optionReadyed' -->
+            <div *ngIf="authed === 'undetermined'  || !optionReadyed " class="token-load-view ">
+                <div class='token-load-view-title'>
+                    <h4 *ngIf="authed === 'undetermined'">Finding who you are</h4>
+                    <h4 *ngIf="isAuthed() && !optionReadyed">Getting things ready</h4>
+                    <div class="lds-ellipsis ">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+            <!-- <app-unauthorized *ngIf="authed === failed"></app-unauthorized> -->
+            <!-- #outlet="outlet" -->
+            <router-outlet *ngIf="authed !== 'undetermined' && optionReadyed"></router-outlet>
+        </main>
+    </mat-sidenav-content>
+</mat-sidenav-container>

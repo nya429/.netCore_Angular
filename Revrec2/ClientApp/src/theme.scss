@@ -1,0 +1,37 @@
+@import '~@angular/material/theming';
+// Plus imports for other components in your app.
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core();
+$md-mcgpalette0: ( 50: #e8eaf6, 100: #d6e2e8, 200: #c1d4dd, 300: #adc6d2, 400: #98b8c7, 500: #83a9bb, 600: #6f9bb0, 700: #5a8da5, 800: #467e99, 900: #31708e, A100: #31708e, A200: #2c6580, A400: #275a72, A700: #224e63, contrast: ( 50: #000000, 100: #000000, 200: #000000, 300: #ffffff, 400: #ffffff, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #ffffff, A200: #ffffff, A400: #ffffff, A700: #ffffff, ));
+$md-mcgpalette1: ( 50: #f0f2f0, 100: #e1e4e0, 200: #d2d7d1, 300: #c3c9c1, 400: #b4bcb2, 500: #a4aea2, 600: #95a193, 700: #869383, 800: #778674, 900: #687864, A100: #687864, A200: #5e6c5a, A400: #536050, A700: #495446, contrast: ( 50: #000000, 100: #000000, 200: #000000, 300: #ffffff, 400: #ffffff, 500: #ffffff, 600: #ffffff, 700: #ffffff, 800: #ffffff, 900: #ffffff, A100: #eeeeee, A200: #ffffff, A400: #ffffff, A700: #ffffff, ));
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$revrec-primary: mat-palette($md-mcgpalette0, A100, 900);
+$revrec-accent: mat-palette($md-mcgpalette1, 800, A200, A400);
+// The warn palette is optional (defaults to red).
+$revrec-warn: mat-palette($mat-red);
+// Create the theme object (a Sass map containing all of the palettes).
+$revrec-theme: mat-light-theme( $revrec-primary, $revrec-accent, $revrec-warn);
+@mixin mat-ripple-theme($theme) {
+    .mat-ripple-element {
+        background-color: #3170831c;
+    }
+}
+
+@mixin mat-nav-theme($theme) {
+    .mat-list-option:hover,
+    .mat-list-option.mat-list-item-focus,
+    .mat-nav-list .mat-list-item:hover,
+    .mat-nav-list .mat-list-item.mat-list-item-focus {
+        background-color: #3170831c;
+        transition: .2s;
+    }
+}
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($revrec-theme);

@@ -1,0 +1,16 @@
+<div class="member-container" fxLayout="row" fxLayoutAlign="begin begin" fxLayoutGap="5px" style="padding:15px;">
+
+    <div fxFlex=34>
+        <app-assignment-list [isLookup]='isLookup' [sourcePaged]="pagedSource" (onPagedAndSorted)="onListPagedSorted($event)"></app-assignment-list>
+    </div>
+
+    <div fxFlex=66>
+        <router-outlet name='bio'></router-outlet>
+    </div>
+</div>
+
+<div *ngIf='displayedDiscrepancy' class="info-overlay">
+    <div class='info-container'>
+        <app-discrepancy-detail-container (onDismissed)='onDiscrepancyDetailDismissed()'></app-discrepancy-detail-container>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="member-container" fxLayout="row" fxLayoutAlign="begin begin" style='padding:15px;'>
+    <div [ngClass]="{'ng-transision': true}" [fxFlex]="selectedMMIS ? (detailShowing ? 40 : 97) : 100" class="member-list-container">
+        <app-member-list [isLookup]='isLookup' [sourcePaged]="pagedSource" (onPagedAndSorted)="onListPagedSorted($event)" (actionClicked)="openDialog()" (memberSelected)='onMemberSelected($event)'></app-member-list>
+    </div>
+
+    <div *ngIf='selectedMMIS' fxFlex="0">
+        <button mat-icon-button style="box-shadow: none;
+        border: 1px solid #eaeaea" id='member-info-toggle' (click)='onMemberDetailToggle($event)' mat-mini-fab>
+        <i class="material-icons-outlined">menu</i>
+        </button>
+    </div>
+
+    <div class="member-detail-container" [ngClass]="{'ng-transision': true}" [fxFlex]="selectedMMIS ? (detailShowing ? 59 : 3) : 0">
+        <!-- [ngClass]="{'ng-slide-in': true}" -->
+        <!-- <mat-card class="table-toolbar" style="padding: 0px;
+        height: 100%" *ngIf='!detailShowing'></mat-card> -->
+        <router-outlet name='bio'></router-outlet>
+    </div>
+</div>
+<!-- 
+<div *ngIf='displayedDiscrepancy' class="info-overlay">
+    <div class='info-container'>
+        <app-discrepancy-detail-container (onDismissed)='onDiscrepancyDetailDismissed()'></app-discrepancy-detail-container>
+    </div>
+</div> -->

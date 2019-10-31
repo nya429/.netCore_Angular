@@ -1,0 +1,103 @@
+<mat-toolbar color="primary" class='toolbar-shadow'>
+    <div>
+        <!-- fxHide.gt-md -->
+        <button mat-icon-button (click)="onToggleSidenav()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    </div>
+    <div>
+        <a routerLink='home'>
+            <strong>
+                    Revenue Reconciliation for Medicaid 
+                    </strong>
+            <!-- <span style='font-size: 13px;'>{{getDate()}}</span> -->
+        </a>
+    </div>
+    <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
+        <ul fxLayout fxLayoutGap="44px" class="navigation-items">
+            <li>
+                <div appClickOutside (clickOutside)="onUniversalSearchDismiss()" class='universal-search-wrapper'>
+                    <div (click)='isAuthed() && onUniversalSearchExpand()' class='universal-search' [ngClass]="{'universal-search-focus-within': inputActive}">
+                        <form [formGroup]="searchForm">
+                            <input #usInputRef formControlName="universalInput" class='universal-search-input' placeholder="Type to search" type="text" [ngClass]="{'universal-search-input-focus': inputActive}">
+                            <mat-icon class="mat-18 universal-input-icon">search</mat-icon>
+                        </form>
+                    </div>
+                    <div>
+                        <div @universalSearchState *ngIf='inputActive' class="universal-search-result">
+                            <div class="universal-search-result-inputvalue">
+                                <span>Search For</span>: <strong>{{searchForm.get('universalInput').value}}</strong>
+                            </div>
+
+                            <section *ngIf="searchForm.get('universalInput').value" class="universal-search-result-fields">
+
+                                <section *ngIf="memebrNameResults && memebrNameResults.length > 0" class="universal-search-result-field">
+                                    <div class="universal-search-result-field-title">
+                                        Members:
+                                    </div>
+                                    <div class="universal-search-result-field-content">
+                                        <div *ngFor="let item of memebrNameResults" class="universal-search-result-field-content-item-list">
+                                            <div (click)="onResultItemClick(item, 'members')" class="universal-search-result-field-content-item">
+                                                <div class="universal-search-result-field-content-item-info">
+                                                    {{item.memberFirstName | titlecase}} {{item.memberLastName | titlecase}} ({{item.mmiS_MMIS_ID}})
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="universal-search-result-field-actions">
+
+                                    </div>
+                                </section>
+                                <mat-divider></mat-divider>
+
+                                <!-- <section class="universal-search-result-field">
+                                <div class="universal-search-result-field-title">
+                                    Discrepancy
+                                </div>
+                                <div class="universal-search-result-field-content">
+                                    
+                                </div>
+                                <div class="universal-search-result-field-actions">
+                                    
+                                </div>
+                            </section>
+                            <mat-divider></mat-divider> -->
+                                <!-- <section class="universal-search-result-field">
+                                <div class="universal-search-result-field-title">
+                                    My Working List
+                                </div>
+                                <div class="universal-search-result-field-content">
+                                    
+                                </div>
+                                <div class="universal-search-result-field-actions">
+                                    
+                                </div>
+                            </section>
+                            <mat-divider></mat-divider> -->
+
+                            </section>
+                            <!-- <mat-card-content>
+                                My Working List
+                            </mat-card-content>
+                            <mat-card-actions align="start">
+                                <button mat-button (click)="onAction1">Action1</button>
+
+                            </mat-card-actions> -->
+                            <mat-card-footer style="margin: 0; color: white;">
+                                Footer
+                                <!-- <span *ngIf="searchLoading" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> -->
+                            </mat-card-footer>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li *ngIf='!isAuth()'>
+                <a routerLink="/login">Login</a>
+            </li>
+            <li *ngIf='isAuth()'>
+                <a style='cursor:pointer;' (click)='onLogout()'>Hi, {{getUser()}}</a>
+            </li>
+        </ul>
+    </div>
+</mat-toolbar>

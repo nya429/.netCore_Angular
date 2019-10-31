@@ -1,0 +1,38 @@
+<div class="bulk-update-container">
+    <form [formGroup]="form">
+        <h2 mat-dialog-title>Update Records</h2>
+        <div mat-dialog-content>
+            <p>{{data.selection.selected.length}} {{data.type}} been selected</p>
+            <mat-divider></mat-divider>
+            <br>
+            <mat-form-field class='bulk-update-field'>
+                <mat-select cdkFocusInitial placeholder="Assign to" formControlName="Assigned_User" name="Assigned_to">
+                    <mat-option *ngFor="let userOption of getOptions('user')" [value]="userOption">
+                        {{userOption.userNameAD}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class='bulk-update-field'>
+                <mat-select placeholder="Status" formControlName="DiscrepancyStatus" name="discrepancyStatus">
+                    <mat-option *ngFor="let discrepancyStatus of getOptions('discrepancyStatus')" [value]="discrepancyStatus"><strong style="color: #224e63">{{discrepancyStatus.discrepancyCategory.slice(0,1)}} : </strong> {{discrepancyStatus.discrepancyStatus}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class='bulk-update-field'>
+                <input matInput placeholder="Due Date" #dueDateEl formControlName="DueDate" [matDatepicker]="picker" (keyup)="fireWhenEmpty(dueDateEl, 'DueDate')">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker startView="year"></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field class="bulk-update-field">
+                <textarea matInput type="text" style='resize: none;' formControlName="DiscrepancyComment" maxlength="2000" placeholder="Leave a comment (2000 characters max)"></textarea>
+            </mat-form-field>
+        </div>
+        <div mat-dialog-actions>
+            <button mat-button (click)="onClose()">Cancel</button>
+            <button mat-button [disabled]='!isFormsValid()' (click)="onSave()">Save</button>
+        </div>
+    </form>
+</div>

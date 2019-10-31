@@ -1,0 +1,66 @@
+<div class="setting-ratecard-list-container">
+    <div class="table-container">
+        <table mat-table matSort (matSortChange)="onSort($event)" [dataSource]="pagedData" class="mat-elevation-z8">
+
+            <!--- Note that these columns can be defined in any order.
+                The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- mmisRegion Column -->
+            <ng-container matColumnDef="mmisRegion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> MMIS 8200 Region </th>
+                <td mat-cell *matCellDef="let element"> {{element.mmisRegion}} </td>
+            </ng-container>
+
+            <!-- Product Column -->
+            <ng-container matColumnDef="mmisProduct">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Product </th>
+                <td mat-cell *matCellDef="let element"> {{element.mmisProduct}} </td>
+            </ng-container>
+
+            <!-- ccaRegion Column -->
+            <ng-container matColumnDef="ccaRegion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> CCA Region </th>
+                <td mat-cell *matCellDef="let element">
+                    <div [ngClass]="{'cell-display': isAuthorized('update')}" (click)="$event.stopPropagation(); 
+                    isAuthorized('update') && onMappingItemFieldClicked(element, 'ccaRegion')" *ngIf="editedElement != element || editedField != 'ccaRegion'">
+                        <div class='cell-display-info'>
+                            {{element.ccaRegion}}
+                            <mat-chip-list *ngIf='element.ccaRegion === "" || element.ccaRegion === null'>
+                                <mat-chip (click)="$event.stopPropagation() ; 
+                                isAuthorized('update') && onMappingItemFieldClicked(element, 'ccaRegion')" selected color="primary">Unmapped</mat-chip>
+                            </mat-chip-list>
+                        </div>
+                        <div class='cell-display-icon'>
+                            <i class="material-icons-outlined">create</i>
+                        </div>
+                    </div>
+
+                    <div class="cell-input-field" *ngIf="editedElement && editedElement == element && editedField == 'ccaRegion'">
+                        <!-- No lable needed  -->
+                        <mat-form-field appClickOutside (clickOutside)="onEditDismiss('update')" class='cell-input-select'>
+                            <mat-select [(ngModel)]="element.ccaRegionID" name="ccaRegion">
+                                <mat-option (click)='$event.stopPropagation(); onSelect(region)' *ngFor="let region of getOptions(element.mmisProduct);" [value]="region.ccaRegionID">
+                                    {{region.ccaRegion}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Active Column -->
+            <ng-container matColumnDef="activeFlag">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Active </th>
+                <td mat-cell *matCellDef="let element"> {{element.activeFlag}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                {{dataSource}}
+            </tr>
+        </table>
+        <mat-card class='pagination-container'>
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="dateSourcePaged.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
+        </mat-card>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+.setting-discrepancy-status-container {
+    position: relative;
+    padding: 24px;
+}
+
+.setting-discrepancy-status-button-container {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+}
+
+.setting-discrepancy-status-actions-conatiner {
+    padding: 1.25em 24px 0 24px;
+}
+
+.app-discrepancy-status-list {
+    width: 800px;
+}
+
+.mat-form-field-narrow {
+    width: 170px;
+    padding-right: 10px;
+}
+
+.mat-form-field-action {
+    display: inline-block;
+}
+
+
+/* #button-edit {
+    visibility: normal;
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s ease-out .2s;
+}
+
+.edit-hide {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s ease-out .2s;
+} */

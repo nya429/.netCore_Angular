@@ -1,0 +1,39 @@
+.bulk-update-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.bulk-update-field {
+    width: 100%;
+}
+
+mat-form-field {
+    padding-left: 24px;
+    width: 100%;
+}
+
+.value-hightlight {
+    color: #467e99;
+    font-size: 18px;
+}
+
+.mat-form-field-narrow {
+    width: 50%;
+}
+
+.create-field:first-child {
+    padding-left: 0px;
+}
+
+.mat-dialog-actions {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.dialog-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}

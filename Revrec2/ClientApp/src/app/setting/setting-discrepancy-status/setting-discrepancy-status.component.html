@@ -1,0 +1,72 @@
+<div class="setting-discrepancy-status-container">
+    <div class="app-discrepancy-status-list">
+        <mat-card class='setting-discrepancy-status-actions-conatiner'>
+            <form [formGroup]="searchForm">
+                <span>Find by: &nbsp;</span>
+                <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="Status" formControlName="discrepancyStatus" [matAutocomplete]="auto1">
+                    <mat-autocomplete #auto1="matAutocomplete">
+                        <mat-option *ngFor="let discrepancyStatus of getOption('discrepancyStatus')" [value]="discrepancyStatus.discrepancyStatus">{{discrepancyStatus.discrepancyStatus}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+                <!-- <mat-form-field class='mat-form-field-narrow'>
+                    <input matInput type="text" placeholder="Category" formControlName="discrepancyCategoryID" [matAutocomplete]="auto2">
+                    <mat-autocomplete #auto2="matAutocomplete">
+                        <mat-option *ngFor="let category of getOptionMOCK('category')" [value]="category">{{category}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field> -->
+                <mat-form-field class='mat-form-field-narrow'>
+                    <mat-label>Category</mat-label>
+                    <mat-select formControlName="discrepancyCategoryID">
+                        <mat-option (click)='$event.stopPropagation();' *ngFor="let discrepancyCategory of getOption('discrepancyCategory');" [value]="discrepancyCategory.discrepancyCategoryID">
+                            {{discrepancyCategory.discrepancyCategory}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class='mat-form-field-narrow'>
+                    <mat-label>Type</mat-label>
+                    <mat-select formControlName="discrepancyStatusType">
+                        <mat-option (click)='$event.stopPropagation();' *ngFor="let discrepancyStatusType of getOption('discrepancyStatusType');" [value]="discrepancyStatusType.value">
+                            {{discrepancyStatusType.type}}
+                        </mat-option>
+                    </mat-select>
+                    <!-- [startAt]="startDate" -->
+                </mat-form-field>
+                <div class='mat-form-field-action'>
+                    <button matTooltip="Clear filter" mat-icon-button [disabled]="searchForm.pristine" (click)='searchForm.reset()'>
+                            <i class="material-icons">
+                                clear
+                            </i>
+                        </button>
+                </div>
+            </form>
+        </mat-card>
+
+        <br>
+        <app-setting-discrepancy-status-list [source]='dataSource' [sourcePaged]="pagedSource" [updatePermissions]="updatePermissions" (discrepnacyStatusSelected)='onDiscrepnacyStatusSelected($event)' (onPagedAndSorted)="onListPagedSorted($event)" (onUpdated)="onUpdate($event)"></app-setting-discrepancy-status-list>
+    </div>
+</div>
+
+
+
+<div class="setting-discrepancy-status-button-container">
+    <div fxLayout="column" fxLayoutAlign="begin begin" fxLayoutGap="20px">
+        <div @button-edit-slide *ngIf="isAuthorized('update') && selection.hasValue()">
+            <button (click)="openDialog('bulk_update')" mat-fab color="primary">
+              <i class="material-icons">
+                  edit
+              </i>
+          </button>
+        </div>
+        <div *ngIf="isAuthorized('create')">
+            <button (click)="openDialog('create')" mat-fab color="primary">
+               <i class="material-icons">
+                   add
+                </i>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+<div class="setting-ratecardmapping-container">
+    <div fxLayout="row" fxLayoutAlign="begin begin" fxLayoutGap="24px">
+        <div fxFlex=50>
+            <mat-accordion>
+                <mat-expansion-panel *ngIf="isAuthorized('listRateCell')">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            MMIS Rate Cell Mapping
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            unmapped Rate Cell: <strong>&nbsp;{{unmappedRateCellCount}}</strong>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div class='setting-ratecard-mapping-actions-conatiner'>
+                        <form [formGroup]="searchFormRateCell">
+                            <span>Find by: &nbsp;</span>
+                            <mat-form-field>
+                                <input matInput formControlName="mmis8200Product" placeholder="Product">
+                            </mat-form-field>
+                            <mat-form-field>
+                                <input matInput formControlName="mmis8200RateCell" placeholder="MMIS Rate Cell">
+                            </mat-form-field>
+                            <mat-form-field>
+                                <input matInput formControlName="ccaRateCell" placeholder="CCA Rate Cell">
+                            </mat-form-field>
+                            <div class='mat-form-field-action'>
+                                <button matTooltip="Clear filter" mat-icon-button [disabled]="searchFormRateCell.pristine" (click)='searchFormRateCell.reset()'>
+                                            <i class="material-icons">
+                                                clear
+                                            </i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <app-setting-ratecell-mapping-list [sourcePaged]="pagedSourceRateCell" [updatePermissionsRatecell]="updatePermissionsRatecell" (onUpdated)="onUpdate($event, 'ratecell')" (onPagedAndSorted)="onListPagedSorted($event, 'ratecell')"></app-setting-ratecell-mapping-list>
+                </mat-expansion-panel>
+                <mat-expansion-panel *ngIf="isAuthorized('listRegion')">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            MMIS Region Mapping
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            unmapped Region: <strong>&nbsp;{{unmappedRegionCount}}</strong>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div class='setting-ratecard-mapping-actions-conatiner'>
+                        <form [formGroup]="searchFormRegion">
+                            <span>Filter &nbsp;</span>
+                            <mat-form-field>
+                                <input matInput formControlName="mmis8200Product" placeholder="Product">
+                            </mat-form-field>
+                            <mat-form-field>
+                                <input matInput formControlName="mmis8200Region" placeholder="MMIS Region">
+                            </mat-form-field>
+                            <mat-form-field>
+                                <input matInput formControlName="ccaRegion" placeholder="CCA Region">
+                            </mat-form-field>
+                            <div class='mat-form-field-action'>
+                                <button matTooltip="Clear filter" [disabled]="searchFormRegion.pristine" mat-icon-button (click)='searchFormRegion.reset()'>
+                                                <i class="material-icons">
+                                                    clear
+                                                </i>
+                                            </button>
+                            </div>
+                        </form>
+                    </div>
+                    <app-setting-region-mapping-list [sourcePaged]="pagedSourceRegion" [updatePermissionsRegion]="updatePermissionsRegion" (onUpdated)="onUpdate($event, 'region')" (onPagedAndSorted)="onListPagedSorted($event, 'region')"></app-setting-region-mapping-list>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </div>
+</div>

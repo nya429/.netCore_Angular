@@ -1,0 +1,52 @@
+<div class="setting-discrepancy-status-list-container">
+    <div class="table-container">
+
+        <table mat-table matSort [dataSource]="pagedData" class="mat-elevation-z8">
+
+            <!--- Note that these columns can be defined in any order.
+                The actual rendered columns are set as a property on the row definition" -->
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <td mat-cell *matCellDef="let element"> {{ element.userFirstName }} {{ element.userLastName }}</td>
+            </ng-container>
+
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef> Email </th>
+                <td mat-cell *matCellDef="let element"> {{ element.userEmail }} </td>
+            </ng-container>
+
+            <!-- Active Column -->
+            <!-- <ng-container matColumnDef="active">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Active </th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-slide-toggle color="primary" [(ngModel)]="element.active">
+                    </mat-slide-toggle>
+                </td>
+            </ng-container> -->
+
+            <!-- Role Column -->
+            <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef> Roles </th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.administrator" (change)="onItemCheckBoxClick(element, 'administrator')">Admin</mat-checkbox>
+                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.helpdesk" (change)="onItemCheckBoxClick(element, 'helpdesk')">Helpdesk</mat-checkbox>
+                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.specialist" (change)="onItemCheckBoxClick(element, 'specialist')">Specialist</mat-checkbox>
+                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.supervisor" (change)="onItemCheckBoxClick(element, 'supervisor')">Supervisor</mat-checkbox>
+
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                {{dataSource}}
+            </tr>
+        </table>
+        <mat-card class='pagination-container'>
+            <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageState.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
+        </mat-card>
+    </div>
+
+</div>

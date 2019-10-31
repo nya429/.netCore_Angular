@@ -1,0 +1,116 @@
+<mat-card class="table-toolbar" style="padding: 0px;
+    height: 100%;
+    overflow:hidden">
+
+
+    <!-- mp_snap_snippet -->
+
+    <div style="padding: 0px;
+        height: 151px;
+        padding: 25px;
+        font-size: 18px;" fxLayout="column" fxLayoutAlign="begin begin" fxLayoutGap="5px" class="member-mp-info-container">
+
+
+        <div class="member-info-row" fxflex='1' fxLayout="row" fxLayoutAlign="begin begin" fxLayoutGap="15px">
+
+            <div matTooltip="Info about the action" class='member-info-cell' fxFlex='none'>
+                <span class="card-subtitle mb-2 text-muted">Name</span>
+                <h6 class="card-title">{{(member ? member.memberFirstName: '') | titlecase}} {{(member ?member.memberLastName : '') | titlecase}} </h6>
+            </div>
+
+            <div class='member-info-cell' fxFlex='none'>
+                <span class="card-subtitle mb-2 text-muted">MMIS</span>
+                <h6 class="card-title"> {{member ? member.mmiS_MMIS_ID : ''}}</h6>
+            </div>
+
+            <div class='member-info-cell' fxFlex='none'>
+
+                <span class="card-subtitle mb-2 text-muted">Eligibility</span>
+                <h6 class="card-title">
+
+                    {{ member ? member.memberEnrollmentStatus : '' }}
+                </h6>
+            </div>
+        </div>
+
+        <!-- style='border: 1px solid black' -->
+        <div fxflex='2' class="member-info-row" fxLayout="Column" fxLayoutAlign="begin begin" fxLayoutGap="15px">
+
+            <div class="member-info-row" fxLayout="row" fxLayoutAlign="begin begin" fxLayoutGap="15px">
+                <div class='member-info-cell' fxFlex='none'>
+                    <span class="card-subtitle mb-2 text-muted">CCA ID</span>
+                    <h6 class="card-title"> {{member ? member.ccaid : ''}} </h6>
+                </div>
+
+
+                <div class='member-info-cell' fxFlex='none'>
+                    <span class="card-subtitle mb-2 text-muted">Product</span>
+                    <h6 class="card-title"> {{ member ? member.product : '' }} </h6>
+
+
+                </div>
+                <div class='member-info-cell' fxFlex='none'>
+                    <span class="card-subtitle mb-2 text-muted">Enrollment Span</span>
+                    <h6 class="card-title"> {{ (member ? member.enrollStartDate : null) | sqlDateFormat}} - {{ (member ? member.enrollEndDate : null) | sqlDateFormat }}</h6>
+
+                </div>
+                <div class='member-info-cell' fxFlex='none'>
+
+                    <span class="card-subtitle mb-2 text-muted">Rating Category</span>
+                    <h6 class="card-title"> {{ member ? member.ratingCategory : '' }} ( {{ member ? member.region : '' }} ) </h6>
+                </div>
+                <div class='member-info-cell' fxFlex='none'>
+
+                    <span class="card-subtitle mb-2 text-muted">Premium</span>
+                    <h6 class="card-title"> {{ (member ? (member.amount ? member.amount : 0 ): 0) | currency }} </h6>
+
+                </div>
+                <div class='member-info-cell' fxFlex='none'>
+
+                    <span class="card-subtitle mb-2 text-muted">Patient Pay</span>
+                    <h6 class="card-title"> {{(member ? (member.patientPay ? member.patientPay : 0 ) : 0) | currency}} </h6>
+                </div>
+                <div class='member-info-cell' fxFlex='none'>
+                    <span class="card-subtitle mb-2 text-muted">Spend Down</span>
+                    <h6 class="card-title"> {{(member ? (member.patientSpendDown ? member.patientSpendDown : 0 ) : 0) | currency}} </h6>
+                </div>
+            </div>
+            <div class="member-info-row" fxLayout="row" fxLayoutAlign="begin begin" fxLayoutGap="15px">
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+    <mat-divider></mat-divider>
+    <nav mat-tab-nav-bar>
+        <a mat-tab-link *ngFor="let link of links" (click)="onNavigate(link)" [active]="activeLink == link"> {{link}} </a>
+    </nav>
+    <div #reconList class="member-reconciliation-list-container">
+        <!-- <app-monthly-summary-record-list
+              *ngIf="activeLink=='monthly_summary_records'"
+            > -->
+
+        <!-- </app-monthly-summary-record-list> -->
+
+        <app-monthly-summary-record-list [containerH]='contentHeight' [masterPatientId]="masterPatientId" [isSubList]='true' [mockMSR]='true' *ngIf="activeLink=='Monthly Summary'"></app-monthly-summary-record-list>
+        <!-- </app-monthly-summary-record-list> -->
+        <app-discrepancy-list [containerH]='contentHeight' [sourcePaged]="pagedSourceDiscrepancy" [masterPatientId]="masterPatientId" [isSubList]='true' [mockMSR]='false' (onDiscrepancyDetailClicked)='onDiscrepancyDetailClick($event)' (onPagedAndSorted)="onListPagedSorted($event, 'discrepancy')"
+            (onLocalSearch)="onLocalSearch($event)" *ngIf="activeLink=='Discrepancy'"></app-discrepancy-list>
+        <!-- <router-outlet></router-outlet> -->
+
+    </div>
+    <!-- *ngIf='memebrLookingUP || containerSourceLookUp' -->
+    <div *ngIf="memebrLookingUP" id='loding-wrapper'>
+        <mat-spinner></mat-spinner>
+    </div>
+
+</mat-card>
+
+
+<!-- <router-outlet></router-outlet> -->
+<div class="member-tip-overlay">
+    <!-- <app-commentary-container></app-commentary-container> -->
+</div>

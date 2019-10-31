@@ -1,0 +1,27 @@
+.coming-soon-overlay {
+    height: calc(100vh - 64px);
+    position: relative;
+    overflow: auto;
+}
+
+.coming-soon {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: calc(30% - 128px);
+    margin: auto;
+    width: 30%;
+    text-align: center;
+    align-content: center;
+}
+
+#coming:after {
+    content: "";
+    position: absolute;
+    right: -151px;
+    top: -0px;
+    height: 570px;
+    width: 850px;
+    transform: scale(0.8);
+    background-image: url(https://cdn.dribbble.com/users/2726/screenshots/3759311/comp_1.gif);
+}

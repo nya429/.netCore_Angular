@@ -1,0 +1,49 @@
+.header-text {
+    /* margin: 0 8px; */
+    box-sizing: border-box;
+    display: block;
+    font-size: 14px;
+}
+
+.commentary-container {
+    margin-bottom: 16px;
+}
+
+.mat-card-subtitle {
+    margin: 0 0 4px 16px;
+}
+
+.header-action-icon {
+    margin-left: 16px;
+    visibility: hidden;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    color: #777;
+    transition: .3s;
+}
+
+
+.commentary-edit-highlightable {
+    cursor: pointer;
+    transition: .2s;
+    display: block;
+    padding-left: 12px;
+    border-left: 4px solid #317083;
+    border-radius: 2.5px;
+}
+
+
+.commentary-edit-highlightable:hover {
+    background-color: #3170831c;
+}
+
+.commentary-edit-highlightable:hover .header-action-icon {
+    opacity: .8;
+    visibility: visible;
+}
+
+.header-text-indicator {
+    color:darkcyan; 
+    padding: 0 4px;
+}

@@ -1,0 +1,23 @@
+<form [formGroup]="commentFormGroup">
+    <div class="input-container">
+        <textarea #textarea type="text" maxlength="1005" (keyup)="onKeyup($event)" formControlName="comment" [ngClass]="{
+      'input-create-padding':!isUpdate(),
+      'input-update-padding':isUpdate()
+    }" class='input'></textarea>
+        <div class='textarea-actions' *ngIf='!isUpdate()'>
+            <button id='textarea-action-send' mat-icon-button [disabled]="commentFormGroup.pristine || !commentFormGroup.valid" (click)="$event.stopPropagation(); onSubmit()">
+          <i class="material-icons-outlined">send</i> 
+        </button>
+        </div>
+        <div class='textarea-actions' *ngIf='isUpdate()'>
+            <button id='textarea-action-close' mat-icon-button (click)="$event.stopPropagation(); onCancel()">
+          <i class="material-icons-outlined">close</i> 
+        </button>
+
+            <button id='textarea-action-check' mat-icon-button [disabled]="commentFormGroup.pristine || !commentFormGroup.valid" (click)="$event.stopPropagation(); onSubmit()">
+          <i class="material-icons-outlined">check</i> 
+        </button>
+        </div>
+    </div>
+
+</form>

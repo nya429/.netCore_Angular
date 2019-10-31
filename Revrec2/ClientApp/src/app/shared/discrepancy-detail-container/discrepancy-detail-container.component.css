@@ -1,0 +1,35 @@
+.host {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    background-color: #fff;
+    border-radius: 2.5px;
+    box-shadow: 0 11px 15px -7px rgba(0, 0, 0, .2), 0 24px 38px 3px rgba(0, 0, 0, .14), 0 9px 46px 8px rgba(0, 0, 0, .12);
+    position: relative;
+    overflow: hidden;
+}
+
+mat-divider {
+    margin: 1px;
+    /* width:100%; */
+}
+
+.list-container {
+    max-height: 100%;
+    overflow: auto;
+    transition: .3s ease-in;
+}
+
+table {
+    width: 100%;
+}
+
+#side-component-container {
+    position: absolute;
+    right: 0;
+    transition: .3s .3s;
+}
+
+.side-retrived {
+    transform: translateX(100%);
+}
