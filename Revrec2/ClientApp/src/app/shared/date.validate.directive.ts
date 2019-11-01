@@ -75,6 +75,18 @@ export function dateValidatorFn(el): ValidatorFn {
 }
 
 
+export function cCAEmailValidatorFn(el): ValidatorFn {
+  const yyyymmddReg: RegExp = /^(\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01]))$/;
+   
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    // console.log(control)
+    let isValid = yyyymmddReg.test(control.value ? control.value.format("YYYY-MM-DD"): '');
+
+    return !isValid ? { 'invalidDate': true } : null;
+  };
+}
+
+
 @Directive({
   selector: '[appDateInputFormat]'
 })

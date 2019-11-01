@@ -29,24 +29,24 @@ export class AuthGuard implements CanActivate {
 
 
         if (this.authService.actionUserRole) {
-            console.log('sync called')
+            // console.log('sync called')
             if (this.authService.isAuthenticated() && this.authService.isViewAuthorized(expectedRoles)) {
-                return state.url === '/auth/unauthroized' ? false : true;
+                return state.url === '/unauthroized' ? false : true;
             } else {
                 // this.authService.changeSigninScale();
-                this.router.navigate(['/auth/unauthroized']);
+                this.router.navigate(['/unauthroized']);
                 return false;
             }
         } else {
             return new Observable(observer => {
-                console.log('signinStateChanged subscribe')
+                // console.log('signinStateChanged subscribe')
                 this.authService.signinStateChanged.subscribe((state: string) => {
-                    console.log('state =', state)
+                    // console.log('state =', state)
                     if (state === ('authed') && this.authService.isViewAuthorized(expectedRoles)) {
                         observer.next(true);
                     } else {
                         observer.next(false);
-                        this.router.navigate(['/auth/unauthroized']);
+                        this.router.navigate(['/unauthroized']);
                     }
                 })
             })

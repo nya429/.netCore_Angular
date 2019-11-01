@@ -30,7 +30,7 @@ const appRoutes: Routes = [
         // pathMatch: 'full'
     },
     {
-        path: 'auth/unauthroized',
+        path: 'unauthroized',
         component: UnauthorizedComponent,
         pathMatch: 'full'
     },

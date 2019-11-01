@@ -11,6 +11,15 @@ export class AppService {
   public signInStateChanged = new Subject<any>();
   public optionInited = new Subject<any>();
 
+  /** Setting Authorization */
+  listPermissionsRateCard: string;
+  listPermissionsRateCellMap: string;
+  listPermissionsRegionMap: string;
+  listPermissionsDiscrepancyStatus: string;
+  listPermissionsDiscrepancyCategory: string;
+  listPermissionsUser: string;
+  settingLinks = []
+
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -26,15 +35,14 @@ export class AppService {
         case "authed":
           this.signInStateChanged.next(authResult);
           this.authService.getAppRoleMappingSettings();
-
           break;
         case "failed":
           this.signInStateChanged.next(authResult);
-          this.router.navigate(['auth/unauthroized']);
+          this.router.navigate(['unauthroized']);
           break;
         default:
           this.signInStateChanged.next(authResult);
-          this.router.navigate(['auth/unauthorized']);
+          this.router.navigate(['unauthorized']);
           break;
       }
     })
@@ -42,11 +50,59 @@ export class AppService {
 
     this.authService.endpointroleSettingReady.subscribe(() => {
       this.settingService.initOpionts();
+      this.configWildCardRoute();
     });
 
     this.settingService.optionsReady$.subscribe(() => {
       this.optionInited.next();
     })
-
   }
+
+  configWildCardRoute() {
+    const linkSettings = [{ segment: 'ratecards', description: 'Rate Cards' },
+    { segment: 'ratecell-region-mappings', description: 'RateCell & Region Mappings' },
+    { segment: 'discrepancy-statuses', description: 'Discrepancy Statuses' },
+    { segment: 'discrepancy-categories', description: 'Discrepancy Categories' },
+    { segment: 'users', description: 'Users' }];
+
+    this.listPermissionsRateCard = this.authService.getRoleMappingSettingByNames('ratecard', 'GetRateCardListByConAsync');
+    this.listPermissionsRateCellMap = this.authService.getRoleMappingSettingByNames('ratecellmap', 'GetRateCellMapListByConAsync');
+    this.listPermissionsRegionMap = this.authService.getRoleMappingSettingByNames('regionmap', 'GetRegionMapListByConAsync');
+    this.listPermissionsDiscrepancyStatus = this.authService.getRoleMappingSettingByNames('discrepancyStatues', 'GetDiscrepancyStatusesListByConAsync');
+    this.listPermissionsDiscrepancyCategory = this.authService.getRoleMappingSettingByNames('discrepancyCateogry', 'GetDiscrepancyCategoryListByConAsync');
+    this.listPermissionsUser = this.authService.getRoleMappingSettingByNames('user', 'GetUsersListByConAsync');
+
+    if (this.authService.isViewAuthorized(this.listPermissionsRateCard)) {
+      this.settingLinks.push(linkSettings[0])
+    }
+
+    if (this.authService.isViewAuthorized(this.listPermissionsRateCellMap) || this.authService.isViewAuthorized(this.listPermissionsRegionMap)) {
+      this.settingLinks.push(linkSettings[1])
+    }
+
+    if (this.authService.isViewAuthorized(this.listPermissionsDiscrepancyStatus)) {
+      this.settingLinks.push(linkSettings[2])
+    }
+
+    if (this.authService.isViewAuthorized(this.listPermissionsDiscrepancyCategory)) {
+      this.settingLinks.push(linkSettings[3])
+    }
+
+    this.settingLinks.push(linkSettings[4])
+    if (this.authService.isViewAuthorized(this.listPermissionsUser)) {
+
+    }
+    
+    let activeLink = this.settingLinks.length ? this.settingLinks[0].segment : '';
+    
+    if (activeLink) {
+      this.router.config.find(c => c.path === "settings").children.push(
+        { path: "", redirectTo: activeLink, pathMatch: 'full' }
+      );
+    }
+    
+    console.log('setting configed')
+  }
+
+  getSettingLinks = () => this.settingLinks;
 }

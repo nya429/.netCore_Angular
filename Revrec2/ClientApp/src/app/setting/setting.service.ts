@@ -16,6 +16,7 @@ import {
   DiscrepancyCategory
 } from '../model/setting.model';
 import { combineAll } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 
 
@@ -78,7 +79,7 @@ export class SettingService {
   public userOptionsReady = new Subject<any>();
 
   constructor(private http: HttpClient,
-    @Inject('BASE_URL') baseUrl: string, ) {
+    @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl + 'api/';
 
     this.rateCardOptionReady$ = combineLatest(this.ccaRateCellListChanged, this.ccaRegionListChanged)
@@ -615,7 +616,7 @@ export class SettingService {
           this.userOptionsReady.next();
         }
       }, error => {
-        console.error("GET User Option =>",error);
+        console.error("GET User Option =>", error);
       });
   }
 
@@ -683,7 +684,7 @@ export class SettingService {
     });
   }
 
-  createUSer(user: User) {
+  createUser(user: User) {
     user.administrator = user.administrator ? 1 : 0;
     user.specialist = user.specialist ? 1 : 0;
     user.helpdesk = user.helpdesk ? 1 : 0;

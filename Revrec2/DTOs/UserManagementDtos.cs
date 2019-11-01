@@ -31,7 +31,6 @@ namespace Revrec2.DTOs
 
     public class UsersForCreateDto
     {
-        public int UserID { get; set; }
         public string UserNameAD { get; set; }
         public string UserEmail { get; set; }
         public string UserFirstName { get; set; }

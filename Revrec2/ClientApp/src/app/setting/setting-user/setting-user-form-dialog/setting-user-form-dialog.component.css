@@ -9,7 +9,6 @@
 }
 
 mat-form-field {
-    padding-left: 24px;
     width: 100%;
 }
 
@@ -22,8 +21,19 @@ mat-form-field {
     width: 50%;
 }
 
-.create-field:first-child {
+.create-field>mat-form-field {
     padding-left: 0px;
+    padding-right: 24px;
+}
+
+.create-field-subtitle {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.create-field>div>mat-checkbox {
+    padding-right: 24px;
+    margin-top: 12px;
 }
 
 .mat-dialog-actions {

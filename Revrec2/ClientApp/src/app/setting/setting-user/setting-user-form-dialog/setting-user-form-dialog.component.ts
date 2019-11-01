@@ -5,12 +5,13 @@ import { MatDialogRef, MAT_DIALOG_DATA, ErrorStateMatcher } from '@angular/mater
 import { SelectionModel } from '@angular/cdk/collections';
 
 
-
+/** Error when the parent is invalid */
 class CrossFieldErrorMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    return control.dirty && form.invalid;
+    return control.dirty && form.getError('ccaemailValidator');
   }
 }
+
 @Component({
   selector: 'app-setting-user-form-dialog',
   templateUrl: './setting-user-form-dialog.component.html',
@@ -21,6 +22,7 @@ export class SettingUserFormDialogComponent implements OnInit {
   formOptions: {
 
   };
+  errorMatcher = new CrossFieldErrorMatcher();
 
   stateOptions = {
     create: {
@@ -53,7 +55,7 @@ export class SettingUserFormDialogComponent implements OnInit {
         validators: [Validators.required]
       }),
       Email: new FormControl('', {
-        validators: [Validators.required, Validators.email]
+        validators: [Validators.required,  Validators.pattern('[a-zA-Z]+@commonwealthcare.org')]
       }),
       administrator: new FormControl(false, {
 
@@ -69,7 +71,7 @@ export class SettingUserFormDialogComponent implements OnInit {
       }),
     },
       {
-        validator: this.roleValidator
+        validator: [this.roleValidator, this.ccaemilValidator]
       });
   }
 
@@ -81,14 +83,25 @@ export class SettingUserFormDialogComponent implements OnInit {
     return condition ? null : { roleValidator: true };
   }
 
+  ccaemilValidator(form: FormGroup) {
+    let firstName = form.get('FirstName').value as string;
+    firstName = firstName.substring(0,1).toLowerCase().replace(/[^a-zA-Z ]/g, "");
+    let lastName = form.get('LastName').value as string;
+    lastName = lastName.toLowerCase().replace(/[^a-zA-Z ]/g, "");
+
+    let condition = form.get('Email').value === firstName + lastName + "@commonwealthcare.org"
+
+    return condition ? null : { ccaemailValidator: true };
+  }
+
   isFormsValid(): boolean {
     return this.form.valid;
   }
 
   getOption(option: string): any[] {
-    switch(option)  {
+    switch (option) {
       default:
-          return [];
+        return [];
     }
   }
 
@@ -97,10 +110,10 @@ export class SettingUserFormDialogComponent implements OnInit {
     if (this.isFormsValid()) {
       let user: User = {
         userID: null,
-        userFirstName: this.form.value.userFirstName,
-        userLastName: this.form.value.userLastName,
-        userNameAD: this.form.value.discrepancyCategoryDisplay,
-        userEmail: this.form.value.userEmail,
+        userFirstName: this.form.value.FirstName,
+        userLastName: this.form.value.LastName,
+        userNameAD: this.parseNameAD(),
+        userEmail: this.form.value.Email,
         administrator: this.form.value.administrator,
         specialist: this.form.value.specialist,
         supervisor: this.form.value.supervisor,
@@ -111,4 +124,11 @@ export class SettingUserFormDialogComponent implements OnInit {
     }
   }
 
+  onClose(): void {
+    this.dialogRef.close('');
+  }
+
+  parseNameAD(): string {
+    return this.form.value.Email.replace(/@commonwealthcare.org/g, "");
+  }
 }

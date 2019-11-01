@@ -145,20 +145,11 @@ export class SettingUserComponent implements OnInit {
       data: { selection: null, type: action }
     });
 
-    this.dialogClose$ = dialogRef.afterClosed().subscribe(result => {
-      if (!result || result === '')
+    this.dialogClose$ = dialogRef.afterClosed().subscribe((user: User | string) => {
+      if (!user || user === '')
         return;
 
-      //   this.memberSelection.selected.map((member: PeriodicElement) => {
-      //     member.discrepancies.map((discrepancy: DisElement) => {
-      //       discrepancy['status'] = result.status ? result.status : discrepancy['status'];
-      //       discrepancy['assigned'] = result.assignee ? result.assignee : discrepancy['assigned'];
-      //       discrepancy['dueDate'] = result.dueDate ? result.dueDate : discrepancy['dueDate']
-      //     })
-
-      //     this.openSnackBar(`${this.memberSelection.selected.length} Memebr Update Sucessfully`, 'Dismiss' ); 
-      //     this.memberSelection.clear();
-      //   })
+        this.service.createUser(user as User);
     });
   }
 
@@ -178,11 +169,11 @@ export class SettingUserComponent implements OnInit {
   onDiscrepnacyStatusSelected(e: SelectionModel<User>) {
     this.selection = e;
   }
-  
+
   onListPagedSorted(e) {
     this.service.getUsers(e, this.searchForm.value);
   }
-  
+
   onUpdate(e) {
     this.service.updateUser(e[0]);
   }
