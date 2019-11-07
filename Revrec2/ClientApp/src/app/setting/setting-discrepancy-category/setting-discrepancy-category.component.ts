@@ -141,23 +141,37 @@ export class SettingDiscrepancyCategoryComponent implements OnInit {
     this.service.updateDiscrepancyCategory(e[0]);
   }
 
+  onEditted(e: DiscrepancyCategory) {
+    this.openDialog("update", e);
+  }
+
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       duration: 1000,
     });
   }
 
-  openDialog(action: string): void {
+  openDialog(action: string, element?: DiscrepancyCategory): void {
     const dialogRef = this.dialog.open(SettingDiscrepancyCategoryFormDialogComponent, {
-      height: '500px',
+      height: '400px',
       width: '400px',
-      data: { selection: null, type: action, formOptions: {} }
+      data: { selection: this.selection, data: element, type: action, formOptions: {} }
     });
 
     this.dialogClose$ = dialogRef.afterClosed().subscribe((result: DiscrepancyCategory) => {
       if (!result)
         return;
-      this.service.createDiscrepancyCategory(result)
+
+      switch (action) {
+        case "create":
+          this.service.createDiscrepancyCategory(result);
+          return;
+        case "update":
+          this.service.updateDiscrepancyCategory(result);
+          return;
+        default:
+          return ;
+      }
     });
   }
 

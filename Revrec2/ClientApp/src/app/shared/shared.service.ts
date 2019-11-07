@@ -234,7 +234,7 @@ export class SharedService {
 
     const discrepancyID = discrepancy.discrepancyID;
 
-    const url = this.baseUrl + 'discrepancy/' + discrepancyID;
+    const url = this.baseUrl + 'discrepancy/UpdateDiscrepancyByID/' + discrepancyID;
 
     console.log("PATCH Update Discrepancy", url, requestBody)
     return this.http.patch<Reponse<any>>(url, requestBody, {
@@ -270,7 +270,7 @@ export class SharedService {
       DueDate: form.DueDate,
       DiscrepancyComment: form.DiscrepancyComment
     };
-    const url = this.baseUrl + 'discrepancy/UpdateMultipleDiscrepancies';
+    const url = this.baseUrl + 'discrepancy/UpdateMultipleDiscrepanciesByIdList';
 
     console.log("POST bulk update discrepancy", url, requestBody)
     return this.http.post<Reponse<any>>(url, requestBody, {

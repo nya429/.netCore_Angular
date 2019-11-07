@@ -18,7 +18,6 @@ using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Revrec2.Services;
 
 namespace Revrec2.Controllers
 {
@@ -30,7 +29,7 @@ namespace Revrec2.Controllers
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger _logger;
-        private readonly IAuthorizationService _authorizationService;
+        private readonly IConfiguration _config;
 
         private const int PageIndex = Constants.PaginationParams.PageIndex;
         private const int PageSize = Constants.PaginationParams.PageSize;
@@ -39,13 +38,13 @@ namespace Revrec2.Controllers
            IMapper mapper,
            IHttpContextAccessor httpContextAccessor,
            ILogger<UserManagementController> logger,
-           IAuthorizationService authorizationService)
+           IConfiguration config)
         {
             _context = context;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
-            _authorizationService = authorizationService;
+            _config = config;
         }
 
         public IActionResult Index()
@@ -56,7 +55,6 @@ namespace Revrec2.Controllers
         [HttpPost("CreateNewUser")]
         public async Task<ActionResult> CreateNewUserByAsync([FromBody] UsersForCreateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -83,32 +81,18 @@ namespace Revrec2.Controllers
                 };
 
             var response = new ResponseData<int?>();
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spCreateUser @eventUserID, @UserNameAD, @UserEmail, @UserFirstName, @UserLastName, @RoleAdministrator, @RoleHelpdesk, @RoleSupervisor, @RoleSpecialist, @ActiveFlag, @NewIdentity OUT, @ReturnCode OUT", parameters);
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spCreateUser @eventUserID, @UserNameAD, @UserEmail, @UserFirstName, @UserLastName, @RoleAdministrator, @RoleHelpdesk, @RoleSupervisor, @RoleSpecialist, @ActiveFlag, @NewIdentity OUT, @ReturnCode OUT", parameters);
-
-                response.IsSuccess = true;
-                response.Data = parameters.FirstOrDefault(p => p.ParameterName.Equals("@NewIdentity")).Value.toInt();
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = nameof(response.Code);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.IsSuccess = false;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(CreateNewUserByAsync), e);
-                return BadRequest(response);
-            }
+            response.IsSuccess = true;
+            response.Data = parameters.FirstOrDefault(p => p.ParameterName.Equals("@NewIdentity")).Value.toInt();
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = nameof(response.Code);
+            return Ok(response);
         }
 
         [HttpPatch("UpdateUserByUserId/{userID}")]
         public async Task<ActionResult> UpdateUserByUserIdAsync(int userID, [FromBody] UsersForCreateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -131,25 +115,13 @@ namespace Revrec2.Controllers
                     };
 
             var response = new Response();
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateUser @eventUserID,@UserID,  @UserNameAD, @UserEmail, @UserFirstName, @UserLastName, @RoleAdministrator, @RoleHelpdesk, @RoleSupervisor, @RoleSpecialist, @ActiveFlag, @ReturnCode OUT", parameters);
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateUser @eventUserID,@UserID,  @UserNameAD, @UserEmail, @UserFirstName, @UserLastName, @RoleAdministrator, @RoleHelpdesk, @RoleSupervisor, @RoleSpecialist, @ActiveFlag, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
 
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateUserByUserIdAsync), e);
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
 
         [HttpPost("GetUsersList")]
@@ -179,32 +151,20 @@ namespace Revrec2.Controllers
 
             };
 
-            try
-            {
-                var query = _context.Query<UsersListPaged>().FromSql($"dbo.spGetUsers @UserID, @UserNameAD, @pageIndex, @pageSize, @sortBy, @orderBy", parameters);
-                var usersList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<UsersListPaged>().FromSql($"dbo.spGetUsers @UserID, @UserNameAD, @pageIndex, @pageSize, @sortBy, @orderBy", parameters);
+            var usersList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataListPaged<UsersListDto>
-                {
-                    //Count = discrepancyCategoriesList.Any() ? discrepancyCategoriesList[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<UsersListDto>>(usersList),
-                    PageSize = pageSize,
-                    PageIndex = pageIndex,
-                    SortBy = sortBy,
-                    OrderBy = orderBy
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataListPaged<UsersListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetUsersListByConAsync), e);
-                return BadRequest(response);
-            }
+                Count = usersList.Any() ? usersList[0].ResultCount : 0,
+                List = _mapper.Map<IEnumerable<UsersListDto>>(usersList),
+                PageSize = pageSize,
+                PageIndex = pageIndex,
+                SortBy = sortBy,
+                OrderBy = orderBy
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("GetUserRecordById/{userId}")]
@@ -220,31 +180,16 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<UserRecordPaged>().FromSql($"dbo.spGetUserRecord {eventUserID},{userID}");
-                var userInfo = await query.AsNoTracking().FirstAsync();
-                response.Data = userInfo;
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetUserRecordByIdByConAsync), e);
-                return BadRequest(response);
-            }
+            var query = _context.Query<UserRecordPaged>().FromSql($"dbo.spGetUserRecord {eventUserID},{userID}");
+            var userInfo = await query.AsNoTracking().FirstAsync();
+            response.Data = userInfo;
+            return Ok(response);
         }
 
         [HttpGet("GetUserDropDownOptions")]
         public async Task<ActionResult> GetUserDropDownOptionsByConAsync()
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
-            string rolebin = Request.GetUserRoleBinary();
-            var test = _authorizationService.IsAuthorized(rolebin);
 
             var response = new ResponseData<ResponseDataList<UsersForDropDown>>
             {
@@ -253,26 +198,14 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<UsersForDropDown>().FromSql($"dbo.spGetUserDropDown {eventUserID}");
-                var usersList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<UsersForDropDown>().FromSql($"dbo.spGetUserDropDown {eventUserID}");
+            var usersList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataList<UsersForDropDown>
-                {
-                    List = usersList
-                };
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataList<UsersForDropDown>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetUserDropDownOptionsByConAsync), e);
-                return BadRequest(response);
-            }
+                List = usersList
+            };
+            return Ok(response);
         }
 
         [HttpGet("GetUserRecordByADName/{userNameAd}")]
@@ -287,23 +220,10 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<UserRecordPaged>().FromSql($"dbo.spGetUserByAD {userNameAD}");
-                var userInfo = await query.AsNoTracking().FirstAsync();
-                response.Data = userInfo;
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetUserRecordByADNameByConAsync), e);
-                return BadRequest(response);
-            }
+            var query = _context.Query<UserRecordPaged>().FromSql($"dbo.spGetUserByAD {userNameAD}");
+            var userInfo = await query.AsNoTracking().FirstAsync();
+            response.Data = userInfo;
+            return Ok(response);
         }
-
     }
 }

@@ -8,7 +8,7 @@
         </section>
         <mat-divider vertical></mat-divider> -->
 
-        <section fxLayout="row" fxLayoutAlign="begin begin">
+        <section *ngIf="this.isAuthorized('bulk_update')" fxLayout="row" fxLayoutAlign="begin begin">
             <button mat-button color="accent" [disabled]='!selection.hasValue()' mat-raised-button (click)='openDialog()'>Update</button>
         </section>
         <mat-divider vertical></mat-divider>
@@ -250,7 +250,7 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]='editedElement'> Status </th>
                 <td mat-cell *matCellDef="let element" style='max-width:270px'>
                     <!-- [awesomeTooltip]="{tipType: 'status', content: element}" -->
-                    <div class="cell-display cursor-pointer" (click)="$event.stopPropagation(); 
+                    <div [ngClass]="{'cell-display': isAuthorized('update')}" (click)="$event.stopPropagation(); 
                             onDiscrepancyItemFieldClicked(element, 'discrepancyStatus')" *ngIf="editedElement !== element || editedField !== 'discrepancyStatus'">
                         <div class='cell-display-info'>
                             {{ element.discrepancyStatus }}
@@ -278,7 +278,7 @@
                 <!-- mat-sort-header -->
                 <th mat-header-cell *matHeaderCellDef> Assigned to</th>
                 <td mat-cell *matCellDef="let element" style='max-width:110px'>
-                    <div class="cell-display cursor-pointer" (click)="$event.stopPropagation(); 
+                    <div [ngClass]="{'cell-display': isAuthorized('update')}" (click)="$event.stopPropagation(); 
                                 onDiscrepancyItemFieldClicked(element, 'assigned_User')" *ngIf="editedElement != element || editedField != 'assigned_User'">
                         <div class='cell-display-info'>
                             {{ element.assigned_UserName }}
@@ -306,7 +306,7 @@
                 <!-- mat-sort-header -->
                 <th mat-header-cell *matHeaderCellDef> Due Date </th>
                 <td mat-cell *matCellDef="let element" style='max-width:90px'>
-                    <div class="cell-display cursor-pointer" (click)="$event.stopPropagation() ; 
+                    <div [ngClass]="{'cell-display': isAuthorized('update')}" (click)="$event.stopPropagation() ; 
                                     onDiscrepancyItemFieldClicked(element, 'dueDate')" *ngIf="editedElement != element || editedField != 'dueDate'">
                         <div class='cell-display-info'>
                             {{ element.dueDate | sqlDateFormat}}
@@ -339,10 +339,11 @@
                 <td mat-cell *matCellDef="let element">
                     <div style='min-width: 60px; display: flex'>
                         <!-- explore -->
-                        <!-- <button matTooltip="Explore" mat-icon-button (click)='$event.stopPropagation();onDiscrepancyDetailClick(element)'>
+                        <!-- <button *ngIf="isAuthorized('explore')" matTooltip="Explore" mat-icon-button (click)='$event.stopPropagation();onDiscrepancyDetailClick(element)'>
                                                 <i class="material-icons-outlined">explore</i>
                                         </button> -->
-                        <button mat-icon-button matTooltip="Comments" (click)='$event.stopPropagation() ; onCommentClick(element)'>
+                        <!-- explore -->
+                        <button *ngIf="isAuthorized('comment')" mat-icon-button matTooltip="Comments" (click)='$event.stopPropagation() ; onCommentClick(element)'>
                                                 <i class="material-icons-outlined">message</i>
                                         </button>
 

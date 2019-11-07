@@ -15,14 +15,6 @@ export class SettingContainerComponent implements OnInit {
   /** @input */
   activeLink;
 
-  /** Authorization */
-  listPermissionsRateCard: string;
-  listPermissionsRateCellMap: string;
-  listPermissionsRegionMap: string;
-  listPermissionsDiscrepancyStatus: string;
-  listPermissionsDiscrepancyCategory: string;
-  listPermissionsUser: string;
-
   constructor(private router: Router,
     private route: ActivatedRoute,
     private appSerivce: AppService

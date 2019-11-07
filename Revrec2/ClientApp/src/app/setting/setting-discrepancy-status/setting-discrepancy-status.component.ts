@@ -57,7 +57,7 @@ export class SettingDiscrepancyStatusComponent implements OnInit, OnDestroy {
     private service: SettingService,
     private authService: AuthService,
     private fb: FormBuilder
-  ) { 
+  ) {
     this.createPermissions = this.authService.getRoleMappingSettingByNames('discrepancyStatues', 'CreateDiscrepancyStatusAsync');
     this.updatePermissions = this.authService.getRoleMappingSettingByNames('discrepancyStatues', 'UpdateDiscrepancyStatusByIDAsync');
   }
@@ -151,24 +151,38 @@ export class SettingDiscrepancyStatusComponent implements OnInit, OnDestroy {
     this.service.updateDiscrepancyStatus(e[0]);
   }
 
+  onEditted(e: DiscrepancyStatus) {
+    this.openDialog("update", e);
+  }
+
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       duration: 1000,
     });
   }
 
-  openDialog(action: string): void {
+  openDialog(action: string, element?: DiscrepancyStatus): void {
 
     const dialogRef = this.dialog.open(SettingDiscrepancyStatusFormDialogComponent, {
-      height: '500px',
+      height: '470px',
       width: '400px',
-      data: { selection: null, type: action, formOptions: this.service.getDiscrepancyStatusFormOptions() }
+      data: { selection: this.selection, data: element, type: action, formOptions: this.service.getDiscrepancyStatusFormOptions() }
     });
 
     dialogRef.afterClosed().subscribe((result: DiscrepancyStatus) => {
       if (!result)
         return;
-      this.service.createDiscrepancyStatus(result)
+
+      switch (action) {
+        case "create":
+          this.service.createDiscrepancyStatus(result);
+          return;
+        case "update":
+          this.service.updateDiscrepancyStatus(result);
+          return;
+        default:
+          return;
+      }
     });
   }
 

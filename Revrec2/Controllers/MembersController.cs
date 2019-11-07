@@ -45,7 +45,7 @@ namespace Revrec2.Controllers
             return View();
         }
 
-        [HttpPost("list")]
+        [HttpPost("GetMemberList")]
         public async Task<ActionResult> GetMemberListByConAsync([FromBody] MemberListRequestDto request)
         {
             int? masterPatientId = request.MasterPatientID;
@@ -69,39 +69,26 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<MembersPaged>().FromSql($"dbo.spGetMemberList {eventUserID}, {masterPatientId}, {name}, {ccaId}, {mmisId}, {includeZeroDiscrepancy}, {assigneeID}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
-                var memberList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<MembersPaged>().FromSql($"dbo.spGetMemberList {eventUserID}, {masterPatientId}, {name}, {ccaId}, {mmisId}, {includeZeroDiscrepancy}, {assigneeID}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
+            var memberList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataListPaged<MemberForListDto>
-                {
-                    Count = memberList.Any() ? memberList[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<MemberForListDto>>(memberList),
-                    PageSize = pageSize,
-                    PageIndex = pageIndex,
-                    SortBy = sortBy,
-                    OrderBy = orderBy
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataListPaged<MemberForListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetMemberListByConAsync), e);
-                return BadRequest(response);
-            }
+                Count = memberList.Any() ? memberList[0].ResultCount : 0,
+                List = _mapper.Map<IEnumerable<MemberForListDto>>(memberList),
+                PageSize = pageSize,
+                PageIndex = pageIndex,
+                SortBy = sortBy,
+                OrderBy = orderBy
+            };
+
+            return Ok(response);
         }
 
-        [HttpGet("MemberInfo/{masterPatientID}")]
+        [HttpGet("GetMemberInfo/{masterPatientID}")]
         public async Task<ActionResult> GetMemberInfoByConAsync(int masterPatientID)
         {
             int? masterPatientId = masterPatientID;
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<Members>
@@ -111,31 +98,18 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<Members>().FromSql($"dbo.spGetMemberInfo {eventUserID},{masterPatientId}");
-                var memberInfo = await query.AsNoTracking().FirstAsync();
+            var query = _context.Query<Members>().FromSql($"dbo.spGetMemberInfo {eventUserID},{masterPatientId}");
+            var memberInfo = await query.AsNoTracking().FirstAsync();
 
-                response.Data = memberInfo;
+            response.Data = memberInfo;
 
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetMemberInfoByConAsync), e);
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
 
-        [HttpGet("MemberByName/{memberName}")]
+        [HttpGet("GetMemberByName/{memberName}")]
         public async Task<ActionResult> GetMemberByNameByConAsync(string memberName)
         {
             string name = memberName;
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<ResponseDataList<MemberByNameListDto>>
@@ -145,34 +119,21 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<MembersByNamePaged>().FromSql($"dbo.spGetMemberName {eventUserID},{name}");
-                var memberByNameList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<MembersByNamePaged>().FromSql($"dbo.spGetMemberName {eventUserID},{name}");
+            var memberByNameList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataList<MemberByNameListDto>
-                {
-                    List = _mapper.Map<IEnumerable<MemberByNameListDto>>(memberByNameList)
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataList<MemberByNameListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetMemberByNameByConAsync), e);
-                return BadRequest(response);
-            }
+                List = _mapper.Map<IEnumerable<MemberByNameListDto>>(memberByNameList)
+            };
+
+            return Ok(response);
         }
 
         [HttpPost("UpdateDiscrepancyForMultipleMembers")]
         public async Task<ActionResult> UpdateDiscrepancyForMultipleMembersByConAsync([FromBody] DiscrepancyUpdateForMultipleMembersRequestDto request)
-        {            
+        {
             DataTable dtMemberIDs = GenerateDataTableBulkIDs("UpdateID", request.MemberIds);
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -196,31 +157,17 @@ namespace Revrec2.Controllers
 
             var response = new Response();
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateBulkMembers @eventUserID, @MemberIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-                return Ok(response);
-            }
-
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateDiscrepancyForMultipleMembersByConAsync), e);
-                return BadRequest(response);
-            }
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateBulkMembers @eventUserID, @MemberIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
+            return Ok(response);
         }
 
         [HttpPost("UpdateMultipleDiscrepanciesBYFilters")]
         public async Task<ActionResult> UpdateMultipleDiscrepanciesBYFiltersByConAsync([FromBody] DiscrepancyUpdateByFiltersRequestDto request)
         {
             DataTable dtMemberIDs = GenerateDataTableBulkIDs("UpdateID", request.MemberIds);
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -248,24 +195,11 @@ namespace Revrec2.Controllers
 
             var response = new Response();
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateFilterMembers @eventUserID, @Name ,@CCAID, @MMIS_ID, @includeZeroDiscrepancy, @MemberIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-                return Ok(response);
-            }
-
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateMultipleDiscrepanciesBYFiltersByConAsync), e);
-                return BadRequest(response);
-            }
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateFilterMembers @eventUserID, @Name ,@CCAID, @MMIS_ID, @includeZeroDiscrepancy, @MemberIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
+            return Ok(response);
         }
 
         protected DataTable GenerateDataTableBulkIDs(string columnName, MemberIDs memberIDs)

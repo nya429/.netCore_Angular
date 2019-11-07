@@ -6,16 +6,14 @@ import { PageEvent, Sort } from '@angular/material';
 import { PagedList } from 'src/app/model/response.model';
 import { RateCard } from 'src/app/model/setting.model';
 
-
 @Component({
   selector: 'app-setting-ratecard-list',
   templateUrl: './setting-ratecard-list.component.html',
   styleUrls: ['./setting-ratecard-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingRatecardListComponent implements OnInit, OnChanges {
   // TODO chenge name according to Table
-  displayedColumns: string[] = ['select', 'ccaratecell', 'ccaregion', 'amount', 'startdate', 'enddate', 'product', 'eligiblity', 'activeflag'];
+  displayedColumns: string[] = ['select', 'ccaratecell', 'ccaregion', 'amount', 'startdate', 'enddate', 'product', 'eligiblity', 'activeflag', 'action'];
 
   private _dateSourcePaged: PagedList<RateCard>;
 
@@ -36,6 +34,8 @@ export class SettingRatecardListComponent implements OnInit, OnChanges {
 
   @Output() rateCardSelected = new EventEmitter<SelectionModel<RateCard>>();
   @Output() onPagedAndSorted = new EventEmitter<any>();
+  @Output() onUpdated = new EventEmitter<RateCard[]>();
+  @Output() onEditted = new EventEmitter<RateCard>();
 
   /** Table Source State: @Input */
   pagedData: RateCard[];
@@ -56,6 +56,13 @@ export class SettingRatecardListComponent implements OnInit, OnChanges {
    */
   selection = new SelectionModel<RateCard>(true, []);
 
+  /** In-line editing */
+  editedElement: RateCard;
+  editedElementPrev: RateCard;
+  editedElementNext: RateCard;
+  editedField: string;
+  selectObject: RateCard;
+
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
@@ -69,8 +76,8 @@ export class SettingRatecardListComponent implements OnInit, OnChanges {
   onStateInit() {
     this.pageSizeOptions = [20, 25, 30];
 
+    this.displayedColumns.shift();
     if (!this.isAuthorized('update')) {
-      this.displayedColumns.shift();
     }
   }
 
@@ -106,6 +113,22 @@ export class SettingRatecardListComponent implements OnInit, OnChanges {
     this.pageState.orderBy = e.direction ? (e.direction === 'asc' ? 0 : 1) : null;
     this.pageState.pageIndex = 0;
     this.onPagedAndSorted.emit(this.pageState);
+  }
+
+  onEdit(element: RateCard) {
+    this.onEditted.emit(element);
+  }
+
+  onItemToggleClick(element: RateCard, field: string): void {
+    // Disable Edit when discrepancyStatusType is System
+    if (!this.isAuthorized('update'))
+      return;
+
+    this.editedElement = element;
+    this.editedElementPrev = { ...this.editedElement };
+    this.editedElementNext = { ...this.editedElement };
+    this.editedElementNext.activeFlag = !this.editedElementPrev.activeFlag;
+    this.onUpdated.emit([this.editedElementNext, this.editedElementPrev])
   }
 
   isAuthorized(view: string) {

@@ -53,7 +53,6 @@ const ColumnsSetting: string[] = [
   selector: 'app-discrepancy-list',
   templateUrl: './discrepancy-list.component.html',
   styleUrls: ['./discrepancy-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [listItemSlideStateTrigger]
 })
 export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
@@ -193,6 +192,12 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   editedField: string;
   selectObject: any = null;
 
+  /** Authorization */
+  updatePermissions: string;
+  infoPermissions: string;
+  bulkUpdatePermissions: string;
+  bulkUpdateFilterPermissions: string;
+  commentPermissions: string;
 
   constructor(private route: ActivatedRoute,
     private _snackBar: MatSnackBar,
@@ -200,7 +205,13 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     private settingService: SettingService,
     private memberService: MemberService,
     private authService: AuthService,
-    public dialog: MatDialog) { }
+    public dialog: MatDialog) {
+    this.updatePermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateDiscrepancyByIDAsync');
+    this.infoPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'GetDiscrepancyByIdByConAsync');
+    this.bulkUpdatePermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateMultipleDiscrepanciesByIdListByConAsync');
+    this.bulkUpdateFilterPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateMultipleDiscrepanciesByFiltersByConAsync');
+    this.commentPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'GetDiscrepancyCommentListByIdByConAsync');
+  }
 
   ngOnInit() {
     this.initForm();
@@ -216,6 +227,14 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
       this.displayedColumns.splice(2, 10);
     } else {
       this.displayedColumns.splice(17, 1);
+    }
+    
+    if (!this.isAuthorized('bulk_update')) {
+      this.displayedColumns.shift();
+    }
+
+    if (!this.isAuthorized('commnet') && !this.isAuthorized('explore')) {
+      this.displayedColumns.pop();
     }
 
     this.searchForm$ = this.searchForm.valueChanges.subscribe(() => this.onSearch());
@@ -454,6 +473,10 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
 
   // prevent edit field open state switch when click outside on other fields  
   onDiscrepancyItemFieldClicked(element: Discrepancy, field: string): void {
+    if (!this.isAuthorized('update')) {
+      return;
+    }
+
     if (this.editedField == null && this.editedElement == null) {
       this.editedField = field;
       this.editedElement = element;
@@ -575,5 +598,21 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  isAuthorized(view: string) {
+    switch (view) {
+      case "explore":
+        return this.authService.isViewAuthorized(this.infoPermissions);
+      case "update":
+        return this.authService.isViewAuthorized(this.updatePermissions);
+      case "bulk_update":
+        return this.authService.isViewAuthorized(this.bulkUpdatePermissions);
+      case "bulk_update_filter":
+        return this.authService.isViewAuthorized(this.bulkUpdateFilterPermissions);
+      case "comment":
+        return this.authService.isViewAuthorized(this.commentPermissions);
+      default:
+        return false;
+    }
+  }
 
 }

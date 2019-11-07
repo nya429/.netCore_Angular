@@ -8,3 +8,7 @@ table {
     /* width: 800px; */
     padding: 0;
 }
+
+.mat-column-action button {
+    min-width: 30px;
+}

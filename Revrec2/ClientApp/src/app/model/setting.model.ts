@@ -14,10 +14,10 @@ import { DiscrepancyCategory } from 'src/app/model/setting.model';
   
   
   export interface RateCard {
-    rateCardID: number;
-    ccaRateCellID: number;
+    rateCardId: number;
+    ccaRateCellId: number;
     ccaRateCell: string;
-    ccaRegionID: number;
+    ccaRegionId: number;
     ccaRegion: string;
     startDate: Date;
     endDate: Date;
@@ -25,6 +25,7 @@ import { DiscrepancyCategory } from 'src/app/model/setting.model';
     product: string;
     activeFlag: boolean;
     eligibility: string;
+    rateCardLabel: string;
   }
   
   export interface RateCardCreateForm {

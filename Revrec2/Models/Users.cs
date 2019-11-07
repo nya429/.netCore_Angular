@@ -22,6 +22,7 @@ namespace Revrec2.Models
         public int Helpdesk { get; private set; }
         public int Specialist { get; private set; }
         public int Supervisor { get; private set; }
+        public int ResultCount { get; private set; }
     }
 
     public partial class UserRecordPaged

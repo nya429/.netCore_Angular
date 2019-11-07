@@ -118,6 +118,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // window.confirm('Do you want to logout') ? this.authService.logoutUser() : null;
   }
 
+  onLogin() {
+    this.authService.autoLoginViaWinAuth();
+  }
+  
   isAuth() {
     return this.authService.isAuthenticated();
   }

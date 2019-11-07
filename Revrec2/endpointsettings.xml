@@ -20,7 +20,7 @@
   </module>
   <module name="user">
     <endpoint name="CreateNewUserByAsync">1110</endpoint>
-    <endpoint name="UpdateUserByUserIdAsync">1110</endpoint>
+    <endpoint name="UpdateUserByUserIdAsync">1010</endpoint>
     <endpoint name="GetUsersListByConAsync">1110</endpoint>
     <endpoint name="GetUserRecordByIdByConAsync">1110</endpoint>
     <endpoint name="GetUserDropDownOptionsByConAsync">1111</endpoint>

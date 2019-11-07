@@ -1,5 +1,5 @@
 import { Discrepancy } from './../../model/discrepancy.model';
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Params } from '@angular/router';
 
 import { ELEMENT_DATA, PeriodicElement, DisElement } from 'src/app/MOCK_DATA';

@@ -87,6 +87,10 @@ mat-spinner {
     width: 100%;
 }
 
+.cell-dispaly {
+    cursor: pointer;
+}
+
 .cell-display-info {
     text-overflow: ellipsis;
     overflow: hidden;

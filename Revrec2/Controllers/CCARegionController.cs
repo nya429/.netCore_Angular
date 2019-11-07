@@ -40,19 +40,11 @@ namespace Revrec2.Controllers
             _logger = logger;
         }
 
-        [HttpPost("list")]
+        [HttpPost("GetCCARegionList")]
         public async Task<ActionResult> GetCCARegionListByConAsync([FromBody] CCARegionListRequestDto request)
         {
             string searchRegion = String.IsNullOrEmpty(request.CCARegion) ? "" : request.CCARegion;
             string searchProduct = String.IsNullOrEmpty(request.Product) ? "" : request.Product;
-            /*
-            int pageSize = request.PageSize.IsNullOrValue(0) ? PageSize : request.PageSize.Value;
-            int pageIndex = request.PageIndex.IsNullOrValue(0) ? PageIndex : request.PageIndex.Value;
-            string sortBy = String.IsNullOrEmpty(request.SortBy) ? "" : request.SortBy;
-            int orderBy = request.OrderBy.GetValueOrDefault(0);*/
-
-            // Temprarioly set EventUserId at Local Env
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<ResponseDataList<CCARegions>>
@@ -62,26 +54,15 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                //var query = _context.Query<CCARegions>().FromSql($"dbo.spGetCCARegions {eventUserID}, {searchRegion}, {searchProduct}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
-                var query = _context.Query<CCARegions>().FromSql($"dbo.spGetCCARegions {eventUserID}, {searchRegion}, {searchProduct}");
-                var ccaRegionList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<CCARegions>().FromSql($"dbo.spGetCCARegions {eventUserID}, {searchRegion}, {searchProduct}");
+            var ccaRegionList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataList<CCARegions>
-                {
-                    List = ccaRegionList,
-                };
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataList<CCARegions>
             {
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetCCARegionListByConAsync), e);
-                return BadRequest(response);
-            }
+                List = ccaRegionList,
+            };
+
+            return Ok(response);
         }
     }
 }

@@ -93,10 +93,12 @@
                 </div>
             </li>
             <li *ngIf='!isAuth()'>
-                <a routerLink="/login">Login</a>
+                <!-- routerLink="/login" -->
+                <a (click)="onLogin()">Login</a>
             </li>
             <li *ngIf='isAuth()'>
-                <a style='cursor:pointer;' (click)='onLogout()'>Hi, {{getUser()}}</a>
+                <!-- (click)='onLogout()' -->
+                <a style='cursor:pointer;'>Hi, {{getUser()}}</a>
             </li>
         </ul>
     </div>

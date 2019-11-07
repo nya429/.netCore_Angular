@@ -62,7 +62,7 @@ export class MemberService {
 
 
   getMembers(con) {
-    const url = this.baseUrl + 'members/list'
+    const url = this.baseUrl + 'members/GetMemberList'
     const pageRequest = {
       // Pagination
       pageIndex: con.pageIndex ? con.pageIndex : 0,
@@ -94,7 +94,7 @@ export class MemberService {
   }
 
   getMemberByMasterPatientId(con) {
-    const url = this.baseUrl + 'members/list'
+    const url = this.baseUrl + 'members/GetMemberList'
     const pageRequest = {
       // Pagination
       pageIndex: 0,
@@ -127,7 +127,7 @@ export class MemberService {
 
 
   getMemberByPatientByID(masterPatientID: number) {
-    const url = this.baseUrl + 'members/memberInfo/' + masterPatientID;
+    const url = this.baseUrl + 'members/GetMemberInfo/' + masterPatientID;
 
     console.log(`GET Member (${masterPatientID})`, url)
     return this.http.get<Reponse<Member>>(url, {
@@ -144,7 +144,7 @@ export class MemberService {
   }
 
   getMemberNamesByNamePartial(memebrNamePartial: string) {
-    const url = this.baseUrl + 'members/memberbyname/' + memebrNamePartial;
+    const url = this.baseUrl + 'members/GetMemberByName/' + memebrNamePartial;
 
     console.log(`Get MemberNames By Partial(${memebrNamePartial})`, url)
     return this.http.get<Reponse<ReponseList<MemberName>>>(url, {

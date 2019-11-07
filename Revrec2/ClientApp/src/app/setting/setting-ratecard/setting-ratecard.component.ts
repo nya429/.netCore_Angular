@@ -6,9 +6,9 @@ import { MatSnackBar, MatDialog, MatDatepickerInputEvent, ErrorStateMatcher } fr
 import { FormGroup, FormControl, Validators, FormGroupDirective, NgForm, FormBuilder } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
 import { animate, style, transition, trigger } from '@angular/animations';
-
+import { deepIsEqual } from './../../util/deepIsEqual';
 import { SettingService } from './../setting.service';
-import { SettingRatecardFormDialogComponent, FORM_OPTIONS_MOCK } from './setting-ratecard-form-dialog/setting-ratecard-form-dialog.component';
+import { SettingRatecardFormDialogComponent } from './setting-ratecard-form-dialog/setting-ratecard-form-dialog.component';
 import * as _moment from 'moment';
 import { default as _rollupMoment, Moment } from 'moment';
 import { PagedList } from 'src/app/model/response.model';
@@ -87,6 +87,7 @@ export class SettingRatecardComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.rateCardChanged$.unsubscribe();
     this.rateCardCreation$.unsubscribe();
+    this.rateCardUpdate$.unsubscribe();
     this.searchForm$.unsubscribe();
     if (this.dialogClose$) {
       this.dialogClose$.unsubscribe();
@@ -116,6 +117,21 @@ export class SettingRatecardComponent implements OnInit, OnDestroy {
       this.pagedSource.count += 1;
       this.openSnackBar("Rate Card Created", "Dismiss")
     })
+
+    this.rateCardUpdate$ = this.service.rateCardUpdated.subscribe((ratecardUpdated: RateCard) => {
+
+      let rawPagedSource = { ...this.pagedSource };
+      rawPagedSource.list = rawPagedSource.list.map((ratecard: RateCard) => {
+        if (ratecard.rateCardId === ratecardUpdated.rateCardId) {
+          if (!deepIsEqual(ratecard, ratecardUpdated)) {
+            ratecard = { ...ratecardUpdated };
+          }
+        }
+        return ratecard;
+      });
+      this.pagedSource = rawPagedSource;
+      this.openSnackBar("Update Successed", "Dismiss")
+    });
   }
 
   initSource() {
@@ -199,23 +215,42 @@ export class SettingRatecardComponent implements OnInit, OnDestroy {
     return condition ? { dateInputError: true } : null;
   }
 
+  onEditted(e: RateCard) {
+    this.openDialog("update", e);
+  }
+
+  onUpdate(e) {
+    this.service.updateRateCard(e[0]);
+  }
+
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, {
       duration: 1000,
     });
   }
 
-  openDialog(action: string): void {
+
+  openDialog(action: string, element?: RateCard): void {
     const dialogRef = this.dialog.open(SettingRatecardFormDialogComponent, {
       height: '500px',
       width: '800px',
-      data: { selection: null, type: action, formOptions: this.service.getRateCardFormOptions() }
+      data: { selection: null, type: action, data: element, formOptions: this.service.getRateCardFormOptions() }
     });
 
     this.dialogClose$ = dialogRef.afterClosed().subscribe((result: RateCard) => {
       if (!result)
         return;
-      this.service.createRateCard(result)
+
+      switch (action) {
+        case "create":
+          this.service.createRateCard(result);
+          return;
+        case "update":
+          this.service.updateRateCard(result);
+          return;
+        default:
+          return;
+      }
     });
   }
 

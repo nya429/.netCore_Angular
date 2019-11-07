@@ -60,7 +60,7 @@ export class AppService {
 
   configWildCardRoute() {
     const linkSettings = [{ segment: 'ratecards', description: 'Rate Cards' },
-    { segment: 'ratecell-region-mappings', description: 'RateCell & Region Mappings' },
+    { segment: 'ratecell-region-mappings', description: 'Rate Cell & Region Mappings' },
     { segment: 'discrepancy-statuses', description: 'Discrepancy Statuses' },
     { segment: 'discrepancy-categories', description: 'Discrepancy Categories' },
     { segment: 'users', description: 'Users' }];
@@ -71,7 +71,7 @@ export class AppService {
     this.listPermissionsDiscrepancyStatus = this.authService.getRoleMappingSettingByNames('discrepancyStatues', 'GetDiscrepancyStatusesListByConAsync');
     this.listPermissionsDiscrepancyCategory = this.authService.getRoleMappingSettingByNames('discrepancyCateogry', 'GetDiscrepancyCategoryListByConAsync');
     this.listPermissionsUser = this.authService.getRoleMappingSettingByNames('user', 'GetUsersListByConAsync');
-
+   
     if (this.authService.isViewAuthorized(this.listPermissionsRateCard)) {
       this.settingLinks.push(linkSettings[0])
     }
@@ -88,20 +88,19 @@ export class AppService {
       this.settingLinks.push(linkSettings[3])
     }
 
-    this.settingLinks.push(linkSettings[4])
     if (this.authService.isViewAuthorized(this.listPermissionsUser)) {
-
+      this.settingLinks.push(linkSettings[4])
     }
-    
+
     let activeLink = this.settingLinks.length ? this.settingLinks[0].segment : '';
-    
+
     if (activeLink) {
       this.router.config.find(c => c.path === "settings").children.push(
         { path: "", redirectTo: activeLink, pathMatch: 'full' }
       );
     }
-    
-    console.log('setting configed')
+
+    console.log( this.router.config)
   }
 
   getSettingLinks = () => this.settingLinks;

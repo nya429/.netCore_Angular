@@ -5,14 +5,14 @@
             <p *ngIf="data.type === 'bulk_update' && data.selection.hasValue()"> {{data.selection.selected.length}} discrepancy category been selected</p>
             <mat-divider></mat-divider>
             <br>
-            <div class="create-field" *ngIf="data.type === 'create'">
+            <div class="create-field" *ngIf="data.type === 'create' || 'update'">
                 <mat-form-field class='bulk-update-field'>
                     <input matInput type="text" placeholder="Category" formControlName="discrepancyCategory">
                 </mat-form-field>
             </div>
-            <div class="create-field" *ngIf="data.type === 'create'">
+            <div class="create-field" *ngIf="data.type === 'create' || 'update'">
                 <mat-form-field class='bulk-update-field'>
-                    <input matInput type="text" placeholder="Description" formControlName="DiscrepancyCategoryDescription">
+                    <textarea matInput type="text" style='resize: none;' formControlName="discrepancyCategoryDescription" maxlength="250" placeholder="Description"></textarea>
                 </mat-form-field>
             </div>
 

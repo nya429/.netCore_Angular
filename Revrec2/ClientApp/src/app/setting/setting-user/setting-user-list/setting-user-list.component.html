@@ -31,10 +31,10 @@
             <ng-container matColumnDef="role">
                 <th mat-header-cell *matHeaderCellDef> Roles </th>
                 <td mat-cell *matCellDef="let element">
-                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.administrator" (change)="onItemCheckBoxClick(element, 'administrator')">Admin</mat-checkbox>
-                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.helpdesk" (change)="onItemCheckBoxClick(element, 'helpdesk')">Helpdesk</mat-checkbox>
-                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.specialist" (change)="onItemCheckBoxClick(element, 'specialist')">Specialist</mat-checkbox>
-                    <mat-checkbox color="primary" [disabled]="element.active" [checked]="element.supervisor" (change)="onItemCheckBoxClick(element, 'supervisor')">Supervisor</mat-checkbox>
+                    <mat-checkbox color="primary" [disabled]="element.active || !isAuthorized('update', '1000', element)" [checked]="element.administrator" (change)="onItemCheckBoxClick(element, 'administrator')">Admin</mat-checkbox>
+                    <mat-checkbox color="primary" [disabled]="element.active || !isAuthorized('update', '1100', element)" [checked]="element.helpdesk" (change)="onItemCheckBoxClick(element, 'helpdesk')">Helpdesk</mat-checkbox>
+                    <mat-checkbox color="primary" [disabled]="element.active || !isAuthorized('update', '1110', element)" [checked]="element.supervisor" (change)="onItemCheckBoxClick(element, 'supervisor')">Supervisor</mat-checkbox>
+                    <mat-checkbox color="primary" [disabled]="element.active || !isAuthorized('update', '1110', element)" [checked]="element.specialist" (change)="onItemCheckBoxClick(element, 'specialist')">Specialist</mat-checkbox>
 
                 </td>
             </ng-container>

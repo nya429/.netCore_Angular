@@ -1,6 +1,7 @@
 <div class="member-container" fxLayout="row" fxLayoutAlign="begin begin" style='padding:15px;'>
     <div [ngClass]="{'ng-transision': true}" [fxFlex]="selectedMMIS ? (detailShowing ? 40 : 97) : 100" class="member-list-container">
-        <app-member-list [isLookup]='isLookup' [sourcePaged]="pagedSource" (onPagedAndSorted)="onListPagedSorted($event)" (actionClicked)="openDialog()" (memberSelected)='onMemberSelected($event)'></app-member-list>
+        <app-member-list [isLookup]='isLookup' [sourcePaged]="pagedSource" [infoPermissions]="infoPermissions" [bulkUpdatePermissions]="bulkMemberUpdatePermissions" [bulkUpdateByFilterPermissions]="bulkMemberUpdateByFilterPermissions" (onPagedAndSorted)="onListPagedSorted($event)"
+            (actionClicked)="openDialog()" (memberSelected)='onMemberSelected($event)'></app-member-list>
     </div>
 
     <div *ngIf='selectedMMIS' fxFlex="0">
@@ -17,9 +18,9 @@
         <router-outlet name='bio'></router-outlet>
     </div>
 </div>
-<!-- 
+
 <div *ngIf='displayedDiscrepancy' class="info-overlay">
     <div class='info-container'>
         <app-discrepancy-detail-container (onDismissed)='onDiscrepancyDetailDismissed()'></app-discrepancy-detail-container>
     </div>
-</div> -->
+</div>

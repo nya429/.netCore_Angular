@@ -46,11 +46,10 @@
         </mat-card>
 
         <br>
-        <app-setting-discrepancy-status-list [source]='dataSource' [sourcePaged]="pagedSource" [updatePermissions]="updatePermissions" (discrepnacyStatusSelected)='onDiscrepnacyStatusSelected($event)' (onPagedAndSorted)="onListPagedSorted($event)" (onUpdated)="onUpdate($event)"></app-setting-discrepancy-status-list>
+        <app-setting-discrepancy-status-list [source]='dataSource' [sourcePaged]="pagedSource" [updatePermissions]="updatePermissions" (discrepnacyStatusSelected)='onDiscrepnacyStatusSelected($event)' (onPagedAndSorted)="onListPagedSorted($event)" (onUpdated)="onUpdate($event)"
+            (onEditted)="onEditted($event)"></app-setting-discrepancy-status-list>
     </div>
 </div>
-
-
 
 <div class="setting-discrepancy-status-button-container">
     <div fxLayout="column" fxLayoutAlign="begin begin" fxLayoutGap="20px">

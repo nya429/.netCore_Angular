@@ -25,16 +25,18 @@
 
         <br>
         <!-- (userSelected)='onUserSelected($event)' -->
-        <app-setting-user-list [source]='dataSource' [sourcePaged]="pagedSource" (onPagedAndSorted)="onListPagedSorted($event)" (onUpdated)="onUpdate($event)"></app-setting-user-list>
+        <app-setting-user-list [sourcePaged]="pagedSource" [updatePermissions]="updatePermissions" (onPagedAndSorted)="onListPagedSorted($event)" (onUpdated)="onUpdate($event)"></app-setting-user-list>
     </div>
 </div>
 
 
 
 <div class="setting-user-button-container">
-    <button (click)="openDialog('create')" mat-fab color="primary">
-        <i class="material-icons">
-            add
-        </i>
-    </button>
+    <div *ngIf="isAuthorized('create')">
+        <button (click)="openDialog('create')" mat-fab color="primary">
+            <i class="material-icons">
+                add
+            </i>
+        </button>
+    </div>
 </div>

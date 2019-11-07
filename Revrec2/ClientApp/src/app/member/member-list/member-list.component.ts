@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/auth/auth.service';
 import { universalSearchTrigger } from './../../navigation/navigation.animation';
 import { MemberService } from './../member.service';
 import { MemberPaged, MemberName } from './../../model/member.model';
@@ -35,7 +36,7 @@ const ColumnsSetting: string[] = [
   selector: 'app-member-list',
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [columnExpandTrigger]
 })
 export class MemberListComponent implements OnInit, OnDestroy {
@@ -53,6 +54,10 @@ export class MemberListComponent implements OnInit, OnDestroy {
   // @Input('source') members: PeriodicElement[];
 
   @Input('isLookup') containerSourceLookUp: boolean;
+
+  @Input('bulkUpdatePermissions') bulkUpdatePermissions: string;
+  @Input('bulkUpdateByFilterPermissions') bulkUpdateByFilterPermissions: string;
+  @Input('infoPermissions') infoPermissions: string;
   @ViewChild('table') private tableContainer: ElementRef;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -143,7 +148,8 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router,
     private route: ActivatedRoute,
-    private service: MemberService) { }
+    private service: MemberService,
+    private authService: AuthService) { }
 
   ngOnInit() {
     this.initForm();
@@ -179,6 +185,11 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
   onStateInit() {
     this.pageSizeOptions = [50, 75, 100];
+
+    if (!this.isAuthorized('bulk_update') || !this.isAuthorized('bulk_update_filter')) {
+      this.displayedColumns.shift();
+    }
+
     this.getChildParams();
 
     this.router$ = this.router.events.pipe(
@@ -312,7 +323,9 @@ export class MemberListComponent implements OnInit, OnDestroy {
   //   this.selectedIndex = this.dataSource.indexOf(element);
   // }
   onMMISClick(element: MemberPaged) {
-    this.router.navigate(['/members', { outlets: { 'bio': [element.masterPatientID] } }]);
+    if(this.isAuthorized('info')) {
+      this.router.navigate(['/members', { outlets: { 'bio': [element.masterPatientID] } }]);
+    }
     // this.selectedPatientID = element.masterPatientID;
   }
 
@@ -378,5 +391,18 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
   isPatrick() {
     return this.searchForm && this.searchForm.get('Name').value.toLowerCase() === 'patrick';
+  }
+
+  isAuthorized(view: string) {
+    switch (view) {
+      case "info":
+        return this.authService.isViewAuthorized(this.infoPermissions);
+      case "bulk_update":
+        return this.authService.isViewAuthorized(this.bulkUpdatePermissions);
+      case "bulk_update_filter":
+        return this.authService.isViewAuthorized(this.bulkUpdateByFilterPermissions);
+      default:
+        return false;
+    }
   }
 }

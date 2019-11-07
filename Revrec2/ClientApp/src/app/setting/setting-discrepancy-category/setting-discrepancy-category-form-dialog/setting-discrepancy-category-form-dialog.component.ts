@@ -11,9 +11,7 @@ import { DiscrepancyCategory } from 'src/app/model/setting.model';
 })
 export class SettingDiscrepancyCategoryFormDialogComponent implements OnInit {
   form: FormGroup;
-  formOptions:{
-  
-  };
+  formOptions:{ };
 
   stateOptions = {
     create: {
@@ -26,15 +24,26 @@ export class SettingDiscrepancyCategoryFormDialogComponent implements OnInit {
       title: 'Update'
     }
   }
+  
+  formInitOption = {
+    discrepancyCategoryID: null,
+    discrepancyCategory: '',
+    discrepancyCategoryDescription: '',
+    discrepancyCategoryDisplay: false,
+    activeFlag: false,
+  }
 
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<SettingDiscrepancyCategoryFormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       selection: SelectionModel<any>, 
+      data: DiscrepancyCategory,
       type: string | null, 
       formOptions:{}
-    }) { }
+    }) {
+      console.log(this.data)
+     }
 
   ngOnInit() {
     this.initForm();
@@ -46,16 +55,25 @@ export class SettingDiscrepancyCategoryFormDialogComponent implements OnInit {
 
   initForm() {
     this.formOptions = this.data.formOptions;
+    if (this.data.type === 'update') {
+      this.formInitOption.discrepancyCategoryID = this.data.data.discrepancyCategoryID;
+      this.formInitOption.discrepancyCategory = this.data.data.discrepancyCategory;
+      this.formInitOption.discrepancyCategoryDescription = this.data.data.discrepancyCategoryDescription;
+      this.formInitOption.discrepancyCategoryDisplay = this.data.data.discrepancyCategoryDisplay;
+      this.formInitOption.activeFlag = this.data.data.activeFlag;
+    }
     this.form = new FormGroup({
-      discrepancyCategory: new FormControl('', {
+      discrepancyCategoryID: new FormControl(this.formInitOption.discrepancyCategoryID, {
+      }),
+      discrepancyCategory: new FormControl(this.formInitOption.discrepancyCategory , {
         validators: [Validators.required]
       }),
-      discrepancyCategoryDescription: new FormControl('', {
+      discrepancyCategoryDescription: new FormControl(this.formInitOption.discrepancyCategoryDescription , {
       }),
-      discrepancyCategoryDisplay: new FormControl(false, {
+      discrepancyCategoryDisplay: new FormControl( this.formInitOption.discrepancyCategoryDisplay, {
         validators: [Validators.required]
       }),
-      activeFlag: new FormControl(false, {
+      activeFlag: new FormControl(this.formInitOption.activeFlag, {
         validators: [Validators.required]
       }),
     });
@@ -76,7 +94,7 @@ export class SettingDiscrepancyCategoryFormDialogComponent implements OnInit {
     // console.log(this.form.value, this.isFormsValid() )
     if (this.isFormsValid()) {
       let dscrepancyCategory: DiscrepancyCategory = {
-        discrepancyCategoryID: null,
+        discrepancyCategoryID: this.form.value.discrepancyCategoryID,
         discrepancyCategory: this.form.value.discrepancyCategory,
         discrepancyCategoryDescription: this.form.value.discrepancyCategoryDescription,
         discrepancyCategoryDisplay: this.form.value.discrepancyCategoryDisplay,

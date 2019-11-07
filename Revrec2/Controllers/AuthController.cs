@@ -145,7 +145,6 @@ namespace Revrec2.Controllers
         {
             var response = new ResponseData<object>();
             var xml = new System.Xml.Serialization.XmlSerializer(typeof(Configuration));
-            //  XPathDocument document = new XPathDocument("books.xml");
             try
             {
                 using (FileStream xmlStream = new FileStream("endpointsettings.xml", FileMode.Open))
@@ -162,12 +161,7 @@ namespace Revrec2.Controllers
             catch (Exception e)
             {
                 StackTrace stackTrace = new StackTrace();
-
                 // Get calling method name
-                var a = stackTrace.GetFrame(1);
-                var b = stackTrace.GetFrame(1).GetMethod();
-                var c = stackTrace.GetFrame(1).GetMethod().Name;
-
                 Console.WriteLine(stackTrace.GetFrame(1).GetMethod().Name);
                 response.Code = Constants.ResponseCode.Fail;
                 response.IsSuccess = false;

@@ -18,3 +18,7 @@ mat-slide-toggle {
     margin-top: 24px;
     padding-right: 24px;
 }
+
+textarea {
+    min-height: 65px;
+}

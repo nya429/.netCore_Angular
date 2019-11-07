@@ -44,7 +44,7 @@ namespace Revrec2.Controllers
             return View();
         }
 
-        [HttpPost("list")]
+        [HttpPost("GetRegionMapList")]
         public async Task<ActionResult> GetRegionMapListByConAsync([FromBody] RegionMapListRequestDto request)
         {
             string product = String.IsNullOrEmpty(request.Product) ? "" : request.Product;
@@ -55,7 +55,6 @@ namespace Revrec2.Controllers
             string sortBy = String.IsNullOrEmpty(request.SortBy) ? "" : request.SortBy;
             int orderBy = request.OrderBy.GetValueOrDefault(0);
 
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -81,39 +80,25 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<RegionMapPaged>().FromSql($"dbo.spGetRegionMap {eventUserID}, {product}, {cCARegion}, {mMISRegion}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
-                var regionMapList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<RegionMapPaged>().FromSql($"dbo.spGetRegionMap {eventUserID}, {product}, {cCARegion}, {mMISRegion}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
+            var regionMapList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataListPaged<RegionMapForListDto>
-                {
-                    Count = regionMapList.Any() ? regionMapList[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<RegionMapForListDto>>(regionMapList),
-                    PageSize = pageSize,
-                    PageIndex = pageIndex,
-                    SortBy = sortBy,
-                    OrderBy = orderBy
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataListPaged<RegionMapForListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetRegionMapListByConAsync), e);
-                return BadRequest(response);
-            }
+                Count = regionMapList.Any() ? regionMapList[0].ResultCount : 0,
+                List = _mapper.Map<IEnumerable<RegionMapForListDto>>(regionMapList),
+                PageSize = pageSize,
+                PageIndex = pageIndex,
+                SortBy = sortBy,
+                OrderBy = orderBy
+            };
+
+            return Ok(response);
         }
 
-        [HttpGet("UnmappedCount")]
+        [HttpGet("GetRegionMapCount")]
         public async Task<ActionResult> GetRegionMapCountByConAsync()
         {
-
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<ResponseCount>
@@ -123,33 +108,20 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<UnmappedMMISRegions>().FromSql($"dbo.spGetUnmappedMMISRegionCount {eventUserID}");
-                var unmappedMMISRegions = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<UnmappedMMISRegions>().FromSql($"dbo.spGetUnmappedMMISRegionCount {eventUserID}");
+            var unmappedMMISRegions = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseCount
-                {
-                    Count = unmappedMMISRegions.Any() ? unmappedMMISRegions[0].UnmappedMMISRegionCount : 0
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseCount
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetRegionMapCountByConAsync), e);
-                return BadRequest(response);
-            }
+                Count = unmappedMMISRegions.Any() ? unmappedMMISRegions[0].UnmappedMMISRegionCount : 0
+            };
+
+            return Ok(response);
         }
 
-        [HttpPatch("{regionMapID}")]
+        [HttpPatch("UpdateRegionMapByID/{regionMapID}")]
         public async Task<ActionResult> UpdateRegionMapByIDAsync(int regionMapID, [FromBody] RegionMapForCreateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -166,24 +138,13 @@ namespace Revrec2.Controllers
 
             var response = new Response();
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateRegionMap @eventUserID, @RegionMapID, @CCARegionID,@ActiveFlag, @ReturnCode OUT", parameters);
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateRegionMap @eventUserID, @RegionMapID, @CCARegionID,@ActiveFlag, @ReturnCode OUT", parameters);
 
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
 
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateRegionMapByIDAsync), e);
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
     }
 }

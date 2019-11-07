@@ -49,11 +49,12 @@ const SettingRoutes: Routes = [
             {
                 path: 'users',
                 component: SettingUserComponent,
-                // canActivate: [AuthGuard],
+                canActivate: [AuthGuard],
                 data: {
-                    expectedRoles: '1110'
+                    expectedRoles: '1111'
                 }
             },
+            // wildcard route redirect will be configured during run-time
             // { path: '', redirectTo: 'ratecards', pathMatch: 'full' },
         ]
     }

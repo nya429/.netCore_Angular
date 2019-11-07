@@ -5,17 +5,20 @@
             <p *ngIf="data.type === 'bulk_update' && data.selection.hasValue()"> {{data.selection.selected.length}} discrepancy status been selected</p>
             <mat-divider></mat-divider>
             <br>
-            <div class="create-field" *ngIf="data.type === 'create'">
+            <div class="create-field" *ngIf="data.type === 'create' || 'update'">
                 <mat-form-field class='bulk-update-field'>
                     <input matInput type="text" placeholder="Status" formControlName="discrepancyStatus">
                 </mat-form-field>
             </div>
             <mat-form-field class='bulk-update-field'>
-                <mat-select placeholder="Category" formControlName="discrepancyCategory" name="category">
+                <mat-select placeholder="Category" formControlName="discrepancyCategory" name="Category">
                     <mat-option (click)='$event.stopPropagation()' *ngFor="let category of getOption('discrepancyCategory')" [value]="category">
                         {{category.discrepancyCategory}}
                     </mat-option>
                 </mat-select>
+            </mat-form-field>
+            <mat-form-field class='bulk-update-field'>
+                <textarea matInput type="text" style='resize: none;' formControlName="discrepancyStatusDescription" maxlength="250" placeholder="Description"></textarea>
             </mat-form-field>
 
             <section class='mat-form-field-narrow'>
@@ -26,7 +29,7 @@
         </div>
         <div mat-dialog-actions>
             <button mat-button (click)="onClose()">Cancel</button>
-            <button mat-button (click)="onSave()">Save</button>
+            <button mat-button [disabled]="!isFormsValid()" (click)="onSave()">Save</button>
         </div>
     </form>
 </div>

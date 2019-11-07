@@ -2,7 +2,7 @@
     <form [formGroup]="searchForm">
         <mat-card class="table-toolbar" style="padding: 0px" fxLayout="row" fxLayoutAlign="space begin begin">
 
-            <section fxLayout="row" fxLayoutAlign="begin begin">
+            <section *ngIf="isAuthorized('bulk_update')" fxLayout="row" fxLayoutAlign="begin begin">
                 <button mat-button color="accent" [disabled]='!selection.hasValue()' mat-raised-button (click)="actionClicked.emit() && $event.stopPropagation()">Update</button>
             </section>
             <mat-divider vertical></mat-divider>
@@ -33,11 +33,11 @@
 
             </section>
             <mat-divider vertical></mat-divider>
-            <section fxLayoutAlign="end center">
+            <!-- <section fxLayoutAlign="end center">
                 <button mat-icon-button fxFlexAlign="begin begin">
                     <mat-icon>clear</mat-icon>
                 </button>
-            </section>
+            </section> -->
 
 
         </mat-card>

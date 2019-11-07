@@ -47,6 +47,7 @@ export class SettingService {
 
   public rateCardListChanged = new Subject<PagedList<RateCard>>();
   public rateCardCreated = new Subject<RateCard>();
+  public rateCardUpdated = new Subject<RateCard>();
 
   public ccaRateCellListChanged = new Subject<ReponseList<CCARateCell>>();
   public ccaRegionListChanged = new Subject<ReponseList<CCARegion>>();
@@ -99,7 +100,7 @@ export class SettingService {
   }
 
   getRateCards(con1, con2) {
-    const url = this.baseUrl + 'ratecards/list'
+    const url = this.baseUrl + 'ratecards/GetRateCardList'
 
     const pageRequest = {
       pageIndex: con1.pageIndex ? con1.pageIndex : 0,
@@ -131,7 +132,7 @@ export class SettingService {
   }
 
   createRateCard(rateCard: RateCard) {
-    const url = this.baseUrl + 'ratecards'
+    const url = this.baseUrl + 'ratecards/CreateRateCard'
     console.log("POST Create RateCard", url, rateCard)
     const requestBody = rateCard;
     return this.http.post<Reponse<number>>(url, requestBody, {
@@ -139,7 +140,7 @@ export class SettingService {
       responseType: 'json'
     }).subscribe(result => {
       if (result.isSuccess || result.code === 3) {
-        rateCard.rateCardID = result.data
+        rateCard.rateCardId = result.data
         console.log("POST Create RateCard => success")
         this.rateCardCreated.next(rateCard);
       }
@@ -148,8 +149,28 @@ export class SettingService {
     });
   }
 
+  updateRateCard(rateCard: RateCard) {
+    const requestBody = rateCard;
+    const rateCardId = rateCard.rateCardId;
+    
+    const url = this.baseUrl + 'ratecards/UpdateRateCard/' + rateCardId;
+    console.log("PATCH update RateCard", url, rateCard)
+    return this.http.patch<Reponse<any>>(url, requestBody, {
+      observe: 'body',
+      responseType: 'json'
+    }).subscribe(result => {
+      if (result.isSuccess) {
+        console.log("PATCH Update Ratecard =>", result)
+        this.rateCardUpdated.next(rateCard);
+      }
+    }, error => {
+      console.error("PATCH Update Ratecard =>", error);
+    });
+  }
+
+
   getCCARateCells(ccaRateCell?: string, product?: string) {
-    const url = this.baseUrl + 'ccaratecells/list'
+    const url = this.baseUrl + 'ccaratecells/GetCCARateCellList'
     console.log("Get CCARateCells", url, ccaRateCell, product)
     const requestBody = {
       product: product,
@@ -170,7 +191,7 @@ export class SettingService {
   }
 
   getCCARegions(ccaRegion?: string, product?: string) {
-    const url = this.baseUrl + 'ccaRegions/list'
+    const url = this.baseUrl + 'ccaRegions/GetCCARegionList'
     console.log("Get CCARegions", url, ccaRegion, product)
     const requestBody = {
       product: product,
@@ -228,25 +249,24 @@ export class SettingService {
     }
   }
 
+  // getOptionsMOCK(form: string, product?: string): string[] {
+  //   if (form === 'rateCell') {
+  //     if (product !== '') {
+  //       return this.formOptionMOCK.rateCell[product]
+  //     }
+  //     return this.formOptionMOCK.rateCell['ICO'].concat(this.formOptionMOCK.rateCell['SCO']);
 
-  getOptionsMOCK(form: string, product?: string): string[] {
-    if (form === 'rateCell') {
-      if (product !== '') {
-        return this.formOptionMOCK.rateCell[product]
-      }
-      return this.formOptionMOCK.rateCell['ICO'].concat(this.formOptionMOCK.rateCell['SCO']);
-
-    } else if (form === 'region') {
-      if (product !== '') {
-        return this.formOptionMOCK.region[product]
-      }
-      return this.formOptionMOCK.region['ICO'].concat(this.formOptionMOCK.region['SCO']);
-    } else if (form === 'product') {
-      return this.formOptionMOCK.product;
-    } else {
-      return [];
-    }
-  }
+  //   } else if (form === 'region') {
+  //     if (product !== '') {
+  //       return this.formOptionMOCK.region[product]
+  //     }
+  //     return this.formOptionMOCK.region['ICO'].concat(this.formOptionMOCK.region['SCO']);
+  //   } else if (form === 'product') {
+  //     return this.formOptionMOCK.product;
+  //   } else {
+  //     return [];
+  //   }
+  // }
 
   getRateCardFormOptions() {
     return {
@@ -271,7 +291,7 @@ export class SettingService {
   }
 
   createDiscrepancyStatus(discrepancyStatus: DiscrepancyStatus) {
-    const url = this.baseUrl + 'discrepancystatus'
+    const url = this.baseUrl + 'discrepancystatus/CreateDiscrepancyStatus'
     console.log("POST Create DiscrepancyStatus", url, discrepancyStatus)
     const requestBody = discrepancyStatus;
     return this.http.post<Reponse<number>>(url, requestBody, {
@@ -299,7 +319,7 @@ export class SettingService {
     const discrepancyStatusID = discrepancyStatus.discrepancyStatusId;
 
 
-    const url = this.baseUrl + 'discrepancystatus/' + discrepancyStatusID;
+    const url = this.baseUrl + 'discrepancystatus/UpdateDiscrepancyStatusByID/' + discrepancyStatusID;
     console.log("PATCH Update RateCell Map", url, discrepancyStatus)
     return this.http.patch<Reponse<any>>(url, requestBody, {
       observe: 'body',
@@ -316,7 +336,7 @@ export class SettingService {
   }
 
   getDiscrepancyStatuses(con1, con2) {
-    const url = this.baseUrl + 'discrepancystatus/list'
+    const url = this.baseUrl + 'discrepancystatus/GetDiscrepancyStatusesList'
 
     const pageRequest = {
       pageIndex: con1.pageIndex ? con1.pageIndex : 0,
@@ -347,7 +367,7 @@ export class SettingService {
   }
 
   getDiscrepancyStatusOptions() {
-    const url = this.baseUrl + 'discrepancystatus/options'
+    const url = this.baseUrl + 'discrepancystatus/getDiscrepancyStatusOptions'
     console.log("GET Discrepancy Status Option", url)
 
     return this.http.get<Reponse<ReponseList<DiscrepancyStatusOption>>>(url, {
@@ -367,7 +387,7 @@ export class SettingService {
 
 
   getDiscrepancyCategoryOptions() {
-    const url = this.baseUrl + 'discrepancycategory/options'
+    const url = this.baseUrl + 'discrepancycategory/GetDiscrepancyCategoryOptions'
     console.log("GET Discrepancy Category Option", url)
 
     return this.http.get<Reponse<ReponseList<DiscrepancyCategoryOption>>>(url, {
@@ -386,7 +406,7 @@ export class SettingService {
   }
 
   getDiscrepancyCategories(con1?) {
-    const url = this.baseUrl + 'discrepancyCategory/list'
+    const url = this.baseUrl + 'discrepancyCategory/GetDiscrepancyCategoryList'
 
     const pageRequest = {
       pageIndex: con1.pageIndex ? con1.pageIndex : 0,
@@ -402,7 +422,7 @@ export class SettingService {
       responseType: 'json'
     }).subscribe(result => {
       if (result.isSuccess) {
-        this.discrepancyCategoryOptions = result.data.list;
+        // this.discrepancyCategoryOptions = result.data.list;
         console.log("Get discrepancyCategory=>", result.data)
         this.discrepancyCategoryListChanged.next(result.data);
       }
@@ -422,7 +442,7 @@ export class SettingService {
     const discrepancyCategoryID = discrepancyCategory.discrepancyCategoryID;
 
 
-    const url = this.baseUrl + 'discrepancycategory/' + discrepancyCategoryID;
+    const url = this.baseUrl + 'discrepancycategory/UpdateDiscrepancyCategoryByID/' + discrepancyCategoryID;
     console.log("PATCH Update Discrepancycategory", url, discrepancyCategory)
     return this.http.patch<Reponse<any>>(url, requestBody, {
       observe: 'body',
@@ -440,7 +460,7 @@ export class SettingService {
   }
 
   createDiscrepancyCategory(discrepancyCategory: DiscrepancyCategory) {
-    const url = this.baseUrl + 'discrepancycategory';
+    const url = this.baseUrl + 'discrepancycategory/CreateDiscreapancyCategory';
     const requestBody = discrepancyCategory;
     console.log("POST Create DiscrepancyCategory", url, requestBody)
     return this.http.post<Reponse<number>>(url, requestBody, {
@@ -460,7 +480,7 @@ export class SettingService {
 
 
   getRateCellMaps(con1?, con2?) {
-    const url = this.baseUrl + 'ratecellmap/list'
+    const url = this.baseUrl + 'ratecellmap/GetRateCellMapList'
 
     const pageRequest = {
       pageIndex: con1.pageIndex ? con1.pageIndex : 0,
@@ -497,7 +517,7 @@ export class SettingService {
     };
     const rateCellMapId = rateCellMap.rateCellMapID;
 
-    const url = this.baseUrl + 'ratecellmap/' + rateCellMapId;
+    const url = this.baseUrl + 'ratecellmap/UpdateRateCellMapByID/' + rateCellMapId;
 
     console.log("PATCH Update RateCell Map", url, requestBody)
     return this.http.patch<Reponse<any>>(url, requestBody, {
@@ -514,7 +534,7 @@ export class SettingService {
   }
 
   getRateCellUnmappedCount() {
-    const url = this.baseUrl + 'ratecellmap/UnmappedCount'
+    const url = this.baseUrl + 'ratecellmap/GetRateCellMapCount'
 
     console.log("GET RateCellUnmapped Count", url)
     return this.http.get<Reponse<{ count: number }>>(url, {
@@ -531,7 +551,7 @@ export class SettingService {
   }
 
   getRegionMaps(con1?, con2?) {
-    const url = this.baseUrl + 'regionmap/list'
+    const url = this.baseUrl + 'regionmap/GetRegionMapList'
 
     const pageRequest = {
       pageIndex: con1.pageIndex ? con1.pageIndex : 0,
@@ -568,7 +588,7 @@ export class SettingService {
     };
     const regionMapID = regionMap.regionMapID;
 
-    const url = this.baseUrl + 'regionmap/' + regionMapID;
+    const url = this.baseUrl + 'regionmap/UpdateRegionMapByID/' + regionMapID;
 
     console.log("PATCH Update Region Map", url, requestBody)
     return this.http.patch<Reponse<any>>(url, requestBody, {
@@ -585,7 +605,7 @@ export class SettingService {
   }
 
   getRegionUnmappedCount() {
-    const url = this.baseUrl + 'regionmap/UnmappedCount'
+    const url = this.baseUrl + 'regionmap/GetRegionMapCount'
 
     console.log("GET Regionunmapped Count", url)
     return this.http.get<Reponse<{ count: number }>>(url, {

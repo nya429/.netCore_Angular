@@ -44,15 +44,14 @@ namespace Revrec2.Controllers
             return View();
         }
 
-        [HttpPost("list")]
+        [HttpPost("GetDiscrepancyCategoryList")]
         public async Task<ActionResult> GetDiscrepancyCategoryListByConAsync([FromBody] DiscrepancyCategoriesListRequestDto request)
-        {            
+        {
             int pageSize = request.PageSize.IsNullOrValue(0) ? PageSize : request.PageSize.Value;
             int pageIndex = request.PageIndex.IsNullOrValue(0) ? PageIndex : request.PageIndex.Value;
             string sortBy = String.IsNullOrEmpty(request.SortBy) ? "" : request.SortBy;
             int orderBy = request.OrderBy.GetValueOrDefault(0);
 
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<ResponseDataListPaged<DiscrepancyCategoriesForListDto>>
@@ -62,38 +61,25 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<DiscrepancyCategoriesPaged>().FromSql($"dbo.spGetDiscrepancyCategories {eventUserID}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
-                var discrepancyCategoriesList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<DiscrepancyCategoriesPaged>().FromSql($"dbo.spGetDiscrepancyCategories {eventUserID}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
+            var discrepancyCategoriesList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataListPaged<DiscrepancyCategoriesForListDto>
-                {
-                    Count = discrepancyCategoriesList.Any() ? discrepancyCategoriesList[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<DiscrepancyCategoriesForListDto>>(discrepancyCategoriesList),
-                    PageSize = pageSize,
-                    PageIndex = pageIndex,
-                    SortBy = sortBy,
-                    OrderBy = orderBy
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataListPaged<DiscrepancyCategoriesForListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetDiscrepancyCategoryListByConAsync), e);
-                return BadRequest(response);
-            }
+                Count = discrepancyCategoriesList.Any() ? discrepancyCategoriesList[0].ResultCount : 0,
+                List = _mapper.Map<IEnumerable<DiscrepancyCategoriesForListDto>>(discrepancyCategoriesList),
+                PageSize = pageSize,
+                PageIndex = pageIndex,
+                SortBy = sortBy,
+                OrderBy = orderBy
+            };
+
+            return Ok(response);
         }
 
-        [HttpPost]
+        [HttpPost("CreateDiscreapancyCategory")]
         public async Task<ActionResult> CreateDiscreapancyCategoryAsync([FromBody] DiscrepancyCategoriesForCreateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -115,32 +101,19 @@ namespace Revrec2.Controllers
                 };
 
             var response = new ResponseData<int?>();
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spCreateDiscrepancyCategories @eventUserID, @DiscrepancyCategory, @DiscrepancyCategoryDescription, @DiscrepancyCategoryDisplay, @ActiveFlag, @NewIdentity OUT, @ReturnCode OUT", parameters);
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spCreateDiscrepancyCategories @eventUserID, @DiscrepancyCategory, @DiscrepancyCategoryDescription, @DiscrepancyCategoryDisplay, @ActiveFlag, @NewIdentity OUT, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Data = parameters.FirstOrDefault(p => p.ParameterName.Equals("@NewIdentity")).Value.toInt();
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = nameof(response.Code);
 
-                response.IsSuccess = true;
-                response.Data = parameters.FirstOrDefault(p => p.ParameterName.Equals("@NewIdentity")).Value.toInt();
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = nameof(response.Code);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.IsSuccess = false;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(CreateDiscreapancyCategoryAsync), e);
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
 
-        [HttpPatch("{discrepancyCategoryID}")]
+        [HttpPatch("UpdateDiscrepancyCategoryByID/{discrepancyCategoryID}")]
         public async Task<ActionResult> UpdateDiscrepancyCategoryByIDAsync(int discrepancyCategoryID, [FromBody] DiscrepancyCategoriesForCreateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -158,34 +131,18 @@ namespace Revrec2.Controllers
                     };
 
             var response = new Response();
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateDiscrepancyCategories @eventUserID, @DiscrepancyCategoryID, @DiscrepancyCategory, @DiscrepancyCategoryDescription, @DiscrepancyCategoryDisplay, @ActiveFlag, @ReturnCode OUT", parameters);
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateDiscrepancyCategories @eventUserID, @DiscrepancyCategoryID, @DiscrepancyCategory, @DiscrepancyCategoryDescription, @DiscrepancyCategoryDisplay, @ActiveFlag, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
 
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateDiscrepancyCategoryByIDAsync), e);
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
 
-        [HttpGet("options")]
+        [HttpGet("GetDiscrepancyCategoryOptions")]
         public async Task<ActionResult> GetDiscrepancyCategoryOptions()
         {
-
-            // int eventUserID = 1;
-            int eventUserID = Request.GetUserID();
-
             var response = new ResponseData<ResponseDataList<DiscrepancyCategoryOption>>
             {
                 IsSuccess = true,
@@ -193,27 +150,15 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<DiscrepancyCategoryOption>().FromSql($"dbo.spGetDiscrepancyCategoriesDropDown");
-                var discrepancyCateogyrOptions = await query.AsNoTracking().ToArrayAsync();
-                
-                response.Data = new ResponseDataList<DiscrepancyCategoryOption>
-                {
-                    List = discrepancyCateogyrOptions
-                };
-                return Ok(response);
+            var query = _context.Query<DiscrepancyCategoryOption>().FromSql($"dbo.spGetDiscrepancyCategoriesDropDown");
+            var discrepancyCateogyrOptions = await query.AsNoTracking().ToArrayAsync();
 
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataList<DiscrepancyCategoryOption>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetDiscrepancyCategoryOptions), e);
-                return BadRequest(response);
-            }
+                List = discrepancyCateogyrOptions
+            };
+
+            return Ok(response);
         }
     }
 }

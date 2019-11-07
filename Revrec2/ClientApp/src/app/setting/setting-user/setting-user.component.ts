@@ -1,3 +1,4 @@
+import { AuthService } from './../../auth/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MatDialog, MatSnackBar } from '@angular/material';
@@ -49,12 +50,21 @@ export class SettingUserComponent implements OnInit {
 
   selection = new SelectionModel<User>(true, []);
 
+  /** Authorization */
+  createPermissions: string;
+  updatePermissions: string;
+
+
   constructor(
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private service: SettingService,
+    private authService: AuthService,
     private fb: FormBuilder
-  ) { }
+  ) {
+    this.createPermissions = this.authService.getRoleMappingSettingByNames('member', 'UpdateDiscrepancyForMultipleMembersByConAsync');
+    this.updatePermissions = this.authService.getRoleMappingSettingByNames('member', 'UpdateMultipleDiscrepanciesBYFiltersByConAsync');
+   }
 
   ngOnInit() {
     this.initForm();
@@ -176,6 +186,17 @@ export class SettingUserComponent implements OnInit {
 
   onUpdate(e) {
     this.service.updateUser(e[0]);
+  }
+
+  isAuthorized(view: string) {
+    switch (view) {
+      case "create":
+        return this.authService.isViewAuthorized(this.createPermissions);
+      case "update":
+        return this.authService.isViewAuthorized(this.updatePermissions);
+      default:
+        return false;
+    }
   }
 }
 

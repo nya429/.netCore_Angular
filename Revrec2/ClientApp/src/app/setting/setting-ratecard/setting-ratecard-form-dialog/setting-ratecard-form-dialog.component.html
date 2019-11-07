@@ -1,8 +1,8 @@
 <div class="dialog-container">
 
-    <h2>Create Rate Card</h2>
-    <mat-vertical-stepper [linear]="true" #stepper>
-        <mat-step [stepControl]="firstForm">
+    <h2>{{ stateOptions[data.type].title }} Rate Card</h2>
+    <mat-vertical-stepper [linear]="true" #stepper [selectedIndex]='selectedIndex'>
+        <mat-step [stepControl]="firstForm" [editable]="this.data.type === 'create'">
             <form [formGroup]="firstForm">
                 <ng-template matStepLabel>{{ this.firstForm.valid ? "Selected: " : "Select Product"}}
                     <span class="value-hightlight"> {{ this.firstForm.valid ? 
@@ -19,7 +19,7 @@
                 </div>
             </form>
         </mat-step>
-        <mat-step [stepControl]="secondForm">
+        <mat-step [stepControl]="secondForm" [editable]="this.data.type === 'create'">
             <form [formGroup]="secondForm">
                 <ng-template matStepLabel>{{ this.secondForm.valid ? "Selected: " : "Select RatingCategory"}}
                     <span class="value-hightlight">{{ this.secondForm.valid ? 
@@ -31,7 +31,7 @@
                         <mat-option *ngFor="let ratecell of getOptions('rateCell')" [value]="ratecell.ccaRateCellID">{{ratecell.ccaRateCell}}
                         </mat-option>
                     </mat-autocomplete> -->
-
+                    <!-- [disabled]="stateOptions[data.type] === 'update'" -->
                     <mat-label>Select RateCell</mat-label>
                     <mat-select formControlName="rateCell" mat-select required>
                         <mat-option *ngFor="let ratecell of getOptions('rateCell')" [value]="ratecell">{{ratecell.ccaRateCell}}
@@ -59,7 +59,7 @@
         </mat-step>
         <mat-step [stepControl]="thirdForm">
             <form [formGroup]="thirdForm">
-                <ng-template matStepLabel>Fill Rate and Effective Time</ng-template>
+                <ng-template matStepLabel>Fill Rate and Time Span</ng-template>
                 <mat-form-field class='mat-form-field-narrow'>
                     <span matPrefix>$ &nbsp;</span>
                     <input type="number" matInput required placeholder="Rate" appTwoDigitDecimaNumber formControlName="rate">

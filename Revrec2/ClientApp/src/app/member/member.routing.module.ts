@@ -5,14 +5,23 @@ import { MemberInfoComponent } from './member-info/member-info.component';
 import { MonthlySummaryRecordListComponent } from './../shared/monthly-summary-record-list/monthly-summary-record-list.component';
 import { DiscrepancyListComponent } from './../shared/discrepancy-list/discrepancy-list.component';
 import { MemberContainerComponent } from './member-container/member-container.component';
+import { AuthGuard } from '../auth/auth-guard.service';
 
 const membersRoutes: Routes = [
     {path: 'members',
         component: MemberContainerComponent,
+        canActivate: [AuthGuard],
+        data: {
+            expectedRoles: '1111'
+        },
         children: [
             {path: ':id',
              component: MemberInfoComponent,
-             outlet: 'bio'
+             outlet: 'bio',
+             canActivate: [AuthGuard],
+             data: {
+                 expectedRoles: '1111'
+             }
             //  children: [
             //      {path: 'discrepancies', component: DiscrepancyListComponent},
             //      {path: 'monthly_summary_records', component: MonthlySummaryRecordListComponent},
@@ -21,7 +30,7 @@ const membersRoutes: Routes = [
             },
             {path: ':id',
             component: MemberInfoComponent,
-            outlet: 'mmis'}
+            outlet: 'mmis',}
         ]
     },
 //     {path: 'members/:id',

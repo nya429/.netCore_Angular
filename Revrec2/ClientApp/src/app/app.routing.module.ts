@@ -8,6 +8,7 @@ import { MemberContainerComponent } from './member/member-container/member-conta
 import { DiscrepancyContainerComponent } from './discrepancy/discrepancy-container/discrepancy-container.component';
 import { ReportContainerComponent } from './report/report-container/report-container.component';
 import { UnauthorizedComponent } from './auth/unauthorized/unauthorized.component';
+import { AuthGuard } from './auth/auth-guard.service';
 
 
 const appRoutes: Routes = [
@@ -15,7 +16,11 @@ const appRoutes: Routes = [
     {
         path: 'discrepancies',
         component: DiscrepancyContainerComponent,
-        pathMatch: 'full'
+        pathMatch: 'full',
+        canActivate: [AuthGuard],
+        data: {
+            expectedRoles: '1011'
+        },
     },
     {
         path: 'FAQs',

@@ -34,9 +34,10 @@ export class SettingDiscrepancyStatusListComponent implements OnInit {
   @Output() discrepnacyStatusSelected = new EventEmitter<SelectionModel<DiscrepancyStatus>>();
   @Output() onPagedAndSorted = new EventEmitter<any>();
   @Output() onUpdated = new EventEmitter<DiscrepancyStatus[]>();
+  @Output() onEditted = new EventEmitter<DiscrepancyStatus>();
 
   /** Column Def */
-  displayedColumns: string[] = ['select', 'status', 'category', 'discrepnacyType', 'active'];
+  displayedColumns: string[] = ['status', 'description', 'category', 'discrepnacyType', 'active', 'action'];
 
   /** Table Source State: @Input */
   // sortedData: DiscrepancyStatus[];
@@ -98,7 +99,7 @@ export class SettingDiscrepancyStatusListComponent implements OnInit {
     this.pageSizeOptions = [20, 25, 30];
 
     if (!this.isAuthorized('update')) {
-      this.displayedColumns.shift();
+      this.displayedColumns.pop();
     }
   }
 
@@ -152,6 +153,10 @@ export class SettingDiscrepancyStatusListComponent implements OnInit {
     this.editedElementNext = { ...this.editedElement };
     this.editedElementNext.activeFlag = !this.editedElementPrev.activeFlag;
     this.onUpdated.emit([this.editedElementNext, this.editedElementPrev])
+  }
+
+  onEdit(element: DiscrepancyStatus) {
+    this.onEditted.emit(element);
   }
 
   isAuthorized(view: string) {

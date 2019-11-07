@@ -8,3 +8,21 @@ table {
     /* width: 800px; */
     padding: 0;
 }
+
+.material-icons {
+    cursor: pointer;
+    padding-right: 12px;
+}
+
+.mat-icon-text-wrapper {
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.mat-icon-text-wrapper-text {
+    padding-top: 2px;
+}
+
+.mat-column-action button {
+    min-width: 30px;
+}

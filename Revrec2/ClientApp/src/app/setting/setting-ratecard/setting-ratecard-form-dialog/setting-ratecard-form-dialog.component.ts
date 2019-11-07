@@ -1,11 +1,11 @@
 import { Subscription } from 'rxjs';
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Component, OnInit, Inject, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatStepper } from '@angular/material';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { Directive, ElementRef, HostListener } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { CCARateCell, CCARegion, RateCard } from 'src/app/model/setting.model';
-
+import { deepIsEqual } from './../../../util/deepIsEqual';
 
 export const FORM_OPTIONS_MOCK = {
   product: ['ICO', 'SCO'],
@@ -61,8 +61,10 @@ export class TwoDigitDecimaNumberDirective {
   styleUrls: ['./setting-ratecard-form-dialog.component.css']
 })
 export class SettingRatecardFormDialogComponent implements OnInit, OnDestroy {
+
   private firstForm$: Subscription;
 
+  selectedIndex: number;
   firstForm: FormGroup;
   secondForm: FormGroup;
   thirdForm: FormGroup;
@@ -76,13 +78,36 @@ export class SettingRatecardFormDialogComponent implements OnInit, OnDestroy {
 
   product: string;
 
-  ViewChild;
+  stateOptions = {
+    create: {
+      title: 'Create'
+    },
+    bulk_update: {
+      title: 'Bulk Update'
+    },
+    update: {
+      title: 'Update'
+    }
+  }
 
+  formInitOption = {
+    rateCardId: null,
+    product: null,
+    ccaRateCell: null,
+    ccaRegion: null,
+    amount: 0,
+    startDate: null,
+    endDate: null,
+    eligibility: null,
+    activeFlag: true,
+    rateCardLabel: null
+  }
 
   constructor(
     public dialogRef: MatDialogRef<SettingRatecardFormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       selection: SelectionModel<any>,
+      data: RateCard,
       type: string | null,
       formOptions: {
         CCARateCellOptions: CCARateCell[] | null,
@@ -100,6 +125,12 @@ export class SettingRatecardFormDialogComponent implements OnInit, OnDestroy {
       this.thirdForm.reset();
     })
 
+    if (this.data.type === 'create') {
+      this.selectedIndex = 0;
+    } else {
+      this.selectedIndex = 2;
+    }
+
     // console.log(this.getOptions('product'))
   }
 
@@ -110,30 +141,46 @@ export class SettingRatecardFormDialogComponent implements OnInit, OnDestroy {
   initForm() {
     this.formOptions = this.data.formOptions
     // console.log('initForm',this.data.formOptions, this.formOptions )
+
+    if (this.data.type === 'update') {
+      this.formInitOption.rateCardId = this.data.data.rateCardId;
+      this.formInitOption.product = this.data.data.product;
+      this.formInitOption.ccaRateCell = this.formOptions.CCARateCellOptions.find(rc => rc.ccaRateCellID === this.data.data.ccaRateCellId)
+      this.formInitOption.ccaRegion = this.formOptions.CCARegionOptions.find(rc => rc.ccaRegionID === this.data.data.ccaRegionId)
+      this.formInitOption.amount = this.data.data.amount;
+      this.formInitOption.startDate = this.data.data.startDate;
+      this.formInitOption.endDate = this.data.data.endDate;
+      this.formInitOption.eligibility = this.data.data.eligibility;
+      this.formInitOption.activeFlag = this.data.data.activeFlag;
+      this.formInitOption.rateCardLabel = this.data.data.rateCardLabel
+      console.log(this.data)
+      console.log(this.formInitOption)
+    }
+
     this.firstForm = new FormGroup({
-      product: new FormControl('', {
+      product: new FormControl(this.formInitOption.product, {
         validators: [Validators.required]
       })
     });
 
     this.secondForm = new FormGroup({
-      rateCell: new FormControl('', {
+      rateCell: new FormControl(this.formInitOption.ccaRateCell, {
         validators: [Validators.required]
       }),
-      region: new FormControl('', {
+      region: new FormControl(this.formInitOption.ccaRegion, {
         validators: [Validators.required]
       }),
 
     });
 
     this.thirdForm = new FormGroup({
-      rate: new FormControl('', {
+      rate: new FormControl(this.formInitOption.amount, {
         validators: [Validators.required]
       }),
-      endDate: new FormControl('', {
+      endDate: new FormControl(this.formInitOption.endDate, {
         validators: [Validators.required]
       }),
-      startDate: new FormControl('', {
+      startDate: new FormControl(this.formInitOption.startDate, {
         validators: [Validators.required]
       })
     });
@@ -165,23 +212,25 @@ export class SettingRatecardFormDialogComponent implements OnInit, OnDestroy {
     // console.log(this.secondForm.value, this.thirdForm.value)
     if (this.isFormsValid()) {
       let ratecard: RateCard = {
-        rateCardID: null,
+        rateCardId: this.formInitOption.rateCardId,
         product: this.firstForm.value.product,
         ccaRateCell: this.secondForm.value.rateCell.ccaRateCell,
-        ccaRateCellID: this.secondForm.value.rateCell.ccaRateCellID,
+        ccaRateCellId: this.secondForm.value.rateCell.ccaRateCellID,
         ccaRegion: this.secondForm.value.region.ccaRegion,
-        ccaRegionID: this.secondForm.value.region.ccaRegionID,
+        ccaRegionId: this.secondForm.value.region.ccaRegionID,
         amount: this.thirdForm.value.rate,
         startDate: this.thirdForm.value.startDate,
         endDate: this.thirdForm.value.endDate,
-        eligibility: '',
-        activeFlag: true,
+        eligibility:  this.formInitOption.eligibility,
+        activeFlag:  this.formInitOption.activeFlag,
+        rateCardLabel: this.formInitOption.rateCardLabel,
       }
-      this.dialogRef.close(ratecard);
+      console.log(ratecard, this.data.data, ratecard === this.data.data)
+       this.dialogRef.close(ratecard);
     }
   }
 
   isFormsValid(): boolean {
-    return this.firstForm.valid && this.secondForm.valid && this.thirdForm.valid;
+    return this.firstForm.valid && this.secondForm.valid && this.thirdForm.valid && this.thirdForm.dirty;
   }
 }

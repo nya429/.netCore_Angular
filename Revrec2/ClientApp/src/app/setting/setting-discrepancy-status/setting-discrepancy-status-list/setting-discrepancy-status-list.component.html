@@ -20,19 +20,32 @@
 
             <!-- status Column -->
             <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                <th mat-header-cell *matHeaderCellDef> Status </th>
                 <td mat-cell *matCellDef="let element"> {{ element.discrepancyStatus }} </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef> Description </th>
+                <td mat-cell *matCellDef="let element"> {{ element.discrepancyStatusDescription }} </td>
             </ng-container>
 
             <!-- Category Column -->
             <ng-container matColumnDef="category">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Category </th>
-                <td mat-cell *matCellDef="let element"> {{ element.discrepancyCategory }} </td>
+                <th mat-header-cell *matHeaderCellDef> Category </th>
+                <td mat-cell *matCellDef="let element">
+                    <div class='mat-icon-text-wrapper'>
+                        <i [awesomeTooltip]="{tipType: 'discreapcnyCategoryDescription', content: element}" class="material-icons">info_outline</i>
+                        <span class="mat-icon-text-wrapper-text">
+                          {{ element.discrepancyCategory }}
+                        </span>
+                    </div>
+                </td>
             </ng-container>
 
             <!-- Active Column -->
             <ng-container matColumnDef="active">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Active </th>
+                <th mat-header-cell *matHeaderCellDef> Active </th>
                 <td mat-cell *matCellDef="let element">
                     <mat-slide-toggle color="primary" [disabled]="!isAuthorized('update') || element.discrepancyStatusType === 0" [(ngModel)]="element.activeFlag" (click)="onItemToggleClick(element, 'active')">
                     </mat-slide-toggle>
@@ -41,8 +54,16 @@
 
             <!-- DiscrepnacyType Column -->
             <ng-container matColumnDef="discrepnacyType">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                <th mat-header-cell *matHeaderCellDef> Type </th>
                 <td mat-cell *matCellDef="let element"> {{element.discrepancyStatusType === 1 ? 'User Entered' : "System" }} </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let element">
+                    <button (click)="onEdit(element)" [disabled]="!isAuthorized('update') || element.discrepancyStatusType === 0" mat-button color="primary">Edit</button>
+                </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

@@ -4,6 +4,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { User } from 'src/app/model/user.model';
 import { PagedList } from 'src/app/model/response.model';
 import { PageEvent, Sort } from '@angular/material';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-setting-user-list',
@@ -12,7 +13,7 @@ import { PageEvent, Sort } from '@angular/material';
 })
 export class SettingUserListComponent implements OnInit {
 
-  @Input('source') dataSource: UserMock[];
+  @Input('updatePermissions') updatePermissions;
 
   private _dateSourcePaged: PagedList<User>;
   @Input('sourcePaged')
@@ -76,7 +77,7 @@ export class SettingUserListComponent implements OnInit {
   editedField: string;
   selectObject: User;
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
     this.onStateInit();
@@ -147,4 +148,16 @@ export class SettingUserListComponent implements OnInit {
     this.onUpdated.emit([this.editedElementNext, this.editedElementPrev])
   }
 
+  isAuthorized(view: string, updatePermissions: string, element: User) {
+    switch (view) {
+      case "update":
+        return this.isCurrentUser(element) || this.authService.isViewAuthorized(updatePermissions);
+      default:
+        return false;
+    }
+  }
+
+  isCurrentUser(element: User) {
+    return element.userID === this.authService.actionUser.userID;
+  } 
 }

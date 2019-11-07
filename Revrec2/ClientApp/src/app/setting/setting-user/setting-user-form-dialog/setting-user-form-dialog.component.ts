@@ -89,7 +89,7 @@ export class SettingUserFormDialogComponent implements OnInit {
     let lastName = form.get('LastName').value as string;
     lastName = lastName.toLowerCase().replace(/[^a-zA-Z ]/g, "");
 
-    let condition = form.get('Email').value === firstName + lastName + "@commonwealthcare.org"
+    let condition = form.get('Email').value.replace(/[^a-zA-Z ]/g, "") === firstName + lastName + "@commonwealthcare.org"
 
     return condition ? null : { ccaemailValidator: true };
   }

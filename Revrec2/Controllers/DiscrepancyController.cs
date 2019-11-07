@@ -49,7 +49,6 @@ namespace Revrec2.Controllers
         public async Task<ActionResult> GetDiscrepancyByIdByConAsync(int discrepancyId)
         {
             int discrepancyID = discrepancyId;
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<DiscrepancyRecordByIdPaged>
@@ -59,22 +58,10 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<DiscrepancyRecordByIdPaged>().FromSql($"dbo.spGetDiscrepancyRecord {eventUserID},{discrepancyID}");
-                var discrepancyInfo = await query.AsNoTracking().FirstAsync();
-                response.Data = discrepancyInfo;
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetDiscrepancyByIdByConAsync), e);
-                return BadRequest(response);
-            }
+            var query = _context.Query<DiscrepancyRecordByIdPaged>().FromSql($"dbo.spGetDiscrepancyRecord {eventUserID},{discrepancyID}");
+            var discrepancyInfo = await query.AsNoTracking().FirstAsync();
+            response.Data = discrepancyInfo;
+            return Ok(response);
         }
 
         [HttpPost("GetDiscrepancyRecordListByFilters")]
@@ -154,39 +141,26 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<DiscrepancyRecordPaged>().FromSql($"dbo.spGetDiscrepancyList @eventUserID, @name, @CCAID, @MMIS_ID, @MasterPatientID, @Months, @Programs, @CCARateCellIDs, @DiscrepancyStatusIDs, @AssigneeIDs, @hasComment, @discoverDateStart, @discoverDateEnd, @resolutionDateStart, @resolutionDateEnd, @includeResolved, @pageIndex, @pageSize, @sortBy, @orderBy", parameters);
-                var discrepancyRecordList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<DiscrepancyRecordPaged>().FromSql($"dbo.spGetDiscrepancyList @eventUserID, @name, @CCAID, @MMIS_ID, @MasterPatientID, @Months, @Programs, @CCARateCellIDs, @DiscrepancyStatusIDs, @AssigneeIDs, @hasComment, @discoverDateStart, @discoverDateEnd, @resolutionDateStart, @resolutionDateEnd, @includeResolved, @pageIndex, @pageSize, @sortBy, @orderBy", parameters);
+            var discrepancyRecordList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataListPaged<DiscrepancyRecordForListDto>
-                {
-                    Count = discrepancyRecordList.Any() ? discrepancyRecordList[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<DiscrepancyRecordForListDto>>(discrepancyRecordList),
-                    PageSize = pageSize,
-                    PageIndex = pageIndex,
-                    SortBy = sortBy,
-                    OrderBy = orderBy
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataListPaged<DiscrepancyRecordForListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetDiscrepancyRecordListByConAsync), e);
-                return BadRequest(response);
-            }
+                Count = discrepancyRecordList.Any() ? discrepancyRecordList[0].ResultCount : 0,
+                List = _mapper.Map<IEnumerable<DiscrepancyRecordForListDto>>(discrepancyRecordList),
+                PageSize = pageSize,
+                PageIndex = pageIndex,
+                SortBy = sortBy,
+                OrderBy = orderBy
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("MonthlySummaryRecordMemberYears/{MasterPatientId}")]
         public async Task<ActionResult> GetMonthlySummaryRecordMemberYearsByConAsync(int MasterPatientId)
         {
             int MasterPatientID = MasterPatientId;
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<ResponseDataList<MonthlySummaryRecordMemberYearsForListDto>>
@@ -196,28 +170,16 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<MonthlySummaryRecordMemberYearsPaged>().FromSql($"dbo.spGetMonthlySummaryRecordMemberYears {eventUserID},{MasterPatientID}");
-                var summaryYearsInfo = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<MonthlySummaryRecordMemberYearsPaged>().FromSql($"dbo.spGetMonthlySummaryRecordMemberYears {eventUserID},{MasterPatientID}");
+            var summaryYearsInfo = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataList<MonthlySummaryRecordMemberYearsForListDto>
-                {
-                    //Count = discrepancyInfo.Any() ? discrepancyInfo[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<MonthlySummaryRecordMemberYearsForListDto>>(summaryYearsInfo)
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataList<MonthlySummaryRecordMemberYearsForListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetMonthlySummaryRecordMemberYearsByConAsync), e);
-                return BadRequest(response);
-            }
+                //Count = discrepancyInfo.Any() ? discrepancyInfo[0].ResultCount : 0,
+                List = _mapper.Map<IEnumerable<MonthlySummaryRecordMemberYearsForListDto>>(summaryYearsInfo)
+            };
+
+            return Ok(response);
         }
 
         [HttpPost("MonthlySummaryRecordMemberMonths")]
@@ -225,7 +187,6 @@ namespace Revrec2.Controllers
         {
             int MasterPatientID = request.MasterPatientID;
             string Year = request.MemberYear;
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<ResponseDataListPaged<MonthlySummaryRecordMemberMonthsForListDto>>
@@ -235,34 +196,20 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<MonthlySummaryRecordMemberMonthsPaged>().FromSql($"dbo.spGetMonthlySummaryRecordMemberMonths {eventUserID},{MasterPatientID},{Year}");
-                var summaryYearsInfo = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<MonthlySummaryRecordMemberMonthsPaged>().FromSql($"dbo.spGetMonthlySummaryRecordMemberMonths {eventUserID},{MasterPatientID},{Year}");
+            var summaryYearsInfo = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataListPaged<MonthlySummaryRecordMemberMonthsForListDto>
-                {
-                    //Count = discrepancyInfo.Any() ? discrepancyInfo[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<MonthlySummaryRecordMemberMonthsForListDto>>(summaryYearsInfo)
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataListPaged<MonthlySummaryRecordMemberMonthsForListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetMonthlySummaryRecordMemberMonthsByConAsync), e);
-                return BadRequest(response);
-            }
+                List = _mapper.Map<IEnumerable<MonthlySummaryRecordMemberMonthsForListDto>>(summaryYearsInfo)
+            };
+
+            return Ok(response);
         }
 
-        [HttpPatch("{discrepancyID}")]
+        [HttpPatch("UpdateDiscrepancyByID/{discrepancyID}")]
         public async Task<ActionResult> UpdateDiscrepancyByIDAsync(int discrepancyID, [FromBody] DiscrepancyRecordForCreateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -279,31 +226,18 @@ namespace Revrec2.Controllers
                    };
 
             var response = new Response();
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateDiscrepancy @eventUserID, @DiscrepancyID, @Assigned_UserID, @DiscrepancyStatusID, @DueDate, @ReturnCode OUT", parameters);
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateDiscrepancy @eventUserID, @DiscrepancyID, @Assigned_UserID, @DiscrepancyStatusID, @DueDate, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
 
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateDiscrepancyByIDAsync), e);
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
 
-        [HttpPost("UpdateMultipleDiscrepancies")]
+        [HttpPost("UpdateMultipleDiscrepanciesByIdList")]
         public async Task<ActionResult> UpdateMultipleDiscrepanciesByIdListByConAsync([FromBody] DiscrepancyRecordForUpdateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             DataTable dtDiscrepancyIDs = new DataTable();
@@ -335,30 +269,17 @@ namespace Revrec2.Controllers
 
             var response = new Response();
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateBulkDiscrepancies @eventUserID, @DiscrepancyIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateMultipleDiscrepanciesByIdListByConAsync), e);
-                return BadRequest(response);
-            }
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateBulkDiscrepancies @eventUserID, @DiscrepancyIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
+            return Ok(response);
         }
 
         [HttpGet("DiscrepancyCommentListById/{discrepancyId}")]
         public async Task<ActionResult> GetDiscrepancyCommentListByIdByConAsync(int discrepancyId)
         {
             int discrepancyID = discrepancyId;
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             var response = new ResponseData<ResponseDataListPaged<DiscrepancyCommentsForListDto>>
@@ -368,34 +289,20 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            try
-            {
-                var query = _context.Query<DiscrepancyCommentsPaged>().FromSql($"dbo.spGetDiscrepancyCommentList {eventUserID},{discrepancyID}");
-                var discrepancyCommentsList = await query.AsNoTracking().ToArrayAsync();
+            var query = _context.Query<DiscrepancyCommentsPaged>().FromSql($"dbo.spGetDiscrepancyCommentList {eventUserID},{discrepancyID}");
+            var discrepancyCommentsList = await query.AsNoTracking().ToArrayAsync();
 
-                response.Data = new ResponseDataListPaged<DiscrepancyCommentsForListDto>
-                {
-                    //Count = discrepancyInfo.Any() ? discrepancyInfo[0].ResultCount : 0,
-                    List = _mapper.Map<IEnumerable<DiscrepancyCommentsForListDto>>(discrepancyCommentsList)
-                };
-
-                return Ok(response);
-            }
-            catch (Exception e)
+            response.Data = new ResponseDataListPaged<DiscrepancyCommentsForListDto>
             {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(GetDiscrepancyCommentListByIdByConAsync), e);
-                return BadRequest(response);
-            }
+                List = _mapper.Map<IEnumerable<DiscrepancyCommentsForListDto>>(discrepancyCommentsList)
+            };
+
+            return Ok(response);
         }
 
         [HttpPost("CreateDiscrepancyComment")]
         public async Task<ActionResult> CreateDiscreapancyCommentAsync([FromBody] DiscrepancyCommentForCreateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -418,31 +325,18 @@ namespace Revrec2.Controllers
 
             var response = new ResponseData<int?>();
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spCreateDiscrepancyComment @eventUserID, @DiscrepancyID, @ReplyCommentID, @DiscrepancyComment, @ActiveFlag, @NewIdentity OUT, @ReturnCode OUT", parameters);
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spCreateDiscrepancyComment @eventUserID, @DiscrepancyID, @ReplyCommentID, @DiscrepancyComment, @ActiveFlag, @NewIdentity OUT, @ReturnCode OUT", parameters);
 
-                response.IsSuccess = true;
-                response.Data = parameters.FirstOrDefault(p => p.ParameterName.Equals("@NewIdentity")).Value.toInt();
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = nameof(response.Code);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.IsSuccess = false;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(CreateDiscreapancyCommentAsync), e);
-                return BadRequest(response);
-            }
+            response.IsSuccess = true;
+            response.Data = parameters.FirstOrDefault(p => p.ParameterName.Equals("@NewIdentity")).Value.toInt();
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = nameof(response.Code);
+            return Ok(response);
         }
 
         [HttpPatch("UpdateDiscrepancyComment/{discrepancyCommentID}")]
         public async Task<ActionResult> UpdateDiscrepancyCommentByIDAsync(int discrepancyCommentID, [FromBody] DiscrepancyCommentForUpdateDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             SqlParameter[] parameters =
@@ -458,31 +352,18 @@ namespace Revrec2.Controllers
                    };
 
             var response = new Response();
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateDiscrepancyComment @eventUserID, @DiscrepancyCommentID, @DiscrepancyComment, @ActiveFlag, @ReturnCode OUT", parameters);
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateDiscrepancyComment @eventUserID, @DiscrepancyCommentID, @DiscrepancyComment, @ActiveFlag, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
 
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateDiscrepancyCommentByIDAsync), e);
-                return BadRequest(response);
-            }
+            return Ok(response);
         }
-                
+
         [HttpPost("UpdateMultipleDiscrepanciesByFilters")]
         public async Task<ActionResult> UpdateMultipleDiscrepanciesByFiltersByConAsync([FromBody] DiscrepancyRecordUpdateBulkFiltersDto request)
         {
-            //int eventUserID = 1;
             int eventUserID = Request.GetUserID();
 
             DataTable dtAssigneeIDs = GenerateDataTableBulkIDs("UpdateID", request.AssigneeIDs);
@@ -551,23 +432,11 @@ namespace Revrec2.Controllers
 
             var response = new Response();
 
-            try
-            {
-                var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateFilterDiscrepancies @eventUserID, @CCAID, @MMIS_ID, @MasterPatientID, @Months, @Programs, @CCARateCellIDs, @DiscrepancyStatusIDs, @AssigneeIDs, @hasComment, @discoverDateStart, @discoverDateEnd, @resolutionDateStart, @resolutionDateEnd, @DiscrepancyIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
-                response.IsSuccess = true;
-                response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
-                response.Message = "Success";
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Code = Constants.ResponseCode.Fail;
-                response.Message = "There was an internal error, please contact to technical support.";
-                response.ErrorMessage = e.Message;
-                _logger?.LogCritical("There was an error on '{0}' invocation: {1}", nameof(UpdateMultipleDiscrepanciesByFiltersByConAsync), e);
-                return BadRequest(response);
-            }
+            var result = await _context.Database.ExecuteSqlCommandAsync("EXEC dbo.spUpdateFilterDiscrepancies @eventUserID, @CCAID, @MMIS_ID, @MasterPatientID, @Months, @Programs, @CCARateCellIDs, @DiscrepancyStatusIDs, @AssigneeIDs, @hasComment, @discoverDateStart, @discoverDateEnd, @resolutionDateStart, @resolutionDateEnd, @DiscrepancyIDs, @DiscrepancyStatusId ,@Assigned_UserID, @DueDate, @DiscrepancyComment, @ReturnCode OUT", parameters);
+            response.IsSuccess = true;
+            response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
+            response.Message = "Success";
+            return Ok(response);
         }
 
         protected DataTable GenerateDataTableBulkIDs(string columnName, AssigneeIDs assigneeIDs)

@@ -11,19 +11,19 @@
                 <span class="nav-caption">Report</span>
             </div>
         </a>
-        <a mat-list-item routerLink="/members" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
+        <a *ngIf="isAuthorized('member')" mat-list-item routerLink="/members" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
             <div class="link-wrapper">
                 <mat-icon class="nav-icon">group</mat-icon>
                 <span class="nav-caption">Members</span>
             </div>
         </a>
-        <a mat-list-item routerLink="/discrepancies" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
+        <a *ngIf="isAuthorized('discrepancy')" mat-list-item routerLink="/discrepancies" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
             <div class="link-wrapper">
                 <mat-icon class="nav-icon">restore_page</mat-icon>
                 <span class="nav-caption">Discrepancy</span>
             </div>
         </a>
-        <a mat-list-item routerLink="/worklist" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
+        <a *ngIf="isAuthorized('member')" mat-list-item routerLink="/worklist" class="router-link" routerLinkActive="router-link-active" (click)="onClose()">
             <div class="link-wrapper">
                 <mat-icon class="nav-icon">styles</mat-icon>
                 <span class="nav-caption">Work List</span>

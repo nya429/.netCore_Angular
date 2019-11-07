@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Revrec2.Services;
+using Revrec2.Extensions;
 
 namespace Revrec2
 {
@@ -88,7 +89,7 @@ namespace Revrec2
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -101,8 +102,9 @@ namespace Revrec2
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            app.ConfigureExceptionHandler(logger);
 
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
     

@@ -6,7 +6,6 @@ import { animate, style, transition, trigger } from '@angular/animations';
   selector: 'app-tooltip',
   templateUrl: './tooltip.component.html',
   styleUrls: ['./tooltip.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('tooltip', [
       transition(':enter', [
@@ -35,43 +34,6 @@ export class TooltipComponent implements OnInit {
   contentInit(): void {
     // console.log('contentInit', this.tipInfo);
     switch(this.tipInfo.tipType) {
-      case 'rc': {
-        this.tipType = 'Rate Cell Variance';
-        this.tipSubtitle = 'CCA vs State'
-        this.tipContent = `${this.tipInfo.content.org_ratecell} Vs ${this.tipInfo.content.payor_ratecell}`;
-        break;
-      }
-      case 're': {
-        this.tipType = 'Region Variance';
-        this.tipSubtitle = 'CCA vs State'
-        this.tipContent = `${this.tipInfo.content.org_region} Vs ${this.tipInfo.content.payor_region}`;
-        break;
-      }
-      case 'pp': {
-        this.tipType = 'Patient Pay Variance';
-        this.tipSubtitle = 'CCA vs State'
-        this.tipContent = `$${this.tipInfo.content.org_pp} Vs $${this.tipInfo.content.payor_pp}`;
-        break;
-      }
-      case 'sp': {
-        this.tipType = 'pp2 Variance';
-        this.tipSubtitle = 'CCA vs State'
-        this.tipContent = `$${this.tipInfo.content.org_sp} Vs $${this.tipInfo.content.payor_sp}`;
-        break;
-      }
-      case 'va': {
-        this.tipType = 'Payment Variance';
-        this.tipSubtitle = 'state_paid - (cca_preimum - ( cca_pp + cca_sp))'
-        this.tipContent = `$${this.tipInfo.content.payor_paid.toFixed(2)} - ($${this.tipInfo.content.org_premium} - ($${this.tipInfo.content.org_pp} + $${this.tipInfo.content.org_sp}))`;
-        break;
-      }
-      case 'pe': {
-        let unexplained = this.tipInfo.content.payor_paid - (this.tipInfo.content.payor_premium - this.tipInfo.content.payor_pp - this.tipInfo.content.payor_sp)
-        this.tipType = `Payment Error: ${unexplained > 0 ? '$' + unexplained.toFixed(2) : '-$' + (unexplained * -1).toFixed(2)}`;
-        this.tipSubtitle = ' state_paid - (state_Premium - (state_pp + state_sp))'
-        this.tipContent = `$${this.tipInfo.content.payor_paid.toFixed(2)} - ($${this.tipInfo.content.payor_premium} - ($${this.tipInfo.content.payor_pp} + $${this.tipInfo.content.payor_sp})) `;
-        break;
-      }
       case 'st': {
         this.tipType = '';
         this.tipSubtitle = ''
@@ -118,6 +80,13 @@ export class TooltipComponent implements OnInit {
         this.tipType = 'Region Variance';
         this.tipSubtitle = 'CCA Region VS State Region'
         this.tipContent = `${this.tipInfo.content.ccaRegion} VS ${this.tipInfo.content.mmisRegion}`;
+        break;
+      }
+
+      case 'discreapcnyCategoryDescription': {
+        this.tipType = 'Discreapcny Category Description';
+        this.tipSubtitle = ''
+        this.tipContent = `${this.tipInfo.content.discrepancyCategoryDescription}`;
         break;
       }
 

@@ -1,3 +1,4 @@
+import { AuthService } from './../../auth/auth.service';
 import { SharedService } from './../../shared/shared.service';
 import { Member, MemberName } from 'src/app/model/member.model';
 import { SettingService } from 'src/app/setting/setting.service';
@@ -57,14 +58,25 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
   // onDisplayDiscrepancy
   public displayedDiscrepancy: DisElement;
 
+  /** Authorization */
+  listPermissions: string;
+  infoPermissions: string;
+  bulkMemberUpdatePermissions: string;
+  bulkMemberUpdateByFilterPermissions: string;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private service: MemberService,
+    private authService: AuthService,
     private navService: NavigationService,
     private settingService: SettingService) {
+    this.listPermissions = this.authService.getRoleMappingSettingByNames('member', 'GetMemberListByConAsync');
+    this.infoPermissions = this.authService.getRoleMappingSettingByNames('member', 'GetMemberInfoByConAsync');
+    this.bulkMemberUpdatePermissions = this.authService.getRoleMappingSettingByNames('member', 'UpdateDiscrepancyForMultipleMembersByConAsync');
+    this.bulkMemberUpdateByFilterPermissions = this.authService.getRoleMappingSettingByNames('member', 'UpdateMultipleDiscrepanciesBYFiltersByConAsync');
   }
 
   ngOnInit(): void {
@@ -215,7 +227,6 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
     }
 
   }
-
 
   unsubcribeSubscriptions() {
     this.displayedDiscrepancyInfo$.unsubscribe();

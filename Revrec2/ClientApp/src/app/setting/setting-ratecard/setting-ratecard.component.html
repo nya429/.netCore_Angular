@@ -18,7 +18,7 @@
                     </mat-autocomplete>
                 </mat-form-field> -->
                 <mat-form-field class='mat-form-field-narrow'>
-                    <input matInput type="text" placeholder="RateCell" formControlName="ccaRateCell" [matAutocomplete]="auto1">
+                    <input matInput type="text" placeholder="Rate Cell" formControlName="ccaRateCell" [matAutocomplete]="auto1">
                     <mat-autocomplete #auto1="matAutocomplete">
                         <mat-option *ngFor="let ratecell of getOptions('rateCell')" [value]="ratecell.ccaRateCell">{{ratecell.ccaRateCell}}
                         </mat-option>
@@ -52,7 +52,7 @@
             </form>
         </mat-card>
         <br>
-        <app-setting-ratecard-list [sourcePaged]="pagedSource" [updatePermissions]="updatePermissions" (onPagedAndSorted)='onListPagedSorted($event)' (rateCardSelected)='onRateCardSelected($event)'></app-setting-ratecard-list>
+        <app-setting-ratecard-list [sourcePaged]="pagedSource" [updatePermissions]="updatePermissions" (onPagedAndSorted)='onListPagedSorted($event)' (rateCardSelected)="onRateCardSelected($event)" (onUpdated)="onUpdate($event)" (onEditted)="onEditted($event)"></app-setting-ratecard-list>
     </div>
 </div>
 

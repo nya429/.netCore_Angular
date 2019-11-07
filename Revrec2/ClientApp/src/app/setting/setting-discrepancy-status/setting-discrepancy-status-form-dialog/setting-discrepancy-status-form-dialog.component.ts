@@ -28,18 +28,27 @@ export class SettingDiscrepancyStatusFormDialogComponent implements OnInit {
     }
   }
 
+  formInitOption = {
+    discrepancyStatusId: null,
+    discrepancyStatus: '',
+    discrepancyStatusDescription: '',
+    discrepancyCategory: { },
+    activeFlag: false,
+  }
+
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<SettingDiscrepancyStatusFormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       selection: SelectionModel<any>,
+      data: DiscrepancyStatus,
       type: string | null,
       formOptions: {
         discrepancyCategoryOption: DiscrepancyCategoryOption[] | null,
         discrepancyStatusTypeOption: any[] | null
       }
-
-    }) { }
+    }) {
+  }
 
   ngOnInit() {
     this.initForm();
@@ -51,15 +60,27 @@ export class SettingDiscrepancyStatusFormDialogComponent implements OnInit {
 
   initForm() {
     this.formOptions = this.data.formOptions;
+    if (this.data.type === 'update') {
+      this.formInitOption.discrepancyStatusId = this.data.data.discrepancyStatusId;
+      this.formInitOption.discrepancyStatus = this.data.data.discrepancyStatus;
+      this.formInitOption.discrepancyStatusDescription = this.data.data.discrepancyStatusDescription;
+      this.formInitOption.discrepancyCategory = this.formOptions.discrepancyCategoryOption.find(dc => dc.discrepancyCategoryID === this.data.data.discrepancyCategoryID)
+      this.formInitOption.activeFlag = this.data.data.activeFlag;
+    }
+
     this.form = new FormGroup({
-      discrepancyStatus: new FormControl('', {
+      discrepancyStatusId: new FormControl(this.formInitOption.discrepancyStatusId, {
+      }),
+      discrepancyStatus: new FormControl(this.formInitOption.discrepancyStatus, {
         validators: [Validators.required]
       }),
-      discrepancyStatusDescription: new FormControl('', {}),
-      discrepancyCategory: new FormControl('', {
+      discrepancyStatusDescription: new FormControl(this.formInitOption.discrepancyStatusDescription, {
+        validators: [Validators.maxLength(250)]
+      }),
+      discrepancyCategory: new FormControl(this.formInitOption.discrepancyCategory, {
         validators: [Validators.required]
       }),
-      activeFlag: new FormControl(false, {
+      activeFlag: new FormControl(this.formInitOption.activeFlag, {
         validators: [Validators.required]
       }),
     });
@@ -84,7 +105,7 @@ export class SettingDiscrepancyStatusFormDialogComponent implements OnInit {
 
     if (this.isFormsValid()) {
       let discrepancyStatus: DiscrepancyStatus = {
-        discrepancyStatusId: null,
+        discrepancyStatusId: this.form.value.discrepancyStatusId,
         discrepancyStatus: this.form.value.discrepancyStatus,
         discrepancyStatusDescription: this.form.value.discrepancyStatusDescription,
         discrepancyCategoryID: this.form.value.discrepancyCategory.discrepancyCategoryID,
@@ -101,93 +122,3 @@ export class SettingDiscrepancyStatusFormDialogComponent implements OnInit {
     return this.form.valid;
   }
 }
-
-const ss = [
-  {
-    discrepancyStatusID: 1,
-    description: 'new',
-    category: 'new',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 2,
-    description: 'Resolution expected from change to MP',
-    category: 'pending',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 3,
-    description: 'Appeal denied by Medicaid',
-    category: 'pending',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 4,
-    description: 'Ready for write-off by CCA',
-    category: 'pending',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 5,
-    description: 'Resolution expected via Medicaid 820, Quarterly',
-    category: 'pending',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 6,
-    description: 'At Medicaid for eligibility reinstatement',
-    category: 'pending',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 7,
-    description: 'Contacting Member (Demographics Verification)',
-    category: 'pending',
-    active: 1,
-    isUIDisplayed: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 8,
-    description: 'At Medicaid For Appeal',
-    category: 'pending',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 9,
-    description: 'Clinical Ops- Expired MDS',
-    category: 'pending',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 10,
-    description: 'Decision to Not Pursue',
-    category: 'complete',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 11,
-    description: 'Write Off',
-    category: 'complete',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  },
-  {
-    discrepancyStatusID: 12,
-    description: 'Write Off',
-    category: 'complete',
-    active: 1,
-    discrepnacyType: 'User Entered'
-  }
-
-
-]
