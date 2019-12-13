@@ -16,4 +16,17 @@
         public const int PageSize = 25;
     }
 
+    public static class InMemoryCacheKeys
+    {
+        public const string DISCREPANCY_UNREAD_COUNT_KEY = "_DicrepancyAssignmentCount";
+        public const string COMMENT_UNREAD_COUNT_KEY = "_CommentCount";
+        public const string NOTIFICATION_UNREAD_KEY = "_NotificationUnread";
+    }
+
+    public static class NotificationTypes
+    {
+        public const string COMMENT = "comment";
+        public const string DISCREPANCY = "discrepancy";
+        public const string MEMBER = "member";
+    }
 }

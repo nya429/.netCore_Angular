@@ -1,3 +1,4 @@
+import { NotificationService } from './../../notification.service';
 import { SharedService } from 'src/app/shared/shared.service';
 import { AuthService } from './../../auth/auth.service';
 import { MemberService } from './../../member/member.service';
@@ -6,13 +7,13 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { Subscription } from 'rxjs';
-import { DisElement } from 'src/app/MOCK_DATA';
 import { PagedList } from 'src/app/model/response.model';
 import { MemberPaged, Member } from 'src/app/model/member.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { SettingService } from 'src/app/setting/setting.service';
 import { filter } from 'rxjs/operators';
-
+import { NavigationService } from 'src/app/navigation/navigation.service';
+import { Notification } from './../../model/notification.model';
 @Component({
   selector: 'app-assignment-container',
   templateUrl: './assignment-container.component.html',
@@ -28,7 +29,8 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
 
   // onDisplayDiscrepancy
   // MOCK
-  public displayedDiscrepancy: DisElement;
+   public displayedDiscrepancy
+   //: DisElement;
 
   pagedSource: PagedList<MemberPaged>;
   isLookup: boolean;
@@ -40,6 +42,11 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
   public selectedMMIS: number;
   public detailShowing: boolean;
 
+  // NotificationUnreadState
+  public unreadMemberIds: number[] = [];
+  public unreadDiscrepancyIds: number[] = [];
+  public unreadCommentIds: number[] = [];
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -47,12 +54,13 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
     private _snackBar: MatSnackBar,
     private service: AssignmentService,
     private settingService: SettingService,
+    private navService: NavigationService,
+    private notificationService: NotificationService,
     private sharedService: SharedService,
     private authService: AuthService,
     private memberService: MemberService
   ) {
     this.actionUserId = this.authService.getActionUserId();
-    console.log('AssignmentContainerComponent.Action_User_ID:', this.actionUserId)
   }
 
   ngOnInit() {
@@ -60,16 +68,29 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
     this.onMemberInfoSelect();
     this.initState()
     this.initSource();
+
+    if (this.navService.hasNavData()) {
+      this.onNotificationNav();
+    } else if (localStorage.getItem('worklist')) {
+      let masterPatientID = localStorage.getItem('worklist');
+      this.router.navigate(['/worklist', { outlets: { 'bio': [masterPatientID] } }]);
+    }
   }
 
   ngOnDestroy() {
     this.unsubcribeSubscriptions();
+
+    if (this.selectedMMIS) {
+      localStorage.setItem('worklist', this.selectedMMIS.toString());
+    }
+
   }
 
   getChildParams(): void {
     this.selectedMMIS = this.route.firstChild
       ? +this.route.firstChild.snapshot.paramMap.get('id')
       : null;
+    console.log(this.selectedMMIS);
   }
 
   onMemberInfoSelect(): void {
@@ -77,7 +98,7 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
   }
 
   initState() {
-    this.displayedDiscrepancyInfo$ = this.service.onDiscrepancyDetailOpened.subscribe((e: DisElement) => {
+    this.displayedDiscrepancyInfo$ = this.service.onDiscrepancyDetailOpened.subscribe((e) => {
       this.displayedDiscrepancy = e;
     })
 
@@ -86,6 +107,10 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.getChildParams()
       this.onMemberInfoSelect();
+      if (this.navService.hasNavData()) {
+        this.onNotificationNav();
+      }
+
     });
 
     this.memberListChanged$ = this.memberService.memberListChanged.subscribe((result: PagedList<MemberPaged>) => {
@@ -122,12 +147,30 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
   initSource() {
     this.pagedSource = this.memberService.getpagedListInl();
     this.isLookup = true;
-    
+
     this.memberService.getMembers({
       sortBy: 'maxAging',
       orderBy: 1,
       assigneeID: this.actionUserId
     });
+  }
+
+  onNotificationNav() {
+    const notification = this.navService.onNaved() as Notification
+    console.log('onNav', notification)
+    switch (notification.NotificationType) {
+      case 'member':
+        return;
+      case 'comment':
+     
+        return;
+      case 'discrepancy':
+     
+        return;
+      default:
+        return;
+    }
+
   }
 
 }

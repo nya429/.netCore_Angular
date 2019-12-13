@@ -109,4 +109,18 @@ import { DiscrepancyCategory } from 'src/app/model/setting.model';
     activeFlag: boolean;
   }
   
+  export interface pageParamsLocalStorage {
+    regionMapID: number;
+    mmisProduct: string;
+    ccaRegion: string;
+    ccaRegionID: number;
+    mmisRegion: string;
+    mmisRegionID: number;
+    activeFlag: boolean;
+  }
+
+  export interface pageParamsWorkList {
+
+  }
+  
   

@@ -56,13 +56,22 @@ namespace Revrec2
                  services.AddDbContext<DataContext>(options => options.UseSqlServer(_config.GetConnectionString("Development")));
             }
             
-            // Add application services . 
-            // Add CORS header 
+            services.AddMemoryCache();
             services.AddCors();
             services.AddHttpContextAccessor();
             // Add Mapper Helper, needs using Microsoft.Extensions.DependencyInjection;
             // With version >= 6.0.1, it requires param  
             services.AddAutoMapper(typeof(Startup));
+
+            // Add ServerSendEvent Service
+            services.AddSingleton<SseService>();
+
+            // Register Background HeartBeat
+            services.AddHostedService<HeartbeatService>();
+            services.AddSingleton<NotificationService>();
+            services.AddSingleton<CommentNotificationService>();
+            services.AddSingleton<DiscrepancyAssignmentService>();
+
             // Add Auth part
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
@@ -77,6 +86,7 @@ namespace Revrec2
             });
 
             services.AddSingleton<IAuthorizationService, AuthorizationService>();
+
 
             // Add foront-end services . 
             // In production, the Angular files will be served from this directory

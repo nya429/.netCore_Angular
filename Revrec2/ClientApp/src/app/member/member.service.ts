@@ -1,7 +1,7 @@
 import { MemberName } from './../model/member.model';
 import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { DisElement } from '../MOCK_DATA';
+// import { DisElement } from '../MOCK_DATA';
 import { Subject } from 'rxjs';
 import { Reponse, PagedList, ReponseList } from '../model/response.model';
 import { MemberPaged, Member } from '../model/member.model';
@@ -15,11 +15,11 @@ import { DiscrepancyStatusOption } from '../model/setting.model';
 export class MemberService {
   private baseUrl: string;
   private queryData: MemberName;
-  private displayedDiscrepancy: DisElement;
+  private displayedDiscrepancy: any;
   public memebrDetailShowing: boolean;
 
 
-  public onDiscrepancyDetailOpened = new Subject<DisElement>();
+  public onDiscrepancyDetailOpened = new Subject<any>();
   public memberListChanged = new Subject<PagedList<MemberPaged>>();
   public singleMemberListFetch = new Subject<MemberPaged>();
   public memberNamesFetched = new Subject<MemberName[]>();
@@ -38,7 +38,7 @@ export class MemberService {
     return this._sharedService;
   }
 
-  onDiscrepancyDetailOpen(e: DisElement): void {
+  onDiscrepancyDetailOpen(e: any): void {
     this.displayedDiscrepancy = e;
     this.onDiscrepancyDetailOpened.next(this.displayedDiscrepancy);
   }

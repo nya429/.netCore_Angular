@@ -14,6 +14,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Revrec2.Services;
 
 namespace Revrec2.Controllers
 {
@@ -25,6 +26,8 @@ namespace Revrec2.Controllers
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger _logger;
+        private readonly DiscrepancyAssignmentService _discrepancyAssignmentService;
+        private readonly CommentNotificationService _commentNotificationService;
 
         private const int PageIndex = Constants.PaginationParams.PageIndex;
         private const int PageSize = Constants.PaginationParams.PageSize;
@@ -32,12 +35,16 @@ namespace Revrec2.Controllers
         public DiscrepancyController(DataContext context,
            IMapper mapper,
            IHttpContextAccessor httpContextAccessor,
-           ILogger<DiscrepancyController> logger)
+           ILogger<DiscrepancyController> logger,
+           DiscrepancyAssignmentService discrepancyAssignmentService,
+           CommentNotificationService commentNotificationService)
         {
             _context = context;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _discrepancyAssignmentService = discrepancyAssignmentService;
+            _commentNotificationService = commentNotificationService;
         }
 
         public IActionResult Index()
@@ -232,6 +239,17 @@ namespace Revrec2.Controllers
             response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
             response.Message = "Success";
 
+            if (request.AssigneeID.HasValue)
+            {
+                string actionUserName = Request.GetUserName();
+
+                List<int> discrepancyIds = new List<int>()
+                {
+                    discrepancyID
+                };
+                _discrepancyAssignmentService.discrepancyAssignement(request.AssigneeID ?? default(int), actionUserName, discrepancyIds);
+            }
+
             return Ok(response);
         }
 
@@ -273,6 +291,16 @@ namespace Revrec2.Controllers
             response.IsSuccess = true;
             response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
             response.Message = "Success";
+
+            if (request.Assigned_UserID.HasValue 
+               // && request.Assigned_UserID != eventUserID
+                )
+            {
+                string actionUserName = Request.GetUserName();
+                var list = request.DiscrepancyIDs.BulkID.Select(bulkID => bulkID.UpdateID).ToList();
+                _discrepancyAssignmentService.discrepancyAssignement(request.Assigned_UserID ?? default(int), actionUserName, list);
+            }
+
             return Ok(response);
         }
 
@@ -301,7 +329,7 @@ namespace Revrec2.Controllers
         }
 
         [HttpPost("CreateDiscrepancyComment")]
-        public async Task<ActionResult> CreateDiscreapancyCommentAsync([FromBody] DiscrepancyCommentForCreateDto request)
+        public async Task<ActionResult> CreateDiscreapancyCommentAsync([FromBody] DiscrepancyCommentForCreatWrapperDto request)
         {
             int eventUserID = Request.GetUserID();
 
@@ -309,10 +337,10 @@ namespace Revrec2.Controllers
                    {
 
                     new SqlParameter("@eventUserID", eventUserID),
-                    new SqlParameter("@DiscrepancyID", request.DiscrepancyID),
-                    new SqlParameter("@ReplyCommentID", !(request.ReplyCommentID.HasValue) ? DBNull.Value : (object)request.ReplyCommentID),
-                    new SqlParameter("@DiscrepancyComment", request.DiscrepancyComment),
-                    new SqlParameter("@ActiveFlag ", request.ActiveFlag),
+                    new SqlParameter("@DiscrepancyID", request.discrepancyCommentForCreateDto.DiscrepancyID),
+                    new SqlParameter("@ReplyCommentID", !(request.discrepancyCommentForCreateDto.ReplyCommentID.HasValue) ? DBNull.Value : (object)request.discrepancyCommentForCreateDto.ReplyCommentID),
+                    new SqlParameter("@DiscrepancyComment", request.discrepancyCommentForCreateDto.DiscrepancyComment),
+                    new SqlParameter("@ActiveFlag ", request.discrepancyCommentForCreateDto.ActiveFlag),
                     new SqlParameter() {
                        ParameterName = "@NewIdentity",
                        SqlDbType = SqlDbType.Int,
@@ -331,6 +359,16 @@ namespace Revrec2.Controllers
             response.Data = parameters.FirstOrDefault(p => p.ParameterName.Equals("@NewIdentity")).Value.toInt();
             response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
             response.Message = nameof(response.Code);
+
+
+            if (request.anchoredUserIds.Any() && request.anchoredUserIds.Count > 0 && response.Data.HasValue)
+            {
+                string actionUserName = Request.GetUserName();
+                _commentNotificationService.commentByAnchoredUserIdsAsync(request.anchoredUserIds, actionUserName, request.masterPatientID, request.discrepancyCommentForCreateDto.DiscrepancyID, response.Data.Value);
+            }
+
+
+
             return Ok(response);
         }
 

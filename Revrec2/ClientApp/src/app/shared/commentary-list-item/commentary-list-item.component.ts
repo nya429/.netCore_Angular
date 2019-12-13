@@ -1,6 +1,6 @@
-import { MasterCommentaryElement } from './../../MOCK_DATA';
+// import { MasterCommentaryElement } from './../../MOCK_DATA';
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { CommentaryElement } from 'src/app/MOCK_DATA';
+// import { CommentaryElement } from 'src/app/MOCK_DATA';
 import { MatCheckbox, MatSnackBar } from '@angular/material';
 import { CommentState } from './../commentary-input/commentary-input.component';
 import { DiscrepancyComment } from 'src/app/model/discrepancyComment.model';
@@ -16,6 +16,7 @@ import { User } from 'src/app/model/user.model';
 export class CommentaryListItemComponent implements OnInit, OnDestroy {
   @Input('source') masterComment: DiscrepancyComment;
   @Input('actionUser') actionUser: User;
+  @Input('masterPatientID') masterPatientID: number;
   
   private discrepancyCommentReplied$: Subscription;
   // Cached created Sub Comment 
@@ -68,7 +69,8 @@ export class CommentaryListItemComponent implements OnInit, OnDestroy {
     this.inputContent = val;
   }
 
-  onCommentSubmited(val: string) {
+  // onCommentSubmited(val: string) {
+  onCommentSubmited(val: {comment: string; anchoredUserIds: number[]}) {
     let newSubComment: DiscrepancyComment = {
       discrepancyCommentID: null,
       discrepancyID: this.masterComment.discrepancyID,
@@ -76,13 +78,15 @@ export class CommentaryListItemComponent implements OnInit, OnDestroy {
       comment_UserID: this.actionUser ? this.actionUser.userID : null,
       userFirstName: this.actionUser ? this.actionUser.userFirstName : '',
       userLastName: this.actionUser ? this.actionUser.userLastName : '',
-      discrepancyComment: val,
+      // discrepancyComment: val,
+      discrepancyComment: val.comment,
       activeFlag: true,
       insertDate: new Date().toLocaleString(),
       updateDate: '',
       subComments: []
     }
-    this.serivce.createDiscreapncyComment(newSubComment, 'reply')
+    // this.serivce.createDiscreapncyComment(newSubComment, 'reply');
+    this.serivce.createDiscreapncyComment(newSubComment, val.anchoredUserIds, this.masterPatientID,'reply');
     this.inputContent = '';
     this.onInputDismiss();
   }

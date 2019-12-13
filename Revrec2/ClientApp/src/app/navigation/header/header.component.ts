@@ -1,3 +1,6 @@
+import { NotificationService } from './../../notification.service';
+import { Notification } from './../../model/notification.model';
+import { AppService } from './../../app.service';
 import { NavigationService } from './../navigation.service';
 import { AssignmentService } from './../../assignment/assignment.service';
 import { SharedService } from './../../shared/shared.service';
@@ -14,6 +17,7 @@ import { execLenValidator, minLenValidator } from 'src/app/shared/date.validate.
 import { initTransferState } from '@angular/platform-browser/src/browser/transfer_state';
 import { Subscription } from 'rxjs';
 import { MemberName } from 'src/app/model/member.model';
+import { SettingService } from 'src/app/setting/setting.service';
 
 @Component({
   selector: 'app-header',
@@ -35,17 +39,25 @@ export class HeaderComponent implements OnInit, OnDestroy {
   memebrNamePartailFetched$: Subscription;
   router$: Subscription;
   memebrNameResults: MemberName[];
+  searchHistory: MemberName[];
+
+  /** Notification Object */
+  notificationAlert$: Subscription;
+  notifications: Notification[];
+  alertList: Notification[];
 
   constructor(private authService: AuthService,
-    private service: NavigationService,
+    private navService: NavigationService,
+    private notificationService: NotificationService,
     private memberService: MemberService,
-    private sharedService: SharedService,
-    private assignmentService: AssignmentService,
     private router: Router,
-    private route: ActivatedRoute, ) { }
+    private route: ActivatedRoute, ) {
+    this.notifications = [];
+    this.alertList = [];
+  }
 
   ngOnInit(): void {
-     /** Are we using this anymore? */
+    /** Are we using this anymore? */
     // this.getChildRoute();
     this.initForm();
     this.initState();
@@ -80,7 +92,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   initState() {
-     /** Are we using this anymore? */
+    /** Are we using this anymore? */
     // this.router$ = this.router.events.pipe(
     //   filter((event: Event) => event instanceof NavigationEnd),
     // ).subscribe(() => {
@@ -89,6 +101,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.searchForm$ = this.searchForm.valueChanges.subscribe(() => {
       this.onSearch();
+    });
+
+    this.notificationAlert$ = this.notificationService.notificatonAlerted.subscribe((notification: Notification[]) => {
+      console.log(  this.alertList,this.notifications);
+      if (notification) {
+        console.log("ALERT", notification);
+        
+        this.notifications = this.notifications.concat(notification);
+        this.alertList = this.alertList.concat(notification)
+        this.alertList.sort((b, a) => new Date(a.EntryTime).getTime() - new Date(b.EntryTime).getTime());
+        console.log(  this.alertList,this.notifications);
+      }
     })
 
     this.memebrNamePartailFetched$ = this.memberService.memberNamesFetched.subscribe((result) => {
@@ -121,7 +145,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onLogin() {
     this.authService.autoLoginViaWinAuth();
   }
-  
+
   isAuth() {
     return this.authService.isAuthenticated();
   }
@@ -140,6 +164,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onUniversalSearchExpand() {
     this.inputActive = true;
     this.usInputRef.nativeElement.focus();
+
+    this.searchHistory = localStorage.getItem('globalsearch') ?
+      JSON.parse(localStorage.getItem('globalsearch'))
+      : [];
+
+    console.log(this.searchHistory)
   }
 
   onSearch() {
@@ -178,10 +208,75 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onResultItemClick(item: MemberName, field: string) {
+    this.searchHistory = localStorage.getItem('globalsearch') ?
+      JSON.parse(localStorage.getItem('globalsearch'))
+      : [];
+
+    if (this.searchHistory.length >= 5 || (this.searchHistory.length < 5 && this.searchHistory.includes(item))) {
+      let index = -1
+
+      this.searchHistory.forEach(h => {
+        if (h.masterPatientID === item.masterPatientID) {
+          index = this.searchHistory.indexOf(h);
+        }
+      });
+      this.searchHistory.splice(index, 1);
+    }
+    this.searchHistory.unshift(item);
+
+    localStorage.setItem('globalsearch', JSON.stringify(this.searchHistory));
+
     switch (field) {
       case 'members':
         this.router.navigate(['/members', { outlets: { 'bio': [item.masterPatientID] } }], {});
-        this.service.onNav(item);
+        this.navService.onNav(item);
+        return;
+      default:
+        return;
+    }
+  }
+
+  getNotification() {
+    return this.notifications ? (this.notifications.length > 10 ? '10+' : this.notifications.length) : 0;
+  }
+
+  clearNotification() {
+    setTimeout(() => {
+      this.notifications = [];
+    }, 300);
+    // this.notificationService.resetNotification().subscribe(() => {
+    //   this.notifications = [];
+    // });
+  }
+
+  isNotificationHighlighted(notification: Notification): boolean {
+    return this.notifications.includes(notification);;
+  }
+
+  clearAlertList() {
+    this.notificationService.resetNotification();
+    this.alertList = [];
+  }
+
+  getNotificationType(notification: Notification): string {
+    return notification.NotificationType;
+  }
+
+  onNoticationItemClick(notification: Notification) {
+    switch (notification.NotificationType) {
+      case 'member':
+        this.router.navigate(['/worklist', { outlets: { 'bio': [notification.NotificationObject[0]] } }], {});
+        this.navService.onNav(notification);
+        this.notificationService.onNotificationClick(notification);
+        return;
+      case 'comment':
+        this.router.navigate(['/worklist', { outlets: { 'bio': [notification.NotificationObject['MasterPatientID']] } }], {});
+        this.navService.onNav(notification);
+        this.notificationService.onNotificationClick(notification);
+        return;
+      case 'discrepancy':
+        // this.router.navigate(['/worklist', { outlets: { 'bio': [notification.NotificationObject['MasterPatientID']] } }], {});
+        // this.navService.onNav(notification);
         return;
       default:
         return;

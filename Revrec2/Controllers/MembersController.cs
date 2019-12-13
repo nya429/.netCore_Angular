@@ -14,6 +14,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Revrec2.Services;
 
 namespace Revrec2.Controllers
 {
@@ -25,6 +26,7 @@ namespace Revrec2.Controllers
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger _logger;
+        private readonly DiscrepancyAssignmentService _discrepancyAssignmentService;
 
         private const int PageIndex = Constants.PaginationParams.PageIndex;
         private const int PageSize = Constants.PaginationParams.PageSize;
@@ -32,12 +34,14 @@ namespace Revrec2.Controllers
         public MembersController(DataContext context,
            IMapper mapper,
            IHttpContextAccessor httpContextAccessor,
-           ILogger<MembersController> logger)
+           ILogger<MembersController> logger,
+           DiscrepancyAssignmentService discrepancyAssignmentService)
         {
             _context = context;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            _discrepancyAssignmentService = discrepancyAssignmentService;
         }
 
         public IActionResult Index()
@@ -161,6 +165,15 @@ namespace Revrec2.Controllers
             response.IsSuccess = true;
             response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
             response.Message = "Success";
+
+            if (request.Assigned_UserID.HasValue
+                // && request.Assigned_UserID != eventUserID
+                )
+            {
+                string actionUserName = Request.GetUserName();
+                var list = request.MemberIds.MemberID.Select(x => x.UpdateID).ToList();
+                _discrepancyAssignmentService.memberAssignment(request.Assigned_UserID ?? default(int), actionUserName, list);
+            }
             return Ok(response);
         }
 

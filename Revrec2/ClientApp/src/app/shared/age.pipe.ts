@@ -61,15 +61,15 @@ export class SignTimePipe implements PipeTransform  {
         
         
         if (timeDiffer < 60000) {
-            return 'seconds ago';
+            return 'Just now';
           } else if (timeDiffer >= 60000 && timeDiffer < 3600000 ) {
             timeDiffer = Math.floor(timeDiffer / 60000);
-            return `${timeDiffer} min${timeDiffer > 1 ? '(s)' : '' } ago`;
+            return `${timeDiffer} Min${timeDiffer > 1 ? '(s)' : '' }`;
           } else if (dayDiffer == 0 && timeDiffer >= 3600000 && timeDiffer < 18000000 ) {
             timeDiffer = Math.floor(timeDiffer / 3600000);
-            return `${timeDiffer} hour${timeDiffer > 1 ? '(s)' : ''} ago`;
+            return `${timeDiffer} Hour${timeDiffer > 1 ? '(s)' : ''}`;
           } else if (dayDiffer ==  0) {
-            return `Today ${hour}:${minute}`;  
+            return ` ${hour}:${minute}`;  
           } else if (dayDiffer == 1) {
             return `Yesterday ${hour}:${minute}`;  
           } else if (dayDiffer > 1) {

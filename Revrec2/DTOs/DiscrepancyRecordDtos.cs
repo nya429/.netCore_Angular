@@ -65,7 +65,7 @@ namespace Revrec2.DTOs
     }
 
     public class DiscrepancyRecordForCreateDto
-    {        
+    {
         public int? AssigneeID { get; set; }
         public int? DiscrepancyStatusID { get; set; }
         public DateTime? DueDate { get; set; }
@@ -79,7 +79,7 @@ namespace Revrec2.DTOs
         public DateTime? DueDate { get; set; }
         public string DiscrepancyComment { get; set; }
     }
-    
+
     public class DiscrepancyRecordUpdateBulkFiltersDto
     {
         public long? CCAID { get; set; }
@@ -262,10 +262,41 @@ namespace Revrec2.DTOs
         public bool ActiveFlag { get; set; }
     }
 
+    public class DiscrepancyCommentForCreatWrapperDto
+    {
+        public DiscrepancyCommentForCreateDto discrepancyCommentForCreateDto { get; set; }
+        public List<int> anchoredUserIds { get; set; }
+        public int masterPatientID { get; set; }
+    }
+
     public class DiscrepancyCommentForUpdateDto
     {
         public int DiscrepancyCommentID { get; set; }
         public string DiscrepancyComment { get; set; }
         public bool ActiveFlag { get; set; }
+    }
+
+    public class DiscrepancyAssignmentUnreadCount
+    {
+        public int AssignedUserID { get; set; }
+        public string ActionUserName { get; set; }
+        public int UnreadCount { get; set; }
+        public string EntryTime { get; set; }
+    }
+
+    public class CommentNotification
+    {
+        public int MasterPatientID { get; set; }
+        public int DiscrepancyID { get; set; }
+        public int DiscrepancyCommentID { get; set; }
+    }
+
+    public class NotificationDto
+    {
+        public int AnchoredUserID { get; set; }
+        public string ActionUserName { get; set; }
+        public string NotificationType { get; set; }
+        public string EntryTime { get; set; }
+        public string NotificationStr { get; set; }
     }
 }

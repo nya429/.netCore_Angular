@@ -1,7 +1,6 @@
 import { MemberService } from './../../member/member.service';
 import { Component, OnInit, ViewChild, Output, EventEmitter, ElementRef, OnDestroy, Input } from '@angular/core';
-
-import { ELEMENT_DATA, PeriodicElement } from 'src/app/MOCK_DATA';
+// import { ELEMENT_DATA, PeriodicElement } from 'src/app/MOCK_DATA';
 import { Sort, PageEvent } from '@angular/material';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -16,8 +15,6 @@ const ColumnsSetting: string[] = [
   'column1',
   'column2',
   'column3'];
-
-
 
 @Component({
   selector: 'app-assignment-list',
@@ -43,8 +40,8 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ColumnsSetting.slice();
 
   /** Table Source State: @Input */
-  dataSource = ELEMENT_DATA;
-  sortedData = ELEMENT_DATA;
+  // dataSource = ELEMENT_DATA;
+  // sortedData = ELEMENT_DATA;
 
   /**  Local list  */
   pagedData: MemberPaged[];
@@ -94,11 +91,11 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
    *  pageSizeOptions
   */
 
-  count = this.dataSource.length;
-  pageIndex = 0;
-  pageSize = 50;
-  sortCloumn: string;
-  sortDirection;
+  // count = this.dataSource.length;
+  // pageIndex = 0;
+  // pageSize = 50;
+  // sortCloumn: string;
+  // sortDirection;
   pageSizeOptions: number[];
   pageState = {
     count: 0,
@@ -137,10 +134,10 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
     private memberService: MemberService) { }
 
   ngOnInit() {
-
     this.initSource();
     this.initForm();
     this.onStateInit();
+    this.getChildParams();
   }
 
   ngOnDestroy() {

@@ -1,6 +1,6 @@
 import { SharedService } from 'src/app/shared/shared.service';
 import { DiscrepancyComment } from 'src/app/model/discrepancyComment.model';
-import { CommentaryElement } from 'src/app/MOCK_DATA';
+// import { CommentaryElement } from 'src/app/MOCK_DATA';
 import { Component, OnInit, Input } from '@angular/core';
 import { CommentState } from '../commentary-input/commentary-input.component';
 import { MatSnackBar } from '@angular/material';
@@ -71,18 +71,21 @@ export class CommentaryItemComponent implements OnInit {
     this.inputContent = this.commentState.content;
   }
 
-  onCommentChanged(val) {
+  onCommentChanged(val: {
+    comment: string
+  }): void {
     // Temprary storage, will use service later
-    
-    this.inputContent = val ? val : "";
+    this.inputContent = val ? val.comment : "";
   }
 
-  onCommentUpdate(val: string): void {
+  onCommentUpdate(val: {
+    comment: string
+  }): void {
     let updateSubComment = {...this.comment}; 
-    updateSubComment.discrepancyComment = val;
+    updateSubComment.discrepancyComment = val.comment;
     updateSubComment.updateDate = new Date().toLocaleString();
     this.service.updateDiscreapncyComment(updateSubComment);
-    this.commentState.content = val;
+    this.commentState.content = val.comment;
     this.commentState.state = 'display';
     this.inputContent = "";
     this.openSnackBar('Comment Update Successfully', 'Dismiss')

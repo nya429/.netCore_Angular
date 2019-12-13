@@ -2,7 +2,7 @@ import { Discrepancy } from './../../model/discrepancy.model';
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Params } from '@angular/router';
 
-import { ELEMENT_DATA, PeriodicElement, DisElement } from 'src/app/MOCK_DATA';
+// import { ELEMENT_DATA, PeriodicElement, DisElement } from 'src/app/MOCK_DATA';
 import { switchMap, } from 'rxjs/operators';
 import { of, Subscription } from 'rxjs';
 import { Content } from '@angular/compiler/src/render3/r3_ast';
@@ -22,7 +22,7 @@ import { UserOption } from 'src/app/model/user.model';
 })
 export class MemberInfoComponent implements OnInit, OnDestroy {
   // MOCK
-  dataSource = ELEMENT_DATA[3];
+  // dataSource = ELEMENT_DATA[3];
 
   @ViewChild('reconList') reconView: ElementRef;
 
@@ -175,7 +175,7 @@ export class MemberInfoComponent implements OnInit, OnDestroy {
     // this.router.navigate(link);
   }
 
-  onDiscrepancyDetailClick(e: DisElement) {
+  onDiscrepancyDetailClick(e: any) {
     this.service.onDiscrepancyDetailOpen(e);
   }
 

@@ -1,5 +1,5 @@
 .commentary-tool-bar {
-    padding: 20px;
+    padding: 12px 24px;
     position: relative;
 }
 
@@ -24,4 +24,12 @@
 
 .commentary-item-container {
     padding: 8px;
+}
+
+.card-title {
+    font-size: 15px;
+}
+
+.card-subtitle {
+    font-size: 13px;
 }

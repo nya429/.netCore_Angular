@@ -1,3 +1,4 @@
+import { Notification } from './../../model/notification.model';
 import { AuthService } from './../../auth/auth.service';
 import { Discrepancy } from './../../model/discrepancy.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnChanges, Output, EventEmitter, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
@@ -7,7 +8,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import { deepIsEqual } from './../../util/deepIsEqual';
-import { PeriodicElement, ELEMENT_DATA, DisElement } from 'src/app/MOCK_DATA';
+// import { PeriodicElement, ELEMENT_DATA, DisElement } from 'src/app/MOCK_DATA';
 import { DiscreapcnyUpdateDialogComponent } from '../discrepancy-update-dialog/discrepancy-update-dialog.component';
 import { SharedService } from '../shared.service';
 import { Subscription } from 'rxjs';
@@ -21,6 +22,9 @@ import { stringify } from '@angular/compiler/src/util';
 import { UserOption } from 'src/app/model/user.model';
 import { listItemSlideStateTrigger } from 'src/app/setting/setting.animation';
 import { MemberService } from 'src/app/member/member.service';
+import { NotificationService } from 'src/app/notification.service';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+
 const moment = _rollupMoment || _moment;
 
 const ColumnsSetting: string[] = [
@@ -53,7 +57,14 @@ const ColumnsSetting: string[] = [
   selector: 'app-discrepancy-list',
   templateUrl: './discrepancy-list.component.html',
   styleUrls: ['./discrepancy-list.component.css'],
-  animations: [listItemSlideStateTrigger]
+  animations: [listItemSlideStateTrigger,
+    // trigger('detailExpand', [
+    //   state('collapsed', style({height: '0px', minHeight: '0'})),
+    //   state('expanded', style({height: '*'})),
+    //   transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    // ]),
+
+  ]
 })
 export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('table') private tableContainer: ElementRef;
@@ -66,7 +77,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   @Input('isLookup') containerSourceLookUp: boolean;
 
 
-  @Output() onDiscrepancyDetailClicked = new EventEmitter<DisElement>();
+  @Output() onDiscrepancyDetailClicked = new EventEmitter<any>();
   @Output() onPagedAndSorted = new EventEmitter<any>();
   @Output() onLocalSearch = new EventEmitter<any>();
   @Output() onUpdated = new EventEmitter<Discrepancy[]>();
@@ -75,16 +86,18 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   displayedColumns: string[] = ColumnsSetting.slice();
 
   /** Table Source State: @Input */
-  @Input() source: DisElement[];
+  @Input() source: any[];
 
   private actionUserId: number;
 
   private testSlideState: boolean;
 
   private _dateSourcePaged: PagedList<Discrepancy>;
+  expandedElement: Discrepancy | null;
 
   @Input('sourcePaged')
   set dateSourcePaged(dateSourcePaged: PagedList<Discrepancy>) {
+    console.log('SOURCE PAGED SET')
     this._dateSourcePaged = dateSourcePaged;
     this.pagedData = [...this._dateSourcePaged.list];
     this.pageState.count = this.dateSourcePaged.count;
@@ -92,7 +105,8 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     this.pageState.pageIndex = this.dateSourcePaged.pageIndex;
     this.isLookup = false;
     this.showCommentary = false;
-    this.selection.clear()
+    this.selection.clear();
+    this.onNotificationClicked();
   };
 
   get dateSourcePaged(): PagedList<Discrepancy> {
@@ -103,6 +117,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   @Input('masterPatientId')
   set masterPatientId(masterPatientId: number) {
     this._masterPatientId = masterPatientId;
+    this.showCommentary = false;
     this.testSlideState = false;
   };
 
@@ -115,6 +130,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   private discrepancyBulkUpdated$: Subscription;
   private memberDiscrepancyBulkUpdated$: Subscription;
   private dialogClose$: Subscription;
+  private notification$: Subscription;
 
   // //MOCK 
   // dataSource = ELEMENT_DATA[0].discrepancies;
@@ -168,6 +184,8 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   /** Commentary Section State */
   showCommentary: boolean = false;
   selectDiscrepancyID: number;
+  selectMasterPatientID: number;
+  selectDiscrepancy: Discrepancy;
 
   /** Edit Section State MOCK*/
   // editedElement: DisElement;
@@ -205,6 +223,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     private settingService: SettingService,
     private memberService: MemberService,
     private authService: AuthService,
+    private notificationService: NotificationService,
     public dialog: MatDialog) {
     this.updatePermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateDiscrepancyByIDAsync');
     this.infoPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'GetDiscrepancyByIdByConAsync');
@@ -228,7 +247,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.displayedColumns.splice(17, 1);
     }
-    
+
     if (!this.isAuthorized('bulk_update')) {
       this.displayedColumns.shift();
     }
@@ -236,6 +255,10 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.isAuthorized('commnet') && !this.isAuthorized('explore')) {
       this.displayedColumns.pop();
     }
+
+    this.notification$ = this.notificationService.notificationClicked.subscribe(n => {
+      this.onNotificationClicked();
+    });
 
     this.searchForm$ = this.searchForm.valueChanges.subscribe(() => this.onSearch());
 
@@ -374,6 +397,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     this.discrepancyBulkUpdated$.unsubscribe();
     this.searchForm$.unsubscribe();
     this.memberDiscrepancyBulkUpdated$.unsubscribe();
+    // this.notification$.unsubscribe();
     if (this.dialogClose$) {
       this.dialogClose$.unsubscribe();
     }
@@ -424,7 +448,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   }
 
 
-  isBubbleLighted(element: DisElement,
+  isBubbleLighted(element: any,
     option: string): boolean {
     if (!element) {
       return false;
@@ -549,9 +573,13 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   onCommentClick(discrepancy: Discrepancy): void {
     this.showCommentary = true;
     this.selectDiscrepancyID = discrepancy.discrepancyID;
+    this.selectMasterPatientID = discrepancy.masterPatientID;
+    this.selectDiscrepancy = discrepancy;
+    // this.expandedElement = discrepancy;
   }
 
-  onDiscrepancyDetailClick(e: DisElement): void {
+  onDiscrepancyDetailClick(e: any): void {
+    this.service.onDiscrepancyDetailClick(e);
     this.onDiscrepancyDetailClicked.emit(e);
   }
 
@@ -573,6 +601,8 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   onCommentaryDismissed() {
     this.showCommentary = false;
     this.selectDiscrepancyID = null;
+    this.selectMasterPatientID = null;
+    this.selectDiscrepancy = null;
   }
 
   openDialog(): void {
@@ -615,4 +645,24 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  onNotificationClicked() {
+
+    if (!this.notificationService.hasNotification())
+      return;
+
+    const notification = this.notificationService.getAndResetNotification();
+    console.log('NOTIFICATION OBSERVED', notification);
+    switch (notification.NotificationType) {
+      case 'comment':
+        this.showCommentary = true;
+        this.selectDiscrepancyID = notification.NotificationObject['DiscrepancyID'];
+        this.selectMasterPatientID = notification.NotificationObject['MasterPatientID'];
+        return;
+      case 'discrepancy':
+        // this.notificationService.onNotificationClick(notification);
+        return;
+      default:
+        return;
+    }
+  }
 }

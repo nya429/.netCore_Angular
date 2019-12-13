@@ -4,6 +4,7 @@
       'input-create-padding':!isUpdate(),
       'input-update-padding':isUpdate()
     }" class='input'></textarea>
+
         <div class='textarea-actions' *ngIf='!isUpdate()'>
             <button id='textarea-action-send' mat-icon-button [disabled]="commentFormGroup.pristine || !commentFormGroup.valid" (click)="$event.stopPropagation(); onSubmit()">
           <i class="material-icons-outlined">send</i> 
@@ -11,13 +12,26 @@
         </div>
         <div class='textarea-actions' *ngIf='isUpdate()'>
             <button id='textarea-action-close' mat-icon-button (click)="$event.stopPropagation(); onCancel()">
-          <i class="material-icons-outlined">close</i> 
-        </button>
+              <i class="material-icons-outlined">close</i> 
+            </button>
 
             <button id='textarea-action-check' mat-icon-button [disabled]="commentFormGroup.pristine || !commentFormGroup.valid" (click)="$event.stopPropagation(); onSubmit()">
-          <i class="material-icons-outlined">check</i> 
-        </button>
-        </div>
-    </div>
+                <i class="material-icons-outlined">check</i> 
+            </button>
 
+        </div>
+
+        <!-- <div class='textarea-actions'> -->
+        <a [matMenuTriggerFor]="menu" id="menuBtn" style="display:none;">@</a>
+        <mat-menu #menu="matMenu" class="myMenu" (close)="onMenuClosed()">
+            <div class="menuOpnBtnWrapper">
+                <button class="menuOpnBtn" mat-menu-item *ngFor="let user of getOptions('assigned_User')" (keyup)="$event.stopPropagation();" (keydown)="$event.stopPropagation();" (click)="onUserClick(user)">
+                      {{ user.userNameAD }}
+                  </button>
+            </div>
+        </mat-menu>
+        <!-- </div> -->
+
+    </div>
+    <!-- -->
 </form>

@@ -28,8 +28,6 @@ import { CommentaryItemComponent } from './commentary-item/commentary-item.compo
 import { DiscrepancyDetailContainerComponent } from './discrepancy-detail-container/discrepancy-detail-container.component';
 import { DiscreapcnyUpdateDialogComponent } from './discrepancy-update-dialog/discrepancy-update-dialog.component';
 
-
-
 @NgModule({
   imports: [
     CommonModule,
@@ -89,13 +87,16 @@ import { DiscreapcnyUpdateDialogComponent } from './discrepancy-update-dialog/di
     DiscrepancySnackbarComponent,
     MonthlySummaryRecordListComponent,
     TooltipComponent, 
-    DiscrepancyDetailContainerComponent
+    DiscrepancyDetailContainerComponent,
   ],
   providers: [ 
     DateValidatorDirective, 
     DateInputFormatDirective,    
     HighLighttDirective,
     SharedService
+  ],
+  entryComponents: [
+  
   ]
 })
 export class SharedModule { }

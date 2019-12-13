@@ -156,3 +156,55 @@ input[type="text"] {
     background: #d6e2e8;
     transition: .1s;
 }
+
+.notification {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    margin-left: 12px;
+    margin-right: 12px;
+}
+
+#user-menu {
+    font-size: 20px;
+    padding: 0 4px;
+}
+
+.notification-clear {
+    cursor: initial;
+    text-align: right;
+    line-height: 0;
+    height: auto;
+}
+
+.notification-clear:hover,
+.notification-clear:focus {
+    background: none !important;
+}
+
+.notification-clear>button {
+    padding: 0 4px;
+    min-width: 50px;
+}
+
+.alert-item {
+    line-height: 22px;
+    height: auto;
+    padding: 4px 16px;
+    color: #777;
+    font-size: 13px;
+    background-color: #fff;
+    transition: background-color linear .1s .4s;
+}
+
+.alert-item strong {
+    color: #555;
+}
+
+.alert-item-time {
+    font-size: 12px;
+}
+
+.alert-item-highlight {
+    background-color: #d6e2e8;
+}

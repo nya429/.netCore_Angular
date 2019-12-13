@@ -1,4 +1,4 @@
-import { DisElement } from './../MOCK_DATA';
+// import { DisElement } from './../MOCK_DATA';
 import { ComponentRef, Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
 import { Overlay, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -7,7 +7,7 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 @Directive({ selector: '[awesomeTooltip]' })
 export class TooltipDirective implements OnInit {
   @Input ('toolTipDisplay') isDisplay: boolean = true;
-  @Input('awesomeTooltip') tipInfo: {tipType: string, content: DisElement};
+  @Input('awesomeTooltip') tipInfo: {tipType: string, content: any};
   private overlayRef: OverlayRef;
 
   constructor(private overlay: Overlay,

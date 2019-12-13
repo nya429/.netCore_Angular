@@ -12,7 +12,7 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { of, Subscription, } from 'rxjs';
 import { switchMap, filter, map } from 'rxjs/operators';
 
-import { PeriodicElement, ELEMENT_DATA, DisElement } from 'src/app/MOCK_DATA';
+// import { PeriodicElement, ELEMENT_DATA, DisElement } from 'src/app/MOCK_DATA';
 import { MemberService } from './../member.service';
 import { DiscreapcnyUpdateDialogComponent } from './../../shared/discrepancy-update-dialog/discrepancy-update-dialog.component';
 import { PagedList } from 'src/app/model/response.model';
@@ -56,7 +56,7 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
   memberSelection: SelectionModel<Member>;
 
   // onDisplayDiscrepancy
-  public displayedDiscrepancy: DisElement;
+  public displayedDiscrepancy: any;
 
   /** Authorization */
   listPermissions: string;
@@ -137,7 +137,7 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
   }
 
   initState() {
-    this.displayedDiscrepancyInfo$ = this.service.onDiscrepancyDetailOpened.subscribe((e: DisElement) => {
+    this.displayedDiscrepancyInfo$ = this.service.onDiscrepancyDetailOpened.subscribe((e: any) => {
       this.displayedDiscrepancy = e;
     })
 

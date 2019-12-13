@@ -1,6 +1,6 @@
 import { User } from './../../model/user.model';
 import { RawDiscrepancyComment } from './../../model/discrepancyComment.model';
-import { CommentaryElement, C_DATA, MasterCommentaryElement, DisElement } from './../../MOCK_DATA';
+// import { CommentaryElement, C_DATA, MasterCommentaryElement, DisElement } from './../../MOCK_DATA';
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, AfterViewChecked, DoCheck, Renderer2, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { throwError, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
@@ -8,6 +8,7 @@ import { SharedService } from '../shared.service';
 import { PagedList } from 'src/app/model/response.model';
 import { DiscrepancyComment } from 'src/app/model/discrepancyComment.model';
 import { AuthService } from 'src/app/auth/auth.service';
+import { Discrepancy } from 'src/app/model/discrepancy.model';
 
 @Component({
   selector: 'app-commentary-container',
@@ -18,16 +19,19 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
   // used to change commentary height;
   @ViewChild('commentaryEf') commentaryEf: ElementRef;
   @ViewChild('inputEf') inputEf: ElementRef;
+  @Input('displayDiscrepancyInfo') displayDiscrepancyInfo: boolean;
   @Input('containerH') containerH: number;
+  @Input('masterPatientID') masterPatientID: number;
+  @Input('discrepancyID') discrepancyID: number;
+  @Input('discrepancy') discrepancy: Discrepancy;
+  @Output() commentaryDismissed = new EventEmitter<void>();
+
+
   // prefixed input height
   inputEfHeight: number = 110;
 
   sourceComments: DiscrepancyComment[];
   commentList: DiscrepancyComment[];
-
-  @Input('discrepancyID') discrepancyID: number;
-  // @Input('actionUserID') actionUserID: number;//
-  @Output() commentaryDismissed = new EventEmitter<void>();
 
   private disrepancyCommentListChanged$: Subscription;
   private discrepancyCommentCreated$: Subscription;
@@ -41,7 +45,7 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
   ngOnInit() {
     this.initSource();
     this.initState();
-    this.inputEfHeight = this.containerH - this.inputEf.nativeElement.offsetHeight - 64;
+ 
     // console.log('ngOnInit', this.inputEfHeight, this.containerH, this.inputEf.nativeElement.offsetHeight);
   }
 
@@ -78,6 +82,17 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
     // this.actionUserID = 1;
     // this.discrepancyID = 1;
 
+    if (!this.discrepancy) {
+      this.serivce.getDiscrepancyById(this.discrepancyID).subscribe(result => {
+        if (result.isSuccess) {
+          console.log("get Comment Discrepancy", result.data)
+          this.discrepancy = result.data;
+        }
+      }, error => {
+        console.error(error);
+      });
+    }
+
     this.actionUser = this.authService.getActionUser();
 
     this.sourceComments = this.serivce.getpagedListInl().list;
@@ -111,6 +126,7 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
       }
     );
     this.sourceComments = masterComments;
+    this.calculateCommentListHeight();
   }
 
   sortComments() {
@@ -121,7 +137,7 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
     })
   }
 
-  onCommentSubmited(val: string) {
+  onCommentSubmited(val: { comment: string; anchoredUserIds: number[] }) {
     let newComment: DiscrepancyComment = {
       discrepancyCommentID: null,
       discrepancyID: this.discrepancyID,
@@ -129,14 +145,15 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
       comment_UserID: this.actionUser ? this.actionUser.userID : null,
       userFirstName: this.actionUser ? this.actionUser.userFirstName : '',
       userLastName: this.actionUser ? this.actionUser.userLastName : '',
-      discrepancyComment: val,
+      // discrepancyComment: val,
+      discrepancyComment: val.comment,
       activeFlag: true,
       insertDate: new Date().toLocaleString(),
       updateDate: '',
       subComments: []
     }
 
-    this.serivce.createDiscreapncyComment(newComment, 'create');
+    this.serivce.createDiscreapncyComment(newComment, val.anchoredUserIds, this.masterPatientID, 'create');
   }
 
   // Auto shwoing the latest the comment
@@ -149,7 +166,12 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
   }
 
   onInputChange(e: string) {
-    this.inputEfHeight = this.containerH - this.inputEf.nativeElement.offsetHeight - 64;
+    this.calculateCommentListHeight();
+  }
+
+  calculateCommentListHeight() {
+    /** Prefixed Discrepancy Hight 102 */
+    this.inputEfHeight = this.containerH - this.inputEf.nativeElement.offsetHeight - (this.displayDiscrepancyInfo ? 102 : 50);
   }
 
   onDismissClick() {

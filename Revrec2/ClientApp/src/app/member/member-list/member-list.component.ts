@@ -5,7 +5,7 @@ import { MemberPaged, MemberName } from './../../model/member.model';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter, Input, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
-import { ELEMENT_DATA, PeriodicElement } from 'src/app/MOCK_DATA';
+// import { ELEMENT_DATA, PeriodicElement } from 'src/app/MOCK_DATA';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Sort, PageEvent, MatSort, MatSortable } from '@angular/material';
 import { FormControl, FormGroup } from '@angular/forms';

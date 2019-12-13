@@ -8,41 +8,45 @@ import { MemberContainerComponent } from './member-container/member-container.co
 import { AuthGuard } from '../auth/auth-guard.service';
 
 const membersRoutes: Routes = [
-    {path: 'members',
+    {
+        path: 'members',
         component: MemberContainerComponent,
         canActivate: [AuthGuard],
         data: {
             expectedRoles: '1111'
         },
         children: [
-            {path: ':id',
-             component: MemberInfoComponent,
-             outlet: 'bio',
-             canActivate: [AuthGuard],
-             data: {
-                 expectedRoles: '1111'
-             }
-            //  children: [
-            //      {path: 'discrepancies', component: DiscrepancyListComponent},
-            //      {path: 'monthly_summary_records', component: MonthlySummaryRecordListComponent},
-            //      {path: '', redirectTo: 'discrepancies', pathMatch: 'full'},
-            // ]
+            {
+                path: ':id',
+                component: MemberInfoComponent,
+                outlet: 'bio',
+                canActivate: [AuthGuard],
+                data: {
+                    expectedRoles: '1111'
+                }
+                //  children: [
+                //      {path: 'discrepancies', component: DiscrepancyListComponent},
+                //      {path: 'monthly_summary_records', component: MonthlySummaryRecordListComponent},
+                //      {path: '', redirectTo: 'discrepancies', pathMatch: 'full'},
+                // ]
             },
-            {path: ':id',
-            component: MemberInfoComponent,
-            outlet: 'mmis',}
+            {
+                path: ':id',
+                component: MemberInfoComponent,
+                outlet: 'mmis',
+            }
         ]
     },
-//     {path: 'members/:id',
-//     component: MemberInfoComponent,
-//          children: [
-//              {path: 'discrepancies', component: DiscrepancyListComponent},
-//              {path: 'monthly_summary_records', component: MonthlySummaryRecordListComponent},
-//              {path: '', redirectTo: 'monthly_summary_records', pathMatch: 'full'},
-//         ]
-    
-    
-// },
+    //     {path: 'members/:id',
+    //     component: MemberInfoComponent,
+    //          children: [
+    //              {path: 'discrepancies', component: DiscrepancyListComponent},
+    //              {path: 'monthly_summary_records', component: MonthlySummaryRecordListComponent},
+    //              {path: '', redirectTo: 'monthly_summary_records', pathMatch: 'full'},
+    //         ]
+
+
+    // },
 ];
 
 @NgModule({
@@ -51,4 +55,4 @@ const membersRoutes: Routes = [
     ],
     exports: [RouterModule]
 })
-export class MembersRoutingModule {}
+export class MembersRoutingModule { }

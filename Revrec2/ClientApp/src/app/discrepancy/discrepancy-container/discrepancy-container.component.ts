@@ -1,8 +1,9 @@
+import { stringify } from '@angular/compiler/src/util';
 import { SharedService } from './../../shared/shared.service';
 import { Discrepancy } from './../../model/discrepancy.model';
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 
-import { DisElement, ELEMENT_DATA, D_DATA } from 'src/app/MOCK_DATA';
+// import { DisElement, ELEMENT_DATA, D_DATA } from 'src/app/MOCK_DATA';
 import { PagedList } from 'src/app/model/response.model';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -27,8 +28,7 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
   private discrepancyUpdated$: Subscription;
   private discrepancyListUpdated$: Subscription;
   private searchForm$: Subscription;
-
-  discrepancyList: DisElement[];
+  // discrepancyList: DisElement[];
   contentHeight: number;
 
   // RateCards Data Source
@@ -68,7 +68,7 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     //MOCK
-    this.discrepancyList = D_DATA.slice(0, 50);
+    // this.discrepancyList = D_DATA.slice(0, 50);
 
     this.initForm();
     this.initState();
@@ -85,6 +85,14 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
     this.discrepancyListChanged$.unsubscribe();
     this.discrepancyUpdated$.unsubscribe();
     this.searchForm$.unsubscribe();
+
+    if (this.searchForm.dirty || this.searchForm) {
+      let discrepacnyParam = {
+        searchform: this.searchForm.value,
+        subform: this.subForm
+      };
+      localStorage.setItem('discrepancylist', JSON.stringify(discrepacnyParam));
+    }
   }
 
   initForm() {
@@ -170,12 +178,28 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
   initSource() {
     this.pagedSourceDiscrepancy = this.service.getpagedListInl();
     this.isLookup = true;
-     /** @Todo Seperate Main/Sub list in more elegant way  */
-    this.service.getDiscrepancies({}, {}, false);
+
+
+
+    if (localStorage.getItem('discrepancylist')) {
+      let discrepancyParams = JSON.parse(localStorage.getItem('discrepancylist'));
+      this.service.getDiscrepancies({}, { ...discrepancyParams.searchform }, false)
+      this.searchForm.patchValue(discrepancyParams.searchform, { emitEvent: false });
+      for (const key in discrepancyParams.searchform) {
+        if (discrepancyParams.searchform[key]) {
+          this.searchForm.get(key).markAsDirty();
+        }
+      }
+    } else {
+      this.service.getDiscrepancies({}, {}, false);
+    }
+
+    /** @Todo Seperate Main/Sub list in more elegant way  */
+
   }
 
   onListPagedSorted(e) {
-     /** @Todo Seperate Main/Sub list in more elegant way  */
+    /** @Todo Seperate Main/Sub list in more elegant way  */
     this.service.getDiscrepancies(e, { ...this.subForm, ...this.searchForm.value }, false);
   }
 
@@ -184,10 +208,10 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
   }
 
   dateInputValidator(form: FormGroup) {
-    const condition = form.get('discoverDateStart').getError('matDatepickerParse') 
-                    || form.get('discoverDateEnd').getError('matDatepickerParse') 
-                    || form.get('resolutionDateStart').getError('matDatepickerParse') 
-                    || form.get('resolutionDateEnd').getError('matDatepickerParse');
+    const condition = form.get('discoverDateStart').getError('matDatepickerParse')
+      || form.get('discoverDateEnd').getError('matDatepickerParse')
+      || form.get('resolutionDateStart').getError('matDatepickerParse')
+      || form.get('resolutionDateEnd').getError('matDatepickerParse');
 
     // console.log('discoverDateStart', form.get('discoverDateStart').getError('matDatepickerParse') )
     return condition ? { dateInputError: true } : null;
@@ -229,6 +253,7 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
       this.isLookup = true;
       this.searchForm.disable({ emitEvent: false });
       /** @Todo Seperate Main/Sub list in more elegant way  */
+      console.log(this.searchForm.value)
       this.service.getDiscrepancies({}, { ...this.subForm, ...this.searchForm.value }, false);
     }, 1500);
   }

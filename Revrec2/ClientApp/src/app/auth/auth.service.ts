@@ -73,7 +73,6 @@ export class AuthService {
     }
 
     getRoleMappingSettingByNames(moduleName: string, viewName: string) {
-        console.log(moduleName, viewName)
         return this.endpointRoleSetting.module.find(m => m.name === moduleName).endpoint.find(e => e.name === viewName).value;
     }
 

@@ -1,3 +1,4 @@
+import { NotificationService } from './notification.service';
 import { AuthService } from './auth/auth.service';
 import { Injectable } from '@angular/core';
 import { SettingService } from './setting/setting.service';
@@ -18,12 +19,13 @@ export class AppService {
   listPermissionsDiscrepancyStatus: string;
   listPermissionsDiscrepancyCategory: string;
   listPermissionsUser: string;
-  settingLinks = []
+  settingLinks = [];
 
   constructor(
     private router: Router,
     private authService: AuthService,
-    private settingService: SettingService) { }
+    private settingService: SettingService,
+    private notificationService: NotificationService) { }
 
   init() {
     this.authService.autoLoginViaWinAuth();
@@ -52,8 +54,11 @@ export class AppService {
       this.settingService.initOpionts();
       this.configWildCardRoute();
     });
-
+    
     this.settingService.optionsReady$.subscribe(() => {
+      let userId = this.authService.getActionUserId();
+      console.log(userId);
+      this.notificationService.subscribeNotification(userId);
       this.optionInited.next();
     })
   }

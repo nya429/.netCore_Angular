@@ -32,6 +32,8 @@ export class SharedService {
   public discrepancyBulkUpdated = new Subject<any>();
   public afterDiscrepancyBulkUpdated = new Subject<any>();
 
+  public displayedDiscrepancy: Discrepancy;
+
   constructor(private http: HttpClient,
     private authService: AuthService,
     @Inject('BASE_URL') baseUrl: string) {
@@ -108,17 +110,20 @@ export class SharedService {
   }
 
 
-  createDiscreapncyComment(discrepancyComment: RawDiscrepancyComment, type: "reply" | "create") {
+  createDiscreapncyComment(discrepancyComment: RawDiscrepancyComment, anchoredUserIds: number[], masterPatientID: number, type: "reply" | "create") {
     const url = this.baseUrl + 'Discrepancy/CreateDiscrepancyComment'
 
-    console.log("POST Create DiscreapncyComment", url, discrepancyComment)
-    const requestBody =
-    {
-      DiscrepancyID: discrepancyComment.discrepancyID,
-      ReplyCommentID: discrepancyComment.replyCommentID,
-      DiscrepancyComment: discrepancyComment.discrepancyComment,
-      ActiveFlag: discrepancyComment.activeFlag
+    const requestBody = {
+      discrepancyCommentForCreateDto: {
+        DiscrepancyID: discrepancyComment.discrepancyID,
+        ReplyCommentID: discrepancyComment.replyCommentID,
+        DiscrepancyComment: discrepancyComment.discrepancyComment,
+        ActiveFlag: discrepancyComment.activeFlag
+      },
+      anchoredUserIds: anchoredUserIds,
+      masterPatientID: masterPatientID
     };
+    console.log("POST Create DiscreapncyComment", url, requestBody)
 
     return this.http.post<Reponse<number>>(url, requestBody, {
       observe: 'body',
@@ -163,6 +168,15 @@ export class SharedService {
       }
     }, error => {
       console.error("PATCH update DiscreapncyComment =>", error);
+    });
+  }
+
+  getDiscrepancyById(discreapncyID: number) {
+    const url = this.baseUrl + 'discrepancy/GetDiscrepancyById/' + discreapncyID;
+    console.log("GET get Discreapncybyid", url)
+    return this.http.get<Reponse<Discrepancy>>(url, {
+      observe: 'body',
+      responseType: 'json',
     });
   }
 
@@ -288,5 +302,13 @@ export class SharedService {
 
   onAfterDiscrepancyBulkUpdated(form: any) {
     this.afterDiscrepancyBulkUpdated.next(form);
+  }
+
+  onDiscrepancyDetailClick(e) {
+    this.displayedDiscrepancy = e;
+  }
+
+  getDisplayedDiscrepancy() {
+    return this.displayedDiscrepancy;
   }
 }

@@ -23,7 +23,7 @@
                     <button matTooltip='Search' mat-icon-button [matMenuTriggerFor]="searchMenu" fxFlexAlign="center">
                             <mat-icon>search</mat-icon>
                    </button>
-                    <mat-menu #searchMenu="matMenu" class="customize">
+                    <mat-menu #searchMenu="matMenu" [overlapTrigger]="false" class="customize">
                         <mat-form-field (click)="$event.stopPropagation()" id='searchMenu'>
                             <input autocomplete="off" (click)="$event.stopPropagation()" matInput type="text" placeholder="Find by Name/CCA/MMIS ID" formControlName="universalInput">
 
@@ -55,7 +55,7 @@
                     <button matTooltip='More Actions' mat-icon-button [matMenuTriggerFor]="moreActionMenu" fxFlexAlign="center">
                        <mat-icon>more_vert</mat-icon>
                     </button>
-                    <mat-menu (click)="$event.stopPropagation()" #moreActionMenu="matMenu">
+                    <mat-menu (click)="$event.stopPropagation()" [overlapTrigger]="false" #moreActionMenu="matMenu">
                         <mat-list (click)="$event.stopPropagation()">
                             <h3 mat-subheader> Sort By</h3>
                             <mat-list-item *ngFor="let option of sortOptions">
@@ -136,7 +136,7 @@
                         <!-- 'lookup-de-highlight': isDeHighlight(i) -->
                     </table>
                 </div>
-                <mat-paginator [pageSizeOptions]="pageSizeOptions " [pageIndex]="pageState.pageIndex " [length]="pageState.count " [pageSize]="pageSize " (page)="onPage($event) " color='warm' showFirstLastButtons></mat-paginator>
+                <mat-paginator [pageSizeOptions]="pageSizeOptions " [pageIndex]="pageState.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
             </div>
         </form>
     </mat-card>

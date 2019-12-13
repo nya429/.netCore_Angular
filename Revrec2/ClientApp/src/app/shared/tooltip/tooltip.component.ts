@@ -1,4 +1,4 @@
-import { DisElement } from 'src/app/MOCK_DATA';
+// import { DisElement } from 'src/app/MOCK_DATA';
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { animate, style, transition, trigger } from '@angular/animations';
 

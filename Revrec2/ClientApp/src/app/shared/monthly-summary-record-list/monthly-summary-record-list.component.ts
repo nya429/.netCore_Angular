@@ -9,7 +9,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { of, Subscription } from 'rxjs';
 
-import { PeriodicElement, ELEMENT_DATA, DisElement } from 'src/app/MOCK_DATA';
+// import { PeriodicElement, ELEMENT_DATA, DisElement } from 'src/app/MOCK_DATA';
 import { DiscreapcnyUpdateDialogComponent } from '../discrepancy-update-dialog/discrepancy-update-dialog.component';
 
 const ColumnsSetting: string[] = [
@@ -82,11 +82,11 @@ export class MonthlySummaryRecordListComponent implements OnInit, OnInit, OnChan
   displayedColumns: string[] = ColumnsSetting.slice();
 
   /** Table Source State: @Input */
-  @Input() source: DisElement[];
+  @Input() source: any[];
 
-  dataSource = ELEMENT_DATA[0].discrepancies;
-  sortedData = this.dataSource;
-  pagedDataMOCK = this.dataSource;
+  dataSource;
+  // sortedData = this.dataSource;
+  // pagedDataMOCK = this.dataSource;
 
   /** loading flag, default false */
   isLookup = true;
@@ -94,7 +94,7 @@ export class MonthlySummaryRecordListComponent implements OnInit, OnInit, OnChan
   /**  Selection State
    *     1. member multiple selection
   */
-  selection = new SelectionModel<DisElement>(true, []);
+  selection = new SelectionModel<any>(true, []);
 
   pageSizeOptions: number[] = [12];
   pageState = {
@@ -229,7 +229,7 @@ export class MonthlySummaryRecordListComponent implements OnInit, OnInit, OnChan
   // @MOCK
   isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.length;
+    const numRows = this.pagedData.length;
     return numSelected == numRows;
   }
 
@@ -245,7 +245,7 @@ export class MonthlySummaryRecordListComponent implements OnInit, OnInit, OnChan
   masterToggle(): void {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.dataSource.forEach(row => this.selection.select(row));
+      this.pagedData.forEach(row => this.selection.select(row));
     // console.log(this.dataSource);
     // this.memberListService.selectMember(this.selection.selected, this.pagedData.length);
   }
@@ -322,7 +322,7 @@ export class MonthlySummaryRecordListComponent implements OnInit, OnInit, OnChan
         return;
 
       // console.log(result, this.selection.selected);
-      this.selection.selected.map((discrepancy: DisElement) => {
+      this.selection.selected.map((discrepancy: any) => {
         // console.log(discrepancy['dueDate'], result.dueDate)
         discrepancy['status'] = result.status ? result.status : discrepancy['status'];
         discrepancy['assigned'] = result.assignee ? result.assignee : discrepancy['assigned'];

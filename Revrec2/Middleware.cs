@@ -4,33 +4,52 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Revrec2.Models;
+using Revrec2.Services;
 
 namespace Revrec2
 {
-    // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
-    public class TestMiddleware
+    public class SseMiddleWare
     {
         private readonly RequestDelegate _next;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly SseService _sseService;
 
-        public TestMiddleware(RequestDelegate next, IHttpContextAccessor httpContextAccessor)
+        public SseMiddleWare(RequestDelegate next, SseService sseService)
         { 
-            _httpContextAccessor = httpContextAccessor;
+            _sseService = sseService;
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        // Test subscribe
+        public Task Invoke(HttpContext context)
         {
-            await _next(context);
+            if (context.Request.Headers["Accept"] == "text/event-stream")
+            {
+                context.Response.ContentType = "text/event-stream";
+                context.Response.Body.Flush();
+
+                SseClient client = new SseClient(context.Response, 1);
+                Guid clientId = _sseService.AddClient(client);
+
+                context.RequestAborted.WaitHandle.WaitOne();
+
+                _sseService.RemoveClient(clientId);
+
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return _next(context);
+            }
         }
     }
 
     // Extension method used to add the middleware to the HTTP request pipeline.
     public static class MiddlewareExtensions
     {
-        public static IApplicationBuilder UseTestMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseSseMiddleWare(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<TestMiddleware>();
+            return builder.UseMiddleware<SseMiddleWare>();
         }
     }
 }

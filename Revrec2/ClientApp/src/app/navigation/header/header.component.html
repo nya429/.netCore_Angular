@@ -45,11 +45,47 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div *ngIf="!memebrNameResults" class="universal-search-result-field-content">
+                                        <div *ngFor="let item of searchHistory" class="universal-search-result-field-content-item-list">
+                                            <div (click)="onResultItemClick(item, 'members')" class="universal-search-result-field-content-item">
+                                                <div class="universal-search-result-field-content-item-info">
+                                                    {{item.memberFirstName | titlecase}} {{item.memberLastName | titlecase}} ({{item.mmiS_MMIS_ID}})
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="universal-search-result-field-actions">
 
                                     </div>
+
                                 </section>
+
                                 <mat-divider></mat-divider>
+
+
+                                <!-- <section class="universal-search-result-field">
+                                    <div class="universal-search-result-field-title">
+                                        History:
+                                    </div>
+                                    <div class="universal-search-result-field-content">
+                                        <div *ngFor="let item of searchHistory" class="universal-search-result-field-content-item-list">
+                                            <div (click)="onResultItemClick(item, 'members')" class="universal-search-result-field-content-item">
+                                                <div class="universal-search-result-field-content-item-info">
+                                                    {{item.memberFirstName | titlecase}} {{item.memberLastName | titlecase}} ({{item.mmiS_MMIS_ID}})
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="universal-search-result-field-actions">
+
+                                    </div>
+
+                                </section> -->
+
 
                                 <!-- <section class="universal-search-result-field">
                                 <div class="universal-search-result-field-title">
@@ -77,6 +113,34 @@
                             <mat-divider></mat-divider> -->
 
                             </section>
+
+
+
+                            <section *ngIf="!searchForm.get('universalInput').value" class="universal-search-result-fields">
+                                <section class="universal-search-result-field">
+                                    <div class="universal-search-result-field-title">
+                                        History:
+                                    </div>
+                                    <div class="universal-search-result-field-content">
+                                        <div *ngFor="let item of searchHistory" class="universal-search-result-field-content-item-list">
+                                            <div (click)="onResultItemClick(item, 'members')" class="universal-search-result-field-content-item">
+                                                <div class="universal-search-result-field-content-item-info">
+                                                    {{item.memberFirstName | titlecase}} {{item.memberFirstName | titlecase}} {{item.memberLastName | titlecase}} ({{item.mmiS_MMIS_ID}})
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="universal-search-result-field-actions">
+
+                                    </div>
+
+                                </section>
+
+
+
+                            </section>
                             <!-- <mat-card-content>
                                 My Working List
                             </mat-card-content>
@@ -92,13 +156,59 @@
                     </div>
                 </div>
             </li>
+
             <li *ngIf='!isAuth()'>
                 <!-- routerLink="/login" -->
                 <a (click)="onLogin()">Login</a>
             </li>
+
             <li *ngIf='isAuth()'>
                 <!-- (click)='onLogout()' -->
-                <a style='cursor:pointer;'>Hi, {{getUser()}}</a>
+
+                <button id="user-menu" mat-button>
+                    <a  style='cursor:pointer;'>Hi, {{getUser()}}</a>
+                    <mat-icon aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+                </button>
+                <button mat-icon-button class="notification" matBadgePosition="after" [matMenuTriggerFor]="notificationMenu" [matBadgeHidden]="!getNotification()" [matBadge]="getNotification()" matBadgeColor="warn" (click)="clearNotification()"><mat-icon>notifications</mat-icon></button>
+                <mat-menu class="notification-list" #notificationMenu="matMenu" [overlapTrigger]="false" yPosition="below">
+                    <button *ngIf="alertList.length === 0" [disabled]="true" mat-menu-item>No Notification</button>
+                    <div *ngFor="let alert of alertList" [ngSwitch]="getNotificationType(alert)">
+                        <div mat-menu-item [ngClass]="{'alert-item-highlight': isNotificationHighlighted(alert)}" (click)="onNoticationItemClick(alert)" class="alert-item">
+
+
+                            <div *ngSwitchCase="'discrepancy'">
+                                <div class="alert-item-title">
+                                    <strong>{{ alert.ActionUserName }} </strong> assigned you {{alert.NotificationObject.length}} Discrepancy
+                                </div>
+                                <div class="alert-item-time">
+                                    {{ alert.EntryTime | signtime }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'member'">
+                                <div class="alert-item-title">
+                                    <strong>{{ alert.ActionUserName }} </strong> assigned you {{alert.NotificationObject.length}} Member
+                                </div>
+                                <div class="alert-item-time">
+                                    {{ alert.EntryTime | signtime }}
+                                </div>
+                            </div>
+
+                            <div *ngSwitchCase="'comment'">
+                                <div class="alert-item-title">
+                                    <strong>{{alert.ActionUserName}} </strong> mentioned you
+                                </div>
+                                <div class="alert-item-time">
+                                    {{ alert.EntryTime | signtime }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="notification-clear" mat-menu-item disableRipple="true">
+                        <button mat-button (click)="clearAlertList()">Dismiss</button>
+                    </div>
+                </mat-menu>
             </li>
         </ul>
     </div>

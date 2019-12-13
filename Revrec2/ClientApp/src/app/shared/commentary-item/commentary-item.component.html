@@ -18,5 +18,5 @@
         {{comment.discrepancyComment}}
     </mat-card-content>
 </div>
-
-<app-commentary-input *ngIf="commentState.state === 'edit'" appClickOutside [commentState]='commentState' (clickOutside)="onInputDismiss($event)" (onCommentChange)="onCommentChanged($event)" (onCommentSubmit)="onCommentUpdate($event)" (onCommentCancel)="onCommentCancel($event)"></app-commentary-input>
+<!-- @userClick (clickOutside)="onInputDismiss($event)"  -->
+<app-commentary-input *ngIf="commentState.state === 'edit'" appClickOutside [commentState]='commentState' (onCommentChange)="onCommentChanged($event)" (onCommentSubmit)="onCommentUpdate($event)" (onCommentCancel)="onCommentCancel($event)"></app-commentary-input>

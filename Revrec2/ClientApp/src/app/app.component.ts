@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs';
 import { AppService } from './app.service';
-import { Component, ChangeDetectorRef, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { fadeAnimation } from './setting/setting.animation';
 import { RouterOutlet, ActivatedRoute } from '@angular/router';
@@ -9,6 +9,7 @@ import { RouterOutlet, ActivatedRoute } from '@angular/router';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  encapsulation: ViewEncapsulation.None
   // animations: [fadeAnimation]
 })
 export class AppComponent implements OnInit, OnDestroy {

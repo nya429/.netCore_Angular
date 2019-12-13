@@ -2,7 +2,7 @@ import { AuthService } from './../../auth/auth.service';
 import { SettingService } from './../../setting/setting.service';
 import { AssignmentService } from './../assignment.service';
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
-import { ELEMENT_DATA, PeriodicElement, DisElement } from 'src/app/MOCK_DATA';
+// import { ELEMENT_DATA, PeriodicElement, DisElement } from 'src/app/MOCK_DATA';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { of, Subscription, SubscriptionLike } from 'rxjs';
@@ -90,7 +90,7 @@ export class AssignmentInfoComponent implements OnInit, OnDestroy {
     this.router$.unsubscribe();
   }
 
-  onDiscrepancyDetailClick(e: DisElement) {
+  onDiscrepancyDetailClick(e) {
     this.service.onDiscrepancyDetailOpen(e);
   }
 
