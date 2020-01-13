@@ -73,7 +73,7 @@ export class AssignmentContainerComponent implements OnInit, OnDestroy {
       this.onNotificationNav();
     } else if (localStorage.getItem('worklist')) {
       let masterPatientID = localStorage.getItem('worklist');
-      this.router.navigate(['/worklist', { outlets: { 'bio': [masterPatientID] } }]);
+      this.router.navigate(['/worklist', { outlets: { 'patient': [masterPatientID] } }]);
     }
   }
 

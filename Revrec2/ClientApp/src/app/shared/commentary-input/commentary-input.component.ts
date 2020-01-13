@@ -22,29 +22,29 @@ export class CommentaryInputComponent implements OnInit {
   @Output() onCommentChange = new EventEmitter<string>();
   @Output() onCommentSubmit = new EventEmitter<string>();
   @Output() onCommentHeightChanged = new EventEmitter<void>();
-  @Output() onCommentCancel= new EventEmitter<void>();
+  @Output() onCommentCancel = new EventEmitter<void>();
   @Input() contentIn: string;
   @Input() commentState: CommentState;
-  
+
   commentFormGroup: FormGroup;
 
   atSignPosition: any;
   anchoredUserIds: number[] = [];
-  
+
   constructor(private settingService: SettingService) { }
 
   ngOnInit() {
     this.initForm();
   }
-  
+
   // focus  after view init
   ngAfterViewInit() {
     this.el.nativeElement.focus();
 
-    if(this.commentState && this.commentState.state == 'edit') {
-       this.el.nativeElement.style.height = (this.el.nativeElement.scrollHeight + 21) + "px";
-      }
+    if (this.commentState && this.commentState.state == 'edit') {
+      this.el.nativeElement.style.height = (this.el.nativeElement.scrollHeight + 21) + "px";
     }
+  }
 
   // textarea auto grow and shrink within Max-height
   autoGrowTextZone(e): void {
@@ -61,8 +61,8 @@ export class CommentaryInputComponent implements OnInit {
     this.commentFormGroup = new FormGroup({
       comment: new FormControl(content, {
         validators: [Validators.maxLength(1005),
-                     Validators.minLength(4),
-                     Validators.required]
+        Validators.minLength(4),
+        Validators.required]
       }),
       anchoredUserIds: new FormControl(this.anchoredUserIds)
     });
@@ -75,24 +75,28 @@ export class CommentaryInputComponent implements OnInit {
     this.commentFormGroup.patchValue({
       comment: '',
       anchoredUserIds: this.anchoredUserIds
-    }, {emitEvent: false});
+    }, { emitEvent: false });
     this.el.nativeElement.style.height = 72 + "px";
   }
- 
+
   onKeyup($e) {
     // 'Enter' === 13
-    if ($e.keyCode === 13 
+    if ($e.keyCode === 13
       && this.commentFormGroup.valid) {
-        this.onEnterKey();
+      this.onEnterKey();
       return;
     }
     // '@' === 50
-    if ($e.keyCode === 50 ) {
+    if ($e.keyCode === 50) {
       this.onAtSignKey($e);
     }
 
     this.autoGrowTextZone($e);
-  } 
+  }
+
+  onAnchorMenuKeyup(event: KeyboardEvent) {
+    event.stopPropagation();
+  }
 
   onEnterKey() {
     this.onSubmit();
@@ -101,17 +105,18 @@ export class CommentaryInputComponent implements OnInit {
 
   onFormChange() {
     this.commentFormGroup.get('comment')
-    .valueChanges
-    .subscribe(val => {
-      this.onCommentChange.emit(val)}
-    );
+      .valueChanges
+      .subscribe(val => {
+        this.onCommentChange.emit(val)
+      }
+      );
   }
 
   onSubmit() {
     this.onCommentSubmit.emit(
       // this.commentFormGroup.get('comment').value
       this.commentFormGroup.value
-      )
+    )
     this.resetForm();
   }
 
@@ -131,47 +136,47 @@ export class CommentaryInputComponent implements OnInit {
   onAtSignKey(e: KeyboardEvent) {
     // this.el.nativeElement as 
 
-    this.atSignPosition =  (e.target as HTMLInputElement).selectionStart;
+    this.atSignPosition = (e.target as HTMLInputElement).selectionStart;
     if (this.el.nativeElement.setSelectionRange) {
-      
+
       // get boundgin of container no useful
       let re = this.el.nativeElement.getBoundingClientRect()
       console.log(this.el.nativeElement.getBoundingClientRect(), (e.target as HTMLInputElement).selectionStart);
 
       this.el.nativeElement.setSelectionRange((e.target as HTMLInputElement).selectionStart - 1, (e.target as HTMLInputElement).selectionStart);
-      
+
       this.onTextSelection(e, re);
-      
-    //   let sel = window.getSelection();
-    //   console.log(sel, sel.getRangeAt(0))
-    //   let range = sel.getRangeAt(0)
-    //   range.text
-    //   ;
-    //  console.log(rec);
+
+      //   let sel = window.getSelection();
+      //   console.log(sel, sel.getRangeAt(0))
+      //   let range = sel.getRangeAt(0)
+      //   range.text
+      //   ;
+      //  console.log(rec);
     }
     // console.log(e, this.el.nativeElement.setSelectionRange, this.el.nativeElement.setSelectionRange(0, (e.target as HTMLInputElement).selectionStart));
     // e.target.getBoundingClientRect();
   }
 
-  onTextSelection(event: any, re):void{
-    if(true){
+  onTextSelection(event: any, re): void {
+    if (true) {
       var menu = document.getElementById('menuBtn');
       menu.style.display = '';
       // menu.style.position = 'absolute';
       // menu.style.left = event.pageX + 5 + 'px';
       // menu.style.top = event.pageY + 5 + 'px';
 
-      menu.style.left =  5 + 'px';
-      menu.style.top =  5 + 'px';
-      this.menuTrigger.openMenu();  
+      menu.style.left = 5 + 'px';
+      menu.style.top = 5 + 'px';
+      this.menuTrigger.openMenu();
     }
   }
 
-  onMenuClosed():void {
+  onMenuClosed(): void {
     var menu = document.getElementById('menuBtn');
-        if (menu) {
-            menu.style.display = 'none';            
-        }
+    if (menu) {
+      menu.style.display = 'none';
+    }
 
     this.el.nativeElement.focus();
   }
@@ -179,10 +184,10 @@ export class CommentaryInputComponent implements OnInit {
   onUserClick(user: UserOption): void {
     var front = (this.el.nativeElement.value).substring(0, this.atSignPosition);
     var back = (this.el.nativeElement.value).substring(this.atSignPosition, this.el.nativeElement.value.length);
-    let value = front + user.userNameAD  + " " + back;
+    let value = front + user.userNameAD + " " + back;
     this.commentFormGroup.patchValue({
       comment: value,
-    },  {emitEvent: false});
+    }, { emitEvent: false });
 
     this.anchoredUserIds.push(user.userID);
     console.log(this.anchoredUserIds);

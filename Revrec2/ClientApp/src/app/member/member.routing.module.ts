@@ -19,7 +19,7 @@ const membersRoutes: Routes = [
             {
                 path: ':id',
                 component: MemberInfoComponent,
-                outlet: 'bio',
+                outlet: 'patient',
                 canActivate: [AuthGuard],
                 data: {
                     expectedRoles: '1111'

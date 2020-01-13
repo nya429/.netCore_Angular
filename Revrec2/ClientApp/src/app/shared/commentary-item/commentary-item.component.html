@@ -7,14 +7,14 @@
         <mat-card-subtitle>
             {{ getUpdatedOrCreatedTime() | signtime }}
             <span class="header-text-indicator" *ngIf="inputContent.length === 0 && (comment.updateDate.length > 0  && comment.updateDate !== comment.insertDate)">
-          Edited</span>
+                        Edited</span>
             <span class="header-text-indicator" *ngIf="inputContent.length > 0">Edting</span>
         </mat-card-subtitle>
         <button mat-icon-button class='header-action-icon'>
-          <i class="material-icons-outlined">create</i> Edit
-      </button>
+                        <i class="material-icons-outlined">create</i> Edit
+                    </button>
     </div>
-    <mat-card-content style='margin-bottom: 0;'>
+    <mat-card-content style='margin-bottom: 0;' [ngClass]="{'commentary-anchored-highlightable': anchored()}">
         {{comment.discrepancyComment}}
     </mat-card-content>
 </div>

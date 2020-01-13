@@ -68,11 +68,11 @@ namespace Revrec2.Services
             }
         }
 
-        public async void getNotification(int userId)
+        public async void getNotification(int userId, string stringGuid)
         {
             ConcurrentDictionary<int, List<NotificationDto>> notificationDict = await GetorCreateAsync();
             string notificationStr = JsonConvert.SerializeObject(notificationDict.FirstOrDefault(x => x.Key == userId).Value);
-            await _sseService.SendEventsAsync(notificationStr, true, userId);
+            await _sseService.SendEventsAsync(notificationStr, true, stringGuid);
         }
 
         public async void sendNotification(int userId, NotificationDto nofitification)

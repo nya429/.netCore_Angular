@@ -254,7 +254,7 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
       return;
 
     let data = this.navService.onNaved() as MemberName
-
+    console.log(data)
     this.isLookup = true;
     this.service.getMembers({
       sortBy: 'absoluteVarianceSum',

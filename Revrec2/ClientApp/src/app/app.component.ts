@@ -1,9 +1,12 @@
-import { Subscription } from 'rxjs';
+import { ErrorService } from './error.service';
+import { Subscription, Subject } from 'rxjs';
 import { AppService } from './app.service';
-import { Component, ChangeDetectorRef, OnDestroy, OnInit, ViewChild, ElementRef, ViewEncapsulation } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy, OnInit, ViewChild, ElementRef, ViewEncapsulation, EventEmitter, NgZone } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { fadeAnimation } from './setting/setting.animation';
 import { RouterOutlet, ActivatedRoute } from '@angular/router';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -22,15 +25,21 @@ export class AppComponent implements OnInit, OnDestroy {
   authed: string = 'undetermined';
   optionReadyed: boolean = false;
 
+  destroy$: Subject<boolean> = new Subject<boolean>();
   auth$: Subscription;
   optionReady$: Subscription;
 
   constructor(changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher,
-    private service: AppService) {
+    private service: AppService,
+    // private errorService: ErrorService,
+    // private _snackBar: MatSnackBar,
+    // private zone: NgZone
+    ) {
     this.xsQuery = media.matchMedia('(max-width: 1480px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.xsQuery.addListener(this._mobileQueryListener);
+    // this.initErrorHandler();
   }
 
   private _mobileQueryListener: () => void;
@@ -38,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.service.init();
 
-    this.auth$ = this.service.signInStateChanged.subscribe((authResult: string) => {
+    this.auth$ = this.service.signInStateChanged.pipe(takeUntil(this.destroy$)).subscribe((authResult: string) => {
       this.authed = authResult;
       console.log(this.authed)
       // temp set
@@ -47,15 +56,17 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.optionReady$ = this.service.optionInited.subscribe(() => {
+    this.optionReady$ = this.service.optionInited.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.optionReadyed = true;
-
     });
+
   }
 
   ngOnDestroy() {
-    this.auth$.unsubscribe();
-    this.optionReady$.unsubscribe();
+    // this.auth$.unsubscribe();
+    // this.optionReady$.unsubscribe();
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 
 
@@ -67,7 +78,7 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log(this.outlet.activatedRoute.component);
     return this.outlet.isActivated ? this.outlet.activatedRouteData.state : '';
   }
-  */ 
+  */
 
   isAuthed() {
     return this.authed === 'authed';

@@ -7,24 +7,24 @@
             <div fxLayout="row" id="discrepancy-info-container" fxLayoutAlign="begin begin">
                 <div fxFlex="100">
                     <span class="card-subtitle mb-2 text-muted">Month</span>
-                    <h6 class="card-title" style="font-weight: bolder">{{discrepancy.memberMonth | sqlDateFormat}}</h6>
+                    <h6 class="card-title" style="font-weight: bolder">{{ (discrepancy ? discrepancy.memberMonth : null) | sqlDateFormat}}</h6>
                 </div>
                 <div fxFlex="20">
                     <span class="card-subtitle mb-2 text-muted">Rate Cell</span>
-                    <h6 class="card-title">{{discrepancy.ccaRateCell}} vs {{discrepancy.mmisRateCell}} </h6>
+                    <h6 class="card-title">{{ discrepancy ? discrepancy.ccaRateCell : ''}} vs {{discrepancy? discrepancy.mmisRateCell: ''}} </h6>
                 </div>
                 <div fxFlex="20">
                     <span class="card-subtitle mb-2 text-muted">Region</span>
-                    <h6 class="card-title">{{discrepancy.ccaRegion}} vs {{discrepancy.mmisRegion}} </h6>
+                    <h6 class="card-title">{{discrepancy ? discrepancy.ccaRegion: ''}} vs {{discrepancy ? discrepancy.mmisRegion : ''}} </h6>
                 </div>
                 <div fxFlex="20">
                     <span class="card-subtitle mb-2 text-muted">Patient Pay</span>
-                    <h6 class="card-title"> {{discrepancy.ccaPatientPay | currency}} vs {{discrepancy.mmisPatientPay | currency}}</h6>
+                    <h6 class="card-title"> {{(discrepancy ? discrepancy.ccaPatientPay : 0) | currency}} vs {{(discrepancy ? discrepancy.mmisPatientPay : 0) | currency}}</h6>
 
                 </div>
                 <div fxFlex="20">
                     <span class="card-subtitle mb-2 text-muted">Spend Down</span>
-                    <h6 class="card-title"> {{discrepancy.ccaPatientSpendDown | currency}} vs {{discrepancy.mmisPatientSpendDown | currency}} </h6>
+                    <h6 class="card-title"> {{(discrepancy ? discrepancy.ccaPatientSpendDown : 0) | currency}} vs {{(discrepancy? discrepancy.mmisPatientSpendDown: 0) | currency}} </h6>
 
                 </div>
 
@@ -43,7 +43,7 @@
         <div class='commentary-list-container'>
             <div *ngFor='let comment of sourceComments'>
                 <div class="commentary-item-container">
-                    <app-commentary-list-item [actionUser]='actionUser' [source]='comment' [masterPatientID]="masterPatientID"></app-commentary-list-item>
+                    <app-commentary-list-item [actionUser]='actionUser' [anchoredCommentId]='anchoredCommentId' [source]='comment' [masterPatientID]="masterPatientID"></app-commentary-list-item>
                 </div>
             </div>
             <div *ngIf='sourceComments.length === 0'>

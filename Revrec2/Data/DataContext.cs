@@ -87,6 +87,8 @@ namespace Revrec2.Data
 
             modelBuilder.Query<UserRecordPaged>();
 
+            modelBuilder.Query<ExplorerDetails>().ToView("vwExplorerDetails");
+
 #pragma warning restore 612, 618
         }
     }

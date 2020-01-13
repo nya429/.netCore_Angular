@@ -34,7 +34,9 @@ import {
   MatBadgeModule,
   MatButtonToggleModule,
   MAT_DATE_FORMATS,
-  MAT_DATE_LOCALE
+  MAT_DATE_LOCALE,
+  MatRippleModule,
+  MatProgressBarModule
 } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatMomentDateModule, MomentDateAdapter, MAT_MOMENT_DATE_FORMATS } from "@angular/material-moment-adapter";
@@ -202,7 +204,9 @@ export const MY_FORMATS = {
     MatStepperModule,
     MatBadgeModule,
     MatButtonToggleModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatRippleModule,
+    MatProgressBarModule
   ],
   exports: [
     FlexLayoutModule,
@@ -238,7 +242,9 @@ export const MY_FORMATS = {
     MatStepperModule,
     MatBadgeModule,
     MatButtonToggleModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatRippleModule,
+    MatProgressBarModule
   ],
   providers: [
     {provide: DateAdapter, useClass: UTCDateAdapter, deps: [MAT_DATE_LOCALE]},

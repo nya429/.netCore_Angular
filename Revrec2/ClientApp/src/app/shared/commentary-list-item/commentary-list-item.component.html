@@ -21,10 +21,10 @@
     {{commentary.content}}
   </mat-card-content>
 </div> -->
-    <app-commentary-item [actionUser]='actionUser' [source]='masterComment'></app-commentary-item>
+    <app-commentary-item [source]='masterComment' [actionUser]='actionUser' [anchoredCommentId]='anchoredCommentId'></app-commentary-item>
     <div class="sub-commentary-list-container" *ngIf='masterComment.subComments && masterComment.subComments.length > 0'>
         <div *ngFor="let subComment of masterComment.subComments">
-            <app-commentary-item [actionUser]='actionUser' [source]='subComment'></app-commentary-item>
+            <app-commentary-item [source]='subComment' [actionUser]='actionUser' [anchoredCommentId]='anchoredCommentId'></app-commentary-item>
         </div>
     </div>
 

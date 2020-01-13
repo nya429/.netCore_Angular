@@ -1,14 +1,17 @@
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { User } from './../../model/user.model';
 import { RawDiscrepancyComment } from './../../model/discrepancyComment.model';
 // import { CommentaryElement, C_DATA, MasterCommentaryElement, DisElement } from './../../MOCK_DATA';
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, AfterViewChecked, DoCheck, Renderer2, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { throwError, Subscription } from 'rxjs';
+import { throwError, Subscription, of } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
 import { SharedService } from '../shared.service';
 import { PagedList } from 'src/app/model/response.model';
 import { DiscrepancyComment } from 'src/app/model/discrepancyComment.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { Discrepancy } from 'src/app/model/discrepancy.model';
+import { NotificationService } from 'src/app/notification.service';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-commentary-container',
@@ -26,6 +29,29 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
   @Input('discrepancy') discrepancy: Discrepancy;
   @Output() commentaryDismissed = new EventEmitter<void>();
 
+  // private _masterPatientID: number;
+  // @Input('masterPatientID')
+  // set masterPatientId(masterPatientId: number) {
+  //   this._masterPatientID = masterPatientId;
+  // };
+
+  // get masterPatientID(): number {
+  //   return this._masterPatientID;
+  // }
+
+  // private _discrepancyID: number;
+  // @Input('discrepancyID')
+  // set discrepancyID(discrepancyID: number) {
+  //   console.log("INPUT _discrepancyID DETECTED", this._discrepancyID, discrepancyID)
+  //   this._discrepancyID = discrepancyID;
+  //   this.getDiscrepancyInfo();
+  //   this.getDiscrepancyInfo();
+  //   this.getAnchoredCommentId();
+  // };
+
+  // get discrepancyID(): number {
+  //   return this._discrepancyID;
+  // }
 
   // prefixed input height
   inputEfHeight: number = 110;
@@ -33,19 +59,25 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
   sourceComments: DiscrepancyComment[];
   commentList: DiscrepancyComment[];
 
+  // anchored CommentID
+  anchoredCommentId: number;
+
   private disrepancyCommentListChanged$: Subscription;
   private discrepancyCommentCreated$: Subscription;
+  private router$: Subscription;
   private actionUser: User;
 
   constructor(private renderer: Renderer2,
     private _snackBar: MatSnackBar,
     private serivce: SharedService,
-    private authService: AuthService) { }
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private notificationService: NotificationService) { }
 
   ngOnInit() {
     this.initSource();
     this.initState();
- 
+
     // console.log('ngOnInit', this.inputEfHeight, this.containerH, this.inputEf.nativeElement.offsetHeight);
   }
 
@@ -59,6 +91,7 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
   ngOnDestroy(): void {
     this.disrepancyCommentListChanged$.unsubscribe();
     this.discrepancyCommentCreated$.unsubscribe();
+    this.router$.unsubscribe();
   }
 
   // Only when new master commment has been made, then scroll to the botttom
@@ -83,14 +116,8 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
     // this.discrepancyID = 1;
 
     if (!this.discrepancy) {
-      this.serivce.getDiscrepancyById(this.discrepancyID).subscribe(result => {
-        if (result.isSuccess) {
-          console.log("get Comment Discrepancy", result.data)
-          this.discrepancy = result.data;
-        }
-      }, error => {
-        console.error(error);
-      });
+      // console.log("SOURCE INIT", this._discrepancyID, this.discrepancy)
+      this.getDiscrepancyInfo();
     }
 
     this.actionUser = this.authService.getActionUser();
@@ -98,6 +125,7 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
     this.sourceComments = this.serivce.getpagedListInl().list;
     this.commentList = [...this.sourceComments];
     this.serivce.getDiscrepancyCommnetByDiscrepancyID(this.discrepancyID);
+    this.getAnchoredCommentId();
   }
 
   initState() {
@@ -105,12 +133,24 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
       this.nestComments(result.list);
       this.sortComments();
       // this.commentList = [...this.sourceComments];
-    })
+    });
 
     this.discrepancyCommentCreated$ = this.serivce.discrepancyCommentCreated.subscribe((result: DiscrepancyComment) => {
       this.sourceComments.push(result);
       this.openSnackBar('Comment has been made', 'Dismiss')
-    })
+    });
+
+    this.router$ = this.route.queryParamMap.pipe(
+      switchMap((param: ParamMap) => of(+param.get('discrepancyId'))
+      )).subscribe(value => {
+        console.log('ROUTE Detect')
+        if (value && value > 0 && value != this.discrepancyID ) {
+          this.discrepancyID = value;
+          this.getDiscrepancyInfo();
+          this.serivce.getDiscrepancyCommnetByDiscrepancyID(this.discrepancyID);
+          this.getAnchoredCommentId();
+        }
+      });
   }
 
   nestComments(rawCommentList: RawDiscrepancyComment[]): void {
@@ -184,4 +224,28 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
     });
   }
 
+  getDiscrepancyInfo() {
+    this.serivce.getDiscrepancyById(this.discrepancyID)
+    .subscribe(result => {
+      if (result.isSuccess) {
+        this.discrepancy = result.data;
+      }
+    }, error => {
+      console.error(error);
+    });
+  }
+
+  getAnchoredCommentId() {
+    if (!this.notificationService.hasNotification())
+      return;
+
+    const notification = this.notificationService.getAndResetNotification();
+    switch (notification.NotificationType) {
+      case 'comment':
+        this.anchoredCommentId = notification.NotificationObject['DiscrepancyCommentID']
+        return;
+      default:
+        return;
+    }
+  }
 }

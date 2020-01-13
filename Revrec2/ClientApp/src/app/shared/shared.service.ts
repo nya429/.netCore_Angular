@@ -1,13 +1,15 @@
+import { Injectable, Inject } from '@angular/core';
+import { Subject } from 'rxjs';
+import { HttpHeaders, HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+
+import { AuthService } from '../auth/auth.service';
 import { DiscrepancyComment, RawDiscrepancyComment } from './../model/discrepancyComment.model';
 import { MonthlySummary, MemberRevYear } from './../model/monthlysummary.model';
-import { HttpHeaders, HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, Inject } from '@angular/core';
-import { PagedList, Reponse, ReponseList } from '../model/response.model';
-import { Subject } from 'rxjs';
+import { PagedList, Response, ResponseList } from '../model/response.model';
 import { DiscrepancyListRequest, Discrepancy } from '../model/discrepancy.model';
 import { UserOption } from '../model/user.model';
 import { DiscrepancyStatusOption } from '../model/setting.model';
-import { AuthService } from '../auth/auth.service';
+import { ExploreRateCell } from '../model/explore.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +33,8 @@ export class SharedService {
   public discrepancyUpdated = new Subject<Discrepancy[]>();
   public discrepancyBulkUpdated = new Subject<any>();
   public afterDiscrepancyBulkUpdated = new Subject<any>();
+
+  public exploreRateCellListChanged = new Subject<ExploreRateCell[]>();
 
   public displayedDiscrepancy: Discrepancy;
 
@@ -56,7 +60,7 @@ export class SharedService {
     const url = this.baseUrl + 'Discrepancy/MonthlySummaryRecordMemberYears/' + masterPatientID;
 
     console.log(`GET MemberRevYears By PatientID(${masterPatientID})`, url)
-    return this.http.get<Reponse<ReponseList<MemberRevYear>>>(url, {
+    return this.http.get<Response<ResponseList<MemberRevYear>>>(url, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -64,8 +68,6 @@ export class SharedService {
         console.log(`GET MemberRevYears By PatientID(${masterPatientID}) =>`, result.data.list)
         this.monthYearFetched.next(result.data.list);
       }
-    }, error => {
-      console.error(`GET MemberRevYears By PatientID(${masterPatientID}) =>`, error);
     });
   }
 
@@ -79,7 +81,7 @@ export class SharedService {
 
     let requestBody = { ...pageRequest, };
     console.log(" Get MSR", url, requestBody)
-    return this.http.post<Reponse<PagedList<MonthlySummary>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<MonthlySummary>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -87,8 +89,6 @@ export class SharedService {
         console.log(" Get MSR =>", result.data.list)
         this.monthlySummaryListChanged.next(result.data);
       }
-    }, error => {
-      console.error(" Get MSR =>", error);
     });
   }
 
@@ -96,16 +96,14 @@ export class SharedService {
     const url = this.baseUrl + 'Discrepancy/DiscrepancyCommentListById/' + discrepancyId;
 
     console.log(`GET Comments by discrepancyId(${discrepancyId})`, url, discrepancyId)
-    return this.http.get<Reponse<PagedList<RawDiscrepancyComment>>>(url, {
+    return this.http.get<Response<PagedList<RawDiscrepancyComment>>>(url, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
       if (result.isSuccess) {
-        console.log(`GET Comments by discrepancyId(${discrepancyId}) =>`, result.data.list)
+        console.log(`GET Comments by discrepancyId(${discrepancyId}) =>`, result)
         this.disrepancyCommentListChanged.next(result.data);
       }
-    }, error => {
-      console.error(`GET Comments by discrepancyId(${discrepancyId}) =>`, error);
     });
   }
 
@@ -125,7 +123,7 @@ export class SharedService {
     };
     console.log("POST Create DiscreapncyComment", url, requestBody)
 
-    return this.http.post<Reponse<number>>(url, requestBody, {
+    return this.http.post<Response<number>>(url, requestBody, {
       observe: 'body',
       responseType: 'json',
     }).subscribe(result => {
@@ -144,8 +142,6 @@ export class SharedService {
             break;
         }
       }
-    }, error => {
-      console.error(error);
     });
   }
 
@@ -158,7 +154,7 @@ export class SharedService {
 
     const url = this.baseUrl + 'Discrepancy/UpdateDiscrepancyComment/' + discrepancyCommentID;
     console.log("PATCH update DiscreapncyComment", url, requestBody)
-    return this.http.patch<Reponse<any>>(url, requestBody, {
+    return this.http.patch<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json',
     }).subscribe(result => {
@@ -166,15 +162,13 @@ export class SharedService {
         console.log("PATCH update DiscreapncyComment =>", discrepancyComment)
         this.discrepancyCommentUpdated.next(discrepancyComment);
       }
-    }, error => {
-      console.error("PATCH update DiscreapncyComment =>", error);
     });
   }
 
   getDiscrepancyById(discreapncyID: number) {
     const url = this.baseUrl + 'discrepancy/GetDiscrepancyById/' + discreapncyID;
     console.log("GET get Discreapncybyid", url)
-    return this.http.get<Reponse<Discrepancy>>(url, {
+    return this.http.get<Response<Discrepancy>>(url, {
       observe: 'body',
       responseType: 'json',
     });
@@ -220,7 +214,7 @@ export class SharedService {
 
     let requestBody = { ...pageRequest, ...filters };
     console.log(" Get Discrepancies", url, requestBody)
-    return this.http.post<Reponse<PagedList<Discrepancy>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<Discrepancy>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -231,11 +225,8 @@ export class SharedService {
           this.disrepancySubListChanged.next(result.data);
         } else {
           this.disrepancyListChanged.next(result.data);
-
         }
       }
-    }, error => {
-      console.error(" Get Discrepancies =>", error);
     });
   }
 
@@ -251,7 +242,7 @@ export class SharedService {
     const url = this.baseUrl + 'discrepancy/UpdateDiscrepancyByID/' + discrepancyID;
 
     console.log("PATCH Update Discrepancy", url, requestBody)
-    return this.http.patch<Reponse<any>>(url, requestBody, {
+    return this.http.patch<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -259,8 +250,27 @@ export class SharedService {
         console.log("PATCH Update Discrepancy =>", discrepancy)
         this.discrepancyUpdated.next([discrepancy, discrepancyPrev]);
       }
-    }, error => {
-      console.error("PATCH Update Discrepancy =>", error);
+    });
+  }
+
+  getRateCellCrossSourceListByDiscrepancyId(discrepancyId: number) {
+    const requestBody = {
+      StartDate: '',
+      EndDate: '',
+    };
+
+    const url = this.baseUrl + 'discrepancy/GetDiscrepancyById/' + discrepancyId + '/GetRateCellCrossSourceList';
+
+    console.log('POST get rate cell cross source')
+
+    return this.http.post<Response<ResponseList<ExploreRateCell>>>(url, requestBody, {
+      observe: 'body',
+      responseType: 'json'
+    }).subscribe(result => {
+      if (result.isSuccess) {
+        console.log("Rate Cell Cross Source Comparison =>", result)
+        this.exploreRateCellListChanged.next(<ExploreRateCell[]>result.data.list);
+      }
     });
   }
 
@@ -287,7 +297,7 @@ export class SharedService {
     const url = this.baseUrl + 'discrepancy/UpdateMultipleDiscrepanciesByIdList';
 
     console.log("POST bulk update discrepancy", url, requestBody)
-    return this.http.post<Reponse<any>>(url, requestBody, {
+    return this.http.post<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -295,8 +305,6 @@ export class SharedService {
         console.log("POST bulk update discrepancy =>", requestBody)
         this.discrepancyBulkUpdated.next(form);
       }
-    }, error => {
-      console.error("POST bulk update discrepancy =>", error);
     });
   }
 

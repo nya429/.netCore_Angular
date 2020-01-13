@@ -25,6 +25,7 @@ namespace Revrec2.Helpers
             CreateMap<MembersPaged, MemberForListDto>();
             CreateMap<MembersByNamePaged, MemberByNameListDto>();
             CreateMap<UsersListPaged, UsersListDto>();
+            CreateMap<ExplorerDetails, ExplorerDetailsDto>();
         }
     }
 }

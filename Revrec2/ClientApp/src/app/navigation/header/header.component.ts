@@ -228,7 +228,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     switch (field) {
       case 'members':
-        this.router.navigate(['/members', { outlets: { 'bio': [item.masterPatientID] } }], {});
+        this.router.navigate(['/members', { outlets: { 'patient': [item.masterPatientID] } }], {});
         this.navService.onNav(item);
         return;
       default:
@@ -265,17 +265,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onNoticationItemClick(notification: Notification) {
     switch (notification.NotificationType) {
       case 'member':
-        this.router.navigate(['/worklist', { outlets: { 'bio': [notification.NotificationObject[0]] } }], {});
-        this.navService.onNav(notification);
+        this.router.navigate(['/worklist', { outlets: { 'patient': [notification.NotificationObject[0]] } }], {});
+        this.navService.onNav({});
         this.notificationService.onNotificationClick(notification);
         return;
       case 'comment':
-        this.router.navigate(['/worklist', { outlets: { 'bio': [notification.NotificationObject['MasterPatientID']] } }], {});
-        this.navService.onNav(notification);
+        this.router.navigate(['/members', { outlets: { 'patient': [notification.NotificationObject['MasterPatientID']] } }], {
+          queryParams: { 'discrepancyId': notification.NotificationObject['DiscrepancyID'], 'type': 'comment' },
+        });
+        this.navService.onNav({masterPatientID: notification.NotificationObject['MasterPatientID']});
         this.notificationService.onNotificationClick(notification);
         return;
       case 'discrepancy':
-        // this.router.navigate(['/worklist', { outlets: { 'bio': [notification.NotificationObject['MasterPatientID']] } }], {});
+        // this.router.navigate(['/worklist', { outlets: { 'patient': [notification.NotificationObject['MasterPatientID']] } }], {});
         // this.navService.onNav(notification);
         return;
       default:

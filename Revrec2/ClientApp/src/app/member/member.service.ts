@@ -3,7 +3,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 // import { DisElement } from '../MOCK_DATA';
 import { Subject } from 'rxjs';
-import { Reponse, PagedList, ReponseList } from '../model/response.model';
+import { Response, PagedList, ResponseList } from '../model/response.model';
 import { MemberPaged, Member } from '../model/member.model';
 import { SharedService } from '../shared/shared.service';
 import { UserOption } from '../model/user.model';
@@ -80,7 +80,7 @@ export class MemberService {
 
     let requestBody = { ...pageRequest, };
     console.log("Get Members", url, requestBody)
-    return this.http.post<Reponse<PagedList<MemberPaged>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<MemberPaged>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -88,8 +88,6 @@ export class MemberService {
         console.log("Get Members =>", result.data)
         this.memberListChanged.next(result.data);
       }
-    }, error => {
-      console.error("Get Members =>", error);
     });
   }
 
@@ -112,7 +110,7 @@ export class MemberService {
 
     let requestBody = { ...pageRequest, };
     console.log("Get (individual)Members by id", url, requestBody)
-    return this.http.post<Reponse<PagedList<MemberPaged>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<MemberPaged>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -120,8 +118,6 @@ export class MemberService {
         console.log("Get (individual)Members by id =>", result.data)
         this.singleMemberListFetch.next(result.data.list[0]);
       }
-    }, error => {
-      console.error("Get (individual)Members by id =>", error);
     });
   }
 
@@ -130,7 +126,7 @@ export class MemberService {
     const url = this.baseUrl + 'members/GetMemberInfo/' + masterPatientID;
 
     console.log(`GET Member (${masterPatientID})`, url)
-    return this.http.get<Reponse<Member>>(url, {
+    return this.http.get<Response<Member>>(url, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -138,8 +134,6 @@ export class MemberService {
         console.log(`GET Member (${masterPatientID}) =>`, result.data)
         this.memebrFetched.next(result.data);
       }
-    }, error => {
-      console.error(`GET Member (${masterPatientID}) =>`, error);
     });
   }
 
@@ -147,7 +141,7 @@ export class MemberService {
     const url = this.baseUrl + 'members/GetMemberByName/' + memebrNamePartial;
 
     console.log(`Get MemberNames By Partial(${memebrNamePartial})`, url)
-    return this.http.get<Reponse<ReponseList<MemberName>>>(url, {
+    return this.http.get<Response<ResponseList<MemberName>>>(url, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -155,8 +149,6 @@ export class MemberService {
         console.log(`Get MemberNames By Partial(${memebrNamePartial}) =>`, result.data.list)
         this.memberNamesFetched.next(result.data.list);
       }
-    }, error => {
-      console.error(`Get MemberNames By Partial(${memebrNamePartial}) =>`, error);
     });
   }
 
@@ -184,7 +176,7 @@ export class MemberService {
     const url = this.baseUrl + 'members/UpdateDiscrepancyForMultipleMembers';
 
     console.log("POST Bulk Update Members' Discrepancy By MemberIDs", url, requestBody)
-    return this.http.post<Reponse<any>>(url, requestBody, {
+    return this.http.post<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -192,8 +184,6 @@ export class MemberService {
         console.log("POST Bulk Update Members' Discrepancy By MemberIDs => Success")
         this.memberDiscrepancyBulkUpdated.next(form);
       }
-    }, error => {
-      console.error("POST Bulk Update Members' Discrepancy By MemberIDs =>", error);
     });
   }
 

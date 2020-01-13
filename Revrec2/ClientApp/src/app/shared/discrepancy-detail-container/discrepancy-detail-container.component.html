@@ -2,275 +2,216 @@
     <!-- fxLayoutAlign="begin begin" -->
     <!-- fxLayout="row" -->
     <div class='discrepancy-detial-container' [fxFlex]='isSideComponentContainerDisplay? 66 : 100'>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
+        <div class="discrepancy-detail-content-wrapper">
+            <div class="discrepancy-detail-content container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <br>
+
+                        <mat-card>
+                            <!-- <mat-card-header>
+                                        <mat-card-title>Discrepancy</mat-card-title>
+                                        <mat-card-subtitle></mat-card-subtitle>
+                                    </mat-card-header> -->
+                            <mat-card-content>
+                                <div class="row">
+
+                                    <div class="mat-card-content-cell col-2">
+                                        <div class="mat-card-content-cell-header">Dicovery Date</div>
+                                        <div class="mat-card-content-cell-content">{{discrepancy.discoverDate | sqlDateFormat}}</div>
+                                    </div>
+
+                                    <div class="mat-card-content-cell col-2">
+                                        <div class="mat-card-content-cell-header">Member Info</div>
+                                        <div class="mat-card-content-cell-content">{{discrepancy.memberFirstName | titlecase }} {{discrepancy.memberLastName | titlecase}} (MMIS: {{discrepancy.mmiS_MMIS_ID }})</div>
+                                    </div>
+
+                                    <div class="mat-card-content-cell col-2">
+                                        <div class="mat-card-content-cell-header">Member month</div>
+                                        <div class="mat-card-content-cell-content">{{discrepancy.memberMonth | sqlDateFormat }} </div>
+                                    </div>
+
+                                    <div class="mat-card-content-cell col-2">
+                                        <div class="mat-card-content-cell-header">Variance</div>
+                                        <div class="mat-card-content-cell-content">{{discrepancy.variance | currency }} </div>
+                                    </div>
+
+                                    <div class="mat-card-content-cell col-2">
+                                        <div class="mat-card-content-cell-header">Discreapncy Status</div>
+                                        <div class="mat-card-content-cell-content">{{discrepancy.discrepancyStatus }} </div>
+                                    </div>
+
+                                    <div class="mat-card-content-cell col-2">
+                                        <div class="mat-card-content-cell-header">Assigned User</div>
+                                        <div class="mat-card-content-cell-content">{{discrepancy.assigned_UserName | titlecase}} </div>
+                                    </div>
+                                </div>
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
+                </div>
+                <br>
+
+
+                <div class="row">
+                    <div class="col-3">
+                        <mat-card mat-ripple class="discrepancy-type-card" (click)="onDiscrepancyTypeCardClick('RC')" [ngClass]="{ 'discrepancyType-active': displayedDiscrepancyType === 'RC'}">
+                            <mat-card-header>
+                                <mat-card-title>Rate Cell</mat-card-title>
+                                <mat-card-subtitle [ngClass]="{ 'variance-active': discrepancy.typeRateCell}"> {{discrepancy.ccaRateCell }} vs {{discrepancy.mmisRateCell }}</mat-card-subtitle>
+                            </mat-card-header>
+                        </mat-card>
+                    </div>
+                    <div class="col-3">
+                        <mat-card mat-ripple class="discrepancy-type-card" (click)="onDiscrepancyTypeCardClick('RE')" [ngClass]="{ 'discrepancyType-active': displayedDiscrepancyType === 'RE'}">
+                            <mat-card-header>
+                                <mat-card-title>Region</mat-card-title>
+                                <mat-card-subtitle [ngClass]="{ 'variance-active': discrepancy.typeRegion}"> {{discrepancy.ccaRegion }} vs {{discrepancy.mmisRegion }}</mat-card-subtitle>
+                            </mat-card-header>
+                        </mat-card>
+                    </div>
+                    <div class="col-3">
+                        <mat-card mat-ripple class="discrepancy-type-card" (click)="onDiscrepancyTypeCardClick('PP')" [ngClass]="{ 'discrepancyType-active': displayedDiscrepancyType === 'PP'}">
+                            <mat-card-header>
+                                <mat-card-title>Patient Pay</mat-card-title>
+                                <mat-card-subtitle [ngClass]="{ 'variance-active': discrepancy.typePatientPay}"> {{discrepancy.ccaPatientPay | currency }} vs {{discrepancy.mmisPatientPay | currency }}</mat-card-subtitle>
+                            </mat-card-header>
+                        </mat-card>
+                    </div>
+                    <div class="col-3">
+                        <mat-card mat-ripple class="discrepancy-type-card" (click)="onDiscrepancyTypeCardClick('SD')" [ngClass]="{ 'discrepancyType-active': displayedDiscrepancyType === 'SD'}">
+                            <mat-card-header>
+                                <mat-card-title>Patient Spend Down</mat-card-title>
+                                <mat-card-subtitle [ngClass]="{ 'variance-active': discrepancy.typePatientSpendDown}"> {{discrepancy.ccaPatientSpendDown | currency }} vs {{discrepancy.mmisPatientSpendDown | currency}}</mat-card-subtitle>
+                            </mat-card-header>
+                        </mat-card>
+                    </div>
+                </div>
+                <div class="row">
                     <br>
-                    <!-- <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>Title</mat-card-title>
-                            <mat-card-subtitle>Subtitle</mat-card-subtitle>
-                        </mat-card-header>
-                        <img matCardImage src="Card wide image source">
-                        <mat-card-content>
-                            Text content
-                        </mat-card-content>
-                        <mat-card-actions align="start">
-                            <button mat-button (click)="onAction1">Action1</button>
-                            
-                        </mat-card-actions>
-                        <mat-card-footer>
-                            Footer
-                        </mat-card-footer>
-                    </mat-card> -->
-                    <mat-card>
-                        <!-- <mat-card-header>
-                            <mat-card-title>Discrepancy</mat-card-title>
-                            <mat-card-subtitle></mat-card-subtitle>
-                        </mat-card-header> -->
-                        <mat-card-content>
-                            <div class="row">
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">Dicovery Date</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.discoverDate | sqlDateFormat}}</div>
-                                </div>
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">Member Info</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.memberFirstName | titlecase }} {{discrepancy.memberLastName | titlecase}} (MMIS: {{discrepancy.mmiS_MMIS_ID }})</div>
-                                </div>
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">Member month</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.memberMonth | sqlDateFormat }} </div>
-                                </div>
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">Variance</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.variance | currency }} </div>
-                                </div>
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">Discreapncy Status</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.discrepancyStatus }} </div>
-                                </div>
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">Assigned User</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.assigned_UserName | titlecase}} </div>
-                                </div>
-                                <!-- 
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">Assigned User</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.assigned_UserName | titlecase}} </div>
-                                </div> -->
-
-                                <!-- <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">CCA ID</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.ccaid }}</div>
-                                </div>
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header">MMIS ID</div>
-                                    <div class="mat-card-content-cell-content">{{discrepancy.mmiS_MMIS_ID }}</div>
-                                </div> -->
-
-                                <div class="mat-card-content-cell col-2">
-                                    <div class="mat-card-content-cell-header"></div>
-                                    <div class="mat-card-content-cell-content"></div>
-                                </div>
-                            </div>
-                        </mat-card-content>
-
-
-                    </mat-card>
+                    <mat-divider></mat-divider>
+                    <br>
                 </div>
-            </div>
-            <div class="row">
-                <br>
-                <mat-divider></mat-divider>
-                <br>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>Rate Cell</mat-card-title>
-                            <mat-card-subtitle [ngClass]="{'variance-active': discrepancy.typeRateCell}"> {{discrepancy.ccaRateCell }} vs {{discrepancy.mmisRateCell }}</mat-card-subtitle>
-                        </mat-card-header>
-                        <!-- <mat-card-content>
-                            {{discrepancy.ccaRateCell }} vs {{discrepancy.mmisRateCell }}
-                        </mat-card-content> -->
 
-                    </mat-card>
-                </div>
-                <div class="col-3">
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>Region</mat-card-title>
-                            <mat-card-subtitle [ngClass]="{'variance-active': discrepancy.typeRegion}"> {{discrepancy.ccaRegion }} vs {{discrepancy.mmisRegion }}</mat-card-subtitle>
-                        </mat-card-header>
-                        <!-- <mat-card-content>
-                            {{discrepancy.ccaRegion }} vs {{discrepancy.mmisRegion }}
-                        </mat-card-content> -->
+                <div class="row">
 
-                    </mat-card>
-                </div>
-                <div class="col-3">
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>Patient Pay</mat-card-title>
-                            <mat-card-subtitle [ngClass]="{'variance-active': discrepancy.typePatientPay}"> {{discrepancy.ccaPatientPay | currency }} vs {{discrepancy.mmisPatientPay | currency }}</mat-card-subtitle>
-                        </mat-card-header>
-                        <!-- <mat-card-content>
-                            {{discrepancy.ccaPatientPay | currency }} vs {{discrepancy.mmisPatientPay | currency }}
-                        </mat-card-content> -->
-
-                    </mat-card>
-                </div>
-                <div class="col-3">
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>Patient Spend Down</mat-card-title>
-                            <mat-card-subtitle [ngClass]="{'variance-active': discrepancy.typePatientSpendDown}"> {{discrepancy.ccaPatientSpendDown | currency }} vs {{discrepancy.mmisPatientSpendDown | currency}}</mat-card-subtitle>
-                        </mat-card-header>
-                        <!-- <mat-card-content>
-                            {{discrepancy.ccaPatientSpendDown | currency }} vs {{discrepancy.mmisPatientSpendDown | currency}}
-                        </mat-card-content> -->
-                    </mat-card>
-                </div>
-            </div>
-            <div class="row">
-                <br>
-                <mat-divider></mat-divider>
-                <br>
-            </div>
-
-            <div class="row">
-
-                <div class="col-12">
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title> Rate Cell Source Comparison</mat-card-title>
-                            <mat-card-subtitle>
-                                <div>
-                                    Select Source
-                                </div>
-                                <mat-action-row>
-                                    <mat-button-toggle-group #group1="matButtonToggleGroup" multiple (change)="toggleChange1($event)">
+                    <div class="col-12">
+                        <mat-card>
+                            <mat-card-header>
+                                <mat-card-title> Rate Cell Source Comparison</mat-card-title>
+                                <mat-card-subtitle>
+                                    <!-- <mat-button-toggle-group #group1="matButtonToggleGroup" [value]="[displayType]" multiple (change)="toggleChange($event)">
                                         <mat-button-toggle *ngFor="let type of displayTypes" [value]="type" aria-label="Text align center">
                                             {{type}}
                                         </mat-button-toggle>
-                                    </mat-button-toggle-group>
-                                </mat-action-row>
-                            </mat-card-subtitle>
-                        </mat-card-header>
-                        <mat-card-content class="table-container" style='overflow-x: auto;
-                                padding-top: 1px;'>
-                            <table mat-table [dataSource]="dataSource_hor" class="mat-elevation-z8">
+                                    </mat-button-toggle-group> -->
+                                    <div class="button-group-tip">
+                                        Please click the system below to see the comparison of each rate cell
+                                    </div>
+                                </mat-card-subtitle>
+                                <div class="comparison-legend">
+                                    <div class="comparison-legend-item">
+                                        <div class="comparison-legend-item-icon" id="discrepancy-month">
 
-                                <!-- Source Column -->
-                                <ng-container [matColumnDef]="column" sticky *ngFor="let column of displayedColumns_hor.slice(0, 1)">
-                                    <th mat-header-cell *matHeaderCellDef class='mat-table-border-right'> {{column}} </th>
-                                    <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element[column]}} </td>
-                                </ng-container>
+                                        </div>
+                                        <div class="comparison-legend-item-description">
+                                            - within selected discrepancy month
+                                        </div>
+                                    </div>
+                                    <div class="comparison-legend-item">
+                                        <div class="comparison-legend-item-icon" id="mds-month">
 
-                                <!-- Month Columns -->
-                                <ng-container [matColumnDef]="column" [sticky]="discrepancy.memberMonth === column" [stickyEnd]="discrepancy.memberMonth === column" *ngFor="let column of displayedColumns_hor.slice(1)">
-                                    <th mat-header-cell *matHeaderCellDef class='mat-table-border-right' [ngClass]="{'column-within-month': discrepancy.memberMonth === column}"> {{formatMonth(column)}} </th>
-                                    <td mat-cell *matCellDef="let element; let i = index" class='mat-table-border-right' [ngClass]="{'mds-outdate': isCloumnReconciled(column, i), 'column-within-month': discrepancy.memberMonth === column}"> {{element[column]}} </td>
-                                </ng-container>
+                                        </div>
+                                        <div class="comparison-legend-item-description">
+                                            - within MDS 12 month period
+                                        </div>
+                                    </div>
+                                    <div class="comparison-legend-item">
+                                        <div class="comparison-legend-item-icon" id="diff-month">
 
-                                <tr mat-header-row *matHeaderRowDef="displayedColumns_hor"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumns_hor;"></tr>
-                            </table>
-                        </mat-card-content>
+                                        </div>
+                                        <div class="comparison-legend-item-description">
+                                            - different from selected source system
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-card-header>
 
-                    </mat-card>
+                            <mat-card-content class="table-container" style='overflow-x: auto;'>
+                                <table *ngIf="displayedColumns_hor" mat-table [dataSource]="dataSource_hor" class="mat-elevation-z8">
+
+                                    <!-- Source Column -->
+                                    <ng-container [matColumnDef]="column" sticky *ngFor="let column of displayedColumns_hor.slice(0, 1)">
+                                        <th mat-header-cell *matHeaderCellDef class='mat-table-border-right'> {{column}} </th>
+                                        <td mat-cell *matCellDef="let element" class='mat-table-border-right' mat-ripple [ngClass]="{'mat-column-Source-active': displayType === element[column]}" (click)="onSoureToggleClick(element[column])">
+                                            <div>
+                                                {{getSourceName(element[column])}}
+
+                                            </div>
+                                            <div>
+                                                {{getLastAssess(element[column] )}}
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <!-- Month Columns -->
+                                    <!-- [sticky]="discrepancy.memberMonth === column" [stickyEnd]="discrepancy.memberMonth === column" -->
+                                    <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns_hor.slice(1)">
+                                        <!-- -->
+                                        <th mat-header-cell *matHeaderCellDef class='mat-table-border-right' [ngClass]="{'column-within-month': discrepancy.memberMonth === column}"> {{formatMonth(column)}} </th>
+                                        <!--    -->
+                                        <td mat-cell *matCellDef="let element; let i = index " class='mat-table-border-right' [ngClass]="{ 'column-within-month': discrepancy.memberMonth === column}">
+                                            <div class="mat-table-cell-indicator" *ngIf="element[column]['LastAssessedDate']" [ngClass]="{'mat-table-cell-indicator-active': isWithinMDS(element[column]['LastAssessedDate'], column)}">
+
+                                            </div>
+                                            <!-- (mouseover)="onRateCellHover($event, element[column])" -->
+                                            <div class="mat-table-cell-value" *ngIf="!(element[column]['RateCell'] === '99' || element[column]['RateCell'] === '')" [ngClass]="{ 'mat-table-cell-value-start': element[column]['isStart'], 
+                                        'mat-table-cell-value-end': element[column]['isEnd'] , 'mat-table-data-diff': !isCloumnReconciled(column, element)}">
+                                                {{ element[column]['isStart'] ? element[column]['RateCell'] : '-' }}
+                                            </div>
+
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumns_hor"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumns_hor;"></tr>
+                                </table>
+                                <!-- <div id="table-tooltip" #tableTooltip>
+                                    tootip
+                                </div> -->
+                            </mat-card-content>
+                        </mat-card>
+                    </div>
                 </div>
-                <!-- <div class="col-6" *ngIf='1'>
-                    <mat-card>
-                        <mat-card-header>
-                            <mat-card-title>Cross Source Comparison</mat-card-title>
-                            <mat-card-subtitle>Rate Cell</mat-card-subtitle>
-                        </mat-card-header>
-                        <mat-card-content>
-                            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-
-                    
-                                <ng-container matColumnDef="month">
-                                    <th mat-header-cell *matHeaderCellDef class='mat-table-border-right'> Month </th>
-                                    <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.month}} </td>
-                                </ng-container>
-
-                                <ng-container matColumnDef="ccaRateCell">
-                                    <th mat-header-cell *matHeaderCellDef class='mat-table-border-right'> ccaRateCell </th>
-                                    <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.ccaRateCell}} </td>
-                                </ng-container>
-
-        
-                                <ng-container matColumnDef="MH834_RateCell">
-                                    <th mat-header-cell *matHeaderCellDef> MH834_RateCell </th>
-                                    <td mat-cell *matCellDef="let element" [ngClass]="{'mds-outdate': isOutDate(element.MH834_LastAssessDate, element.month) }"> {{element.MH834_RateCell}} {{isWithinMonth(element.MH834_LastAssessDate, element.month)}} </td>
-                                </ng-container>
-
-                                <ng-container matColumnDef="MH834_LastAssessDate">
-                                    <th mat-header-cell *matHeaderCellDef class='mat-table-border-right'> MH834_LastAssessDate </th>
-                                    <td mat-cell *matCellDef="let element" class='mat-table-border-right' [ngClass]="{'mds-outdate': isOutDate(element.MH834_LastAssessDate, element.month),'mat-table-border-top': isWithinMonth(element.MH834_LastAssessDate, element.month) }">
-                                   
-                                        {{isWithinMonth(element.MH834_LastAssessDate, element.month)}} </td>
-                                </ng-container>
-
-
-                                <ng-container matColumnDef="GC_RateCell">
-                                    <th mat-header-cell *matHeaderCellDef class='mat-table-border-right'> GC_RateCell </th>
-                                    <td mat-cell *matCellDef="let element" class='mat-table-border-right' [ngClass]="{'mds-outdate': isOutDate(element.GC_LastAssessDate, element.month) ,'mat-table-border-top': isWithinMonth(element.GC_LastAssessDate, element.month) }"> {{element.GC_RateCell}} {{isWithinMonth(element.GC_LastAssessDate, element.month)}} </td>
-                                </ng-container>
-
-                                <ng-container matColumnDef="GC_LastAssessDate">
-                                    <th mat-header-cell *matHeaderCellDef> GC_LastAssessDate </th>
-                                    <td mat-cell *matCellDef="let element"> {{element.GC_LastAssessDate}} </td>
-                                </ng-container>
-
-                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                            </table>
-                        </mat-card-content>
-                    </mat-card>
-                </div> -->
-
-            </div>
-
-            <div class="discrpancy-container-action">
-                <button mat-icon-button (click)='$event.stopPropagation(); toggleSideComponent()'>
-                          <i class="material-icons-outlined" id="container-action-sidetoggle" [ngClass]="{'chevron-rotate': !isSideComponentContainerDisplay}" >chevron_right</i>
-                </button>
             </div>
         </div>
 
+        <!-- [ngClass]="{ 'chevron-rotate': !isSideComponentContainerDisplay}"-->
+        <div class="discrpancy-container-action">
+            <button matTooltip='Toggle Display' id="container-action-sidetoggle" mat-mini-fab color="primary" (click)='$event.stopPropagation(); toggleSideComponent()'>
+                      <i  class="material-icons-outlined">menu</i>
+            </button>
+        </div>
     </div>
 
-    <!-- <mat-divider [vertical]="true"></mat-divider> -->
+    <!-- <mat-divider [vertical]="true "></mat-divider> -->
 
     <div @sub-container id="side-component-container" fxFlex='34' *ngIf="isSideComponentContainerDisplay">
         <nav mat-tab-nav-bar>
-            <a mat-tab-link *ngFor="let link of links" (click)="onNavigate(link)" [active]="activeLink == link">
+            <a mat-tab-link *ngFor="let link of links" (click)="onNavigate(link)" [active]="activeLink === link">
                 <mat-icon>{{link}}</mat-icon>{{link | titlecase}}
             </a>
         </nav>
-        <app-commentary-container *ngIf="activeLink == 'comment'" [displayDiscrepancyInfo]="false" [masterPatientID]='discrepancy.masterPatientID' [discrepancyID]='discrepancy.discrepancyID' [discrepancy]='discrepancy' [containerH]='contentHeight' (commentaryDismissed)='onDismiss()'></app-commentary-container>
+        <app-commentary-container *ngIf="activeLink == 'comment'" [displayDiscrepancyInfo]="false " [masterPatientID]='discrepancy.masterPatientID' [discrepancyID]='discrepancy.discrepancyID' [discrepancy]='discrepancy' [containerH]='sideComponentHeight' (commentaryDismissed)='onDismiss()'></app-commentary-container>
 
-        <div class='history-container' *ngIf="activeLink == 'history'">
+        <div class='history-container' *ngIf="activeLink=='history'">
             Not Built yet
         </div>
     </div>
 
     <div class="container-action">
         <button mat-icon-button id="container-action-close" (click)='$event.stopPropagation(); onDismissClick()'>
-              <i class="material-icons-outlined">close</i>
-            </button>
+            <i class="material-icons-outlined">close</i>
+        </button>
     </div>
 </div>
-
-<!-- [ngClass]="{'side-retrived': !group.value.length > 0}" -->

@@ -15,6 +15,7 @@ import { User } from 'src/app/model/user.model';
 export class CommentaryItemComponent implements OnInit {
   @Input('source') source: DiscrepancyComment;
   @Input('actionUser') actionUser: User;
+  @Input('anchoredCommentId') anchoredCommentId: number;
 
   comment: DiscrepancyComment;
   
@@ -61,6 +62,10 @@ export class CommentaryItemComponent implements OnInit {
     // console.log('actionuser', this.actionUser, this.comment.comment_UserID)
     let actionUserId = this.actionUser ? this.actionUser.userID : 0;
     return this.comment.comment_UserID === actionUserId;
+  }
+
+  anchored(): boolean {
+    return this.source.discrepancyCommentID === this.anchoredCommentId;
   }
   
   onCommentEdit(): void {

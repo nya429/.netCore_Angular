@@ -49,7 +49,9 @@ export interface Discrepancy {
     insertDate: string,
     updateDate: string,
     mmiS_MMIS_ID: string,
-    ccaid: number
+    ccaid: number,
+    hasDiscrepancyComment: number,
+    countDiscrepancyComments: number,
 }
 
 export interface DiscrepancyListRequest {

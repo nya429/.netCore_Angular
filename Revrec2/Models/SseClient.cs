@@ -34,7 +34,7 @@ namespace Revrec2.Models
         {
             return WriteSseEventAsync(new ServerSentEventDtos
             {
-                Type = alert ? "alert" : null,
+                Type = alert ? "alert" : "ping",
                 Data = new List<string>(notification.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
             });
         }

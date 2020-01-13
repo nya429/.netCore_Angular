@@ -17,6 +17,7 @@ export class CommentaryListItemComponent implements OnInit, OnDestroy {
   @Input('source') masterComment: DiscrepancyComment;
   @Input('actionUser') actionUser: User;
   @Input('masterPatientID') masterPatientID: number;
+  @Input('anchoredCommentId') anchoredCommentId: number;
   
   private discrepancyCommentReplied$: Subscription;
   // Cached created Sub Comment 

@@ -3,8 +3,8 @@ import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestr
 import { ActivatedRoute, ParamMap, Params } from '@angular/router';
 
 // import { ELEMENT_DATA, PeriodicElement, DisElement } from 'src/app/MOCK_DATA';
-import { switchMap, } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
+import { switchMap, delay, tap, } from 'rxjs/operators';
+import { of, Subscription, Observable } from 'rxjs';
 import { Content } from '@angular/compiler/src/render3/r3_ast';
 import { MemberService } from '../member.service';
 import { Member } from 'src/app/model/member.model';
@@ -29,7 +29,7 @@ export class MemberInfoComponent implements OnInit, OnDestroy {
   /** sublist dimention parameter */
   contentHeight: number;
   contentWidth: number;
-
+  memebrInfoShrink: boolean = false;
 
   //mock
   mmis
@@ -159,7 +159,7 @@ export class MemberInfoComponent implements OnInit, OnDestroy {
       // inline update triggered member fetch
       if (displayIndex || assignchange) {
         // console.log('inline update triggered member fetch')
-        this.service.getMemberByMasterPatientId({masterPatientId: discrepancyUpdated.masterPatientID})
+        this.service.getMemberByMasterPatientId({ masterPatientId: discrepancyUpdated.masterPatientID })
       }
 
       // console.log(rawPagedSource);
@@ -182,13 +182,13 @@ export class MemberInfoComponent implements OnInit, OnDestroy {
 
   initDiscrepancyByPatientID() {
     /** @Todo Seperate Main/Sub list in more elegant way  */
-    this.service.sharedService.getDiscrepancies({ pageSize: 15 }, { MasterPatientID: this.masterPatientId }, true);
+    this.service.sharedService.getDiscrepancies({ pageSize: 25 }, { MasterPatientID: this.masterPatientId }, true);
   }
 
   onListPagedSorted(e, type: string) {
     switch (type) {
       case 'discrepancy':
-      /** @Todo Seperate Main/Sub list in more elegant way  */
+        /** @Todo Seperate Main/Sub list in more elegant way  */
         this.service.sharedService.getDiscrepancies(e, { ...this.subForm, ...{ MasterPatientID: this.masterPatientId } }, true);
         break;
 

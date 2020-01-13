@@ -1,46 +1,11 @@
-import { SharedService } from 'src/app/shared/shared.service';
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { ExploreRateCell } from './../../model/explore.model';
+import { Subscription } from 'rxjs';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, Renderer2, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Discrepancy } from 'src/app/model/discrepancy.model';
 import { initTransferState } from '@angular/platform-browser/src/browser/transfer_state';
-
-const MOCK_DATA = [
-  { month: '2017-01-01T00:00:00', ccaRateCell: 'DC1', MH834_RateCell: 'DC1', MH834_LastAssessDate: '2017-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-02-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-03-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-04-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-05-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-06-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-07-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-08-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-09-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-10-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-11-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2017-12-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-01-01T00:00:00', ccaRateCell: 'DC1', MH834_RateCell: 'DC1', MH834_LastAssessDate: '2017-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-02-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-03-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-04-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-05-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-06-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-07-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-08-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-09-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-10-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-11-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2018-12-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-01-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-02-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DC1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-03-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DC1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-04-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DC1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-05-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DC1', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-06-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DC3', MH834_LastAssessDate: '2018-02-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-07-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2019-07-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-08-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2019-07-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-09-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2019-07-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-10-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2019-07-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-  { month: '2019-11-01T00:00:00', ccaRateCell: 'DF1', MH834_RateCell: 'DF1', MH834_LastAssessDate: '2019-07-01T00:00:00', GC_RateCell: 'DC1', GC_LastAssessDate: '2018-10-01T00:00:00' },
-];
+import { SharedService } from 'src/app/shared/shared.service';
+import { ErrorService } from 'src/app/error.service';
 
 @Component({
   selector: 'app-discrepancy-detail-container',
@@ -70,73 +35,213 @@ const MOCK_DATA = [
     ]),
   ],
 })
-export class DiscrepancyDetailContainerComponent implements OnInit {
+export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
   @ViewChild('host') hostView: ElementRef;
+  // @ViewChild('tableTooltip') tooltip: ElementRef;
+
   @Output() onDismissed = new EventEmitter<void>();
 
   // Migth need object mod
   discrepancy: Discrepancy;
 
-  displayedColumns: string[] = ['month', 'ccaRateCell', 'MH834_RateCell', 'GC_RateCell',];
-  dataSource = MOCK_DATA;
+  exploreRateCellListChanged$: Subscription;
+
+  /** Side Component State */
+  isSideComponentContainerDisplay = false;
+  links = ["comment", "history"];
+  /** @input */
+  activeLink = this.links[0];
+  sideComponentHeight: number;
+  sideComponentWidth: number;
+
+
+  /** Comparison State */
+  discrepancyType = ['RC', 'RE', 'PP', 'SP'];
+  displayedDiscrepancyType = this.discrepancyType[0];
+
+
+  /** Comparison State */
+  sourceSystems = {
+    mP: 'Market Prominence',
+    mH834: 'Mass Health 834',
+    cmP: 'Guiding Care',
+  };
+  displayedColumns: string[] = ['month', 'cca_RateCell', 'MH834_RateCell', 'GC_RateCell'];
+  dataSource: ExploreRateCell[];
 
   displayedColumns_hor: string[];
   dataSource_hor = [];
 
+  displayTypes = ['mP', 'mH834', 'cmP'];
+  displayType = this.displayTypes[0];
 
-  contentHeight: number;
-  contentWidth: number;
+  // timespan = {
+  //   cca: [] as { ratecell: string, start: string, end: string }[],
+  //   MH834: [] as { ratecell: string, start: string, end: string }[],
+  //   GC: [] as { ratecell: string, start: string, end: string }[],
+  // };
 
-  isSideComponentContainerDisplay = false;
- 
-  displayTypes = ['MP', 'MH834', 'GC'];
-  displayType;
+  timespan = {
+    mP: [] as { ratecell: string, start: string, end: string }[],
+    mH834: [] as { ratecell: string, start: string, end: string }[],
+    cmP: [] as { ratecell: string, start: string, end: string }[],
+  };
 
-  links = ["comment", "history"];
-  /** @input */
-  activeLink = this.links[0];
-
-  constructor(private service: SharedService) {
-
-  }
+  constructor(private service: SharedService,
+    private errorService: ErrorService
+    // private renderer: Renderer2
+  ) { }
 
   ngOnInit() {
-    this.initSource();
     this.initState();
-   
-
   }
 
   ngDoCheck() {
-    // get sub-list height at every tick  
-    this.contentHeight = this.hostView.nativeElement.offsetHeight;
-    this.contentWidth = this.hostView.nativeElement.offsetHeight;
+    /** get sub-list height at every tick  */
+    this.sideComponentHeight = this.hostView.nativeElement.offsetHeight;
+    // this.sideComponentWidth = this.hostView.nativeElement.offsetHeight;
+  }
+
+  ngOnDestroy() {
+    this.exploreRateCellListChanged$.unsubscribe();
   }
 
   initState() {
-    this.isSideComponentContainerDisplay = true;
+    this.isSideComponentContainerDisplay = false;
 
-    this.displayedColumns_hor = this.dataSource.map(d => d.month);
+    this.exploreRateCellListChanged$ = this.service.exploreRateCellListChanged.subscribe((exploreRateCellList: ExploreRateCell[]) => {
+      console.log(exploreRateCellList)
+      this.dataSource = []
+
+      let idDuplicated = false;
+
+
+      // Temprary Solution for Duplicate Member Month
+      exploreRateCellList.forEach((e: ExploreRateCell) => {
+        const month = e.memberMonth;
+        if (this.dataSource.find((e: ExploreRateCell) => e.memberMonth === month)) {
+          idDuplicated = true;
+        }
+        // Temprary Solution for Missing Member Month
+        else {
+          this.dataSource.push(e);
+        }
+      })
+
+      if (idDuplicated) {
+        this.errorService.sendCustomizedError(["Duplicated Month"])
+      }
+
+      setTimeout(() => {
+        this.getSpan();
+        this.turnSourceHorizantal();
+      }, 500);
+    })
+
+    this.initSource();
+  }
+
+  turnSourceHorizantal() {
+    // this.displayedColumns_hor = this.dataSource.map(d => d.month);
+    this.displayedColumns_hor = this.dataSource.map(d => d.memberMonth);
     this.displayedColumns_hor.unshift('Source');
 
-    const sources = ['ccaRateCell', 'MH834_RateCell', 'GC_RateCell'];
+    // const sources = ['cca', 'MH834', 'GC'];
+    const sources = ['mP', 'mH834', 'cmP'];
 
     sources.map(source => {
-      let row = {};
-      row['Source'] = source;
+      let sourceRow = {};
+      sourceRow['Source'] = source;
+      sources.filter
+      // this.dataSource.forEach(monthRow => {
+      this.dataSource.forEach((monthRow: ExploreRateCell) => {
+        let isStart = !!this.timespan[source].find(span => Date.parse(span.start) == Date.parse(monthRow.memberMonth));
+        let isEnd = !!this.timespan[source].find(span => Date.parse(span.end) == Date.parse(monthRow.memberMonth));
 
-      this.dataSource.forEach(e => {
-        row[e['month']] = e[source];
+        sourceRow[monthRow.memberMonth] = {
+          RateCell: monthRow[source + '_RateCell'] ? monthRow[source + '_RateCell'] : '99'
+          , LastAssessedDate: monthRow[source + "_LastAssessedDate"]
+          , isStart: isStart
+          , isEnd: isEnd
+          , source: source
+        };
+
+        sources
+          .filter(sor => sor !== source)
+          .forEach(sourceB => {
+            const cloumName = `match_${source.toUpperCase()}To${sourceB.toUpperCase()}`;
+            sourceRow[monthRow.memberMonth][cloumName] = monthRow[cloumName] == "1"
+          })
       });
-      this.dataSource_hor.push(row);
+      this.dataSource_hor.push(sourceRow);
     });
 
     console.log(this.dataSource_hor)
-    console.log(this.discrepancy)
+  }
+
+  getSpan() {
+    // const sources = ['cca', 'MH834', 'GC'];
+    const sources = ['mP', 'mH834', 'cmP'];
+
+    this.dataSource.forEach((monthRow: ExploreRateCell, index) => {
+      // const month = monthRow.month
+      const month = monthRow.memberMonth
+
+      sources.map(source => {
+        const sourceRateCell = monthRow[source + '_RateCell'] ? monthRow[source + '_RateCell'] : '99';
+        let next = false;
+        if (this.timespan[source].length === 0) {
+          this.timespan[source].push({ ratecell: sourceRateCell, start: month, end: '' })
+          next = true;
+        }
+
+        if (!next) {
+          let span = this.timespan[source][this.timespan[source].length - 1];
+
+          if (span.ratecell != sourceRateCell) {
+
+             
+
+            const MONTH = new Date(Date.parse(month));
+            let mon = month.substr(5, 2);
+
+            /** @TODO Year + 1*/
+            
+
+            // Month + 1
+            let mon1 = mon === '12' ?
+              '01' :
+              (Number(mon) + 1 < 10 ?
+                '0' + (Number(mon) + 1).toString() : (Number(mon) + 1).toString());
+
+            span.end = month.substr(0, 5) + mon1 + month.substr(7);
+
+            this.timespan[source][this.timespan[source].length - 1] = span;
+            this.timespan[source].push({ ratecell: sourceRateCell, start: month, end: '' });
+          }
+        }
+
+        if (index === this.dataSource.length - 1) {
+          let span = this.timespan[source][this.timespan[source].length - 1];
+          span.end = month;
+          this.timespan[source][this.timespan[source].length - 1] = span;
+        }
+      });
+    });
+
+    console.log(this.timespan)
+  }
+
+  getLastAssess(source) {
+    if (source === 'mP') {
+      return '';
+    }
+    return " Last Assessed on:" + this.formatMonth(this.dataSource[0][source + "_LastAssessedDate"]);
   }
 
   initSource() {
     this.getDiscrepancy();
+    this.service.getRateCellCrossSourceListByDiscrepancyId(this.discrepancy.discrepancyID);
   }
 
   onDismissClick() {
@@ -144,12 +249,22 @@ export class DiscrepancyDetailContainerComponent implements OnInit {
   }
 
   toggleSideComponent() {
-    this.isSideComponentContainerDisplay = ! this.isSideComponentContainerDisplay;
-
+    this.isSideComponentContainerDisplay = !this.isSideComponentContainerDisplay;
   }
 
-  toggleChange1(event) {
-    console.log(event.source)
+  getSourceName(columnName) {
+    return this.sourceSystems[columnName];
+  }
+
+  onSoureToggleClick(columnName) {
+    if (columnName && this.displayType != columnName) {
+      this.displayType = columnName;
+    } else if (this.displayType === columnName) {
+      this.displayType = null;
+    }
+  }
+
+  toggleChange(event) {
     let toggle = event.source;
     if (toggle) {
       let group = toggle.buttonToggleGroup;
@@ -158,11 +273,11 @@ export class DiscrepancyDetailContainerComponent implements OnInit {
         this.displayType = toggle.value;
       }
     } else {
-      this.displayType = []
+      this.displayType = null;
     }
   }
 
-  isOutDate(value, month) {
+  isWithinMDS(value, month) {
     const MDS_EFFECTIVE_PERIOD = 12;
 
     const mds: Date = new Date(Date.parse(value));
@@ -171,7 +286,7 @@ export class DiscrepancyDetailContainerComponent implements OnInit {
     const monthDiff = current.getMonth() - mds.getMonth();
     const dateDiff = current.getDate() - mds.getDate();
 
-    let condition = (monthDiff + yearDiff * 12) >= MDS_EFFECTIVE_PERIOD;
+    let condition = (monthDiff + yearDiff * 12) < MDS_EFFECTIVE_PERIOD && (monthDiff + yearDiff * 12) >= 0;
     return condition;
   }
 
@@ -192,36 +307,34 @@ export class DiscrepancyDetailContainerComponent implements OnInit {
     return date.toLocaleDateString('default', { month: 'short', year: 'numeric' });
   }
 
-  isCloumnReconciled(month, index) {
-    const column = this.dataSource.filter(d =>
-      d.month === month)[0];
-
-    let condition = false;
-    switch (this.displayType) {
-      case "MP":
-        if (index === 1) {
-          condition = column.MH834_RateCell != column.ccaRateCell;
-        } else if (index === 2) {
-          condition = column.GC_RateCell != column.ccaRateCell;
-        }
-        break;
-      case "MH834":
-        if (index === 0) {
-          condition = column.MH834_RateCell != column.ccaRateCell;
-        } else if (index === 2) {
-          condition = column.MH834_RateCell != column.GC_RateCell;
-        }
-        break;
-      case "GC":
-        if (index === 0) {
-          condition = column.GC_RateCell != column.ccaRateCell;
-        } else if (index === 1) {
-          condition = column.GC_RateCell != column.MH834_RateCell;
-        }
-        break;
+  /**
+   * @param month 
+   * @param cell 
+   * 
+   */
+  isCloumnReconciled(month, cell) {
+    if (this.displayType === null) {
+      return true;
     }
 
-    return !!column && condition;
+    const source = this.displayType.toUpperCase();
+    const sourceBStr = cell['Source'].toUpperCase()
+
+    let condition = false;
+    condition = (source === sourceBStr) || (cell[month][`match_${sourceBStr.toUpperCase()}To${source.toUpperCase()}`])
+    return condition;
+  }
+
+  getLastAssessDate() {
+
+  }
+
+  getRateCell(cell) {
+    return cell['isStart'] ? cell['RateCell'] : '--'
+  }
+
+  getTooltip(cell) {
+    return this.timespan[cell['source']]
   }
 
   getDiscrepancy() {
@@ -243,4 +356,13 @@ export class DiscrepancyDetailContainerComponent implements OnInit {
   onNavigate(link) {
     this.activeLink = link;
   }
+
+  onDiscrepancyTypeCardClick(type: string) {
+    this.displayedDiscrepancyType = type;
+  }
+
+  // onRateCellHover(e: MouseEvent, element) {
+  //   this.renderer.setStyle(this.tooltip.nativeElement, "top", -16 + "px");
+  //   this.renderer.setStyle(this.tooltip.nativeElement, "left", e.layerX + "px");
+  // }
 }

@@ -7,12 +7,12 @@ export interface PagedList<T> {
     orderBy: number;
   }
   
-  export interface ReponseList<T> {
+  export interface ResponseList<T> {
     list: T[];
   }
   
   
-  export interface Reponse<T> {
+  export interface Response<T> {
     code: number;
     isSuccess: boolean;
     errorMessage: string;

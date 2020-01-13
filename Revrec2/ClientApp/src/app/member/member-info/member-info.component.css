@@ -2,6 +2,37 @@ a {
     text-decoration: none;
 }
 
+.member-mp-info-wrapper {
+    position: relative;
+    display: block;
+}
+
+.member-mp-info-overlay {
+    height: auto;
+    overflow: hidden;
+    height: 151px;
+    transition: height .3s;
+}
+
+.member-mp-info-overlay-shrink {
+    height: 24px !important;
+}
+
+.member-mp-info-actions {
+    position: absolute;
+    margin: auto;
+    bottom: -19px;
+    right: 50%;
+    left: 50%;
+}
+
+.member-mp-info-container {
+    padding: 0px;
+    /* height: 151px; */
+    padding: 25px;
+    font-size: 18px;
+}
+
 .member-reconciliation-list-container {
     position: absolute;
     overflow: hidden;
@@ -10,6 +41,11 @@ a {
     left: 0;
     /* vendor prefixed height */
     height: calc(100% - 201px);
+}
+
+.member-reconciliation-list-container-expand {
+    /* vendor prefixed height */
+    height: calc(100% - 74px);
 }
 
 .member-info-cell {

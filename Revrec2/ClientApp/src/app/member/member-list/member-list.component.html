@@ -5,8 +5,6 @@
             <section *ngIf="isAuthorized('bulk_update')" fxLayout="row" fxLayoutAlign="begin begin">
                 <button mat-button color="accent" [disabled]='!selection.hasValue()' mat-raised-button (click)="actionClicked.emit() && $event.stopPropagation()">Update</button>
             </section>
-            <mat-divider vertical></mat-divider>
-
             <!-- <section fxLayout="row" fxLayoutAlign="begin center">
                 <button mat-button color="secondary" (click)="test()">BUTTON</button>
             </section>
@@ -14,6 +12,8 @@
 
             <!-- FIXME added this when have button -->
             <!-- style="padding: 12px 24px 6px/12px 24px;" -->
+
+            <mat-divider vertical></mat-divider>
             <section style="padding: 12px 24px" fxLayout="row" fxLayoutAlign="space begin begin">
 
                 <!-- style='margin-top: 6px;' -->
@@ -33,11 +33,11 @@
 
             </section>
             <mat-divider vertical></mat-divider>
-            <!-- <section fxLayoutAlign="end center">
-                <button mat-icon-button fxFlexAlign="begin begin">
-                    <mat-icon>clear</mat-icon>
+            <section fxLayout="row" fxLayoutAlign="begin center">
+                <button (click)="onRefresh()" mat-icon-button>
+                    <mat-icon>refresh</mat-icon>
                 </button>
-            </section> -->
+            </section>
 
 
         </mat-card>

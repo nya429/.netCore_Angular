@@ -344,8 +344,8 @@
                                         </button>
                         <!-- explore -->
                         <button *ngIf="isAuthorized('comment')" mat-icon-button matTooltip="Comments" (click)='$event.stopPropagation() ; onCommentClick(element)'>
-                                                <i class="material-icons-outlined">message</i>
-                                        </button>
+                            <i class="material-icons-outlined"  matBadgeSize="medium" [matBadge]="element.countDiscrepancyComments" [matBadgeHidden]="!element.hasDiscrepancyComment" matBadgeColor="accent">message</i> 
+                         </button>
 
                     </div>
                 </td>

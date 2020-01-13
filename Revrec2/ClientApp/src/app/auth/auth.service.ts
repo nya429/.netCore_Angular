@@ -4,7 +4,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { resolve } from 'url';
-import { Reponse } from '../model/response.model';
+import { Response } from '../model/response.model';
 import * as jwt_decode from "jwt-decode";
 
 @Injectable({
@@ -30,7 +30,7 @@ export class AuthService {
     autoLoginViaWinAuth() {
         const url = this.baseUrl + 'auth/login';
         console.log("GET /auth/login")
-        return this.httpClient.get<Reponse<any>>(url, {
+        return this.httpClient.get<Response<any>>(url, {
             observe: 'body',
             responseType: 'json',
         }).subscribe(result => {
@@ -55,7 +55,7 @@ export class AuthService {
     getAppRoleMappingSettings() {
         const url = this.baseUrl + 'auth/settings';
         console.log("GET /auth/settings")
-        return this.httpClient.get<Reponse<EndpointRoleMap>>(url, {
+        return this.httpClient.get<Response<EndpointRoleMap>>(url, {
             observe: 'body',
             responseType: 'json',
         }).subscribe(result => {

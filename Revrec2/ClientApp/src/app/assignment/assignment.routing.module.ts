@@ -10,7 +10,7 @@ const AssignmentRoutes: Routes = [
         children: [
             {path: ':id',
              component: AssignmentInfoComponent,
-             outlet: 'bio'
+             outlet: 'patient'
             //  children: [
             //      {path: 'discrepancies', component: DiscrepancyListComponent},
             //      {path: 'monthly_summary_records', component: MonthlySummaryRecordListComponent},

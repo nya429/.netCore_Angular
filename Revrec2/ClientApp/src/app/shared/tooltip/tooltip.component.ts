@@ -43,35 +43,35 @@ export class TooltipComponent implements OnInit {
 
       case 'payment_error': {
         this.tipType = 'Payment Error';
-        this.tipSubtitle = 'StatePaid - (StatePremium - (CCAPatientPay + StateSpenddown))'
+        this.tipSubtitle = 'State Paid - (State Premium - (State Patient Pay + State Spend down))'
         this.tipContent = `$${this.tipInfo.content.paidCapitationAmount} - ($${this.tipInfo.content.mmisAmount} - ($${this.tipInfo.content.mmisPatientPay} + $${this.tipInfo.content.mmisPatientSpendDown})) `;
         break;
       }
       
       case 'payment_variance': {
         this.tipType = 'Payment Variance';
-        this.tipSubtitle = 'StatePaid - (CCAPreimum - ( CCAPatientPay + CCASpenddown))'
+        this.tipSubtitle = 'State Paid - (CCA Preimum - ( CCA Patient Pay + CCA Spend Down))'
         this.tipContent = `$${this.tipInfo.content.paidCapitationAmount} - ($${this.tipInfo.content.ccaAmount} - ($${this.tipInfo.content.ccaPatientPay} + $${this.tipInfo.content.ccaPatientSpendDown}))`;
         break;
       }
 
       case 'typeRateCell': {
         this.tipType = 'Rate Cell Variance';
-        this.tipSubtitle = 'CCA RateCell VS State RateCell'
+        this.tipSubtitle = 'CCA Rate Cell VS State Rate Cell'
         this.tipContent = `${this.tipInfo.content.ccaRateCell} VS ${this.tipInfo.content.mmisRateCell}`;
         break;
       }
       
       case 'typePatientPay': {
         this.tipType = 'Patient Pay Variance';
-        this.tipSubtitle = 'CCA PatientPay VS State PatientPay'
+        this.tipSubtitle = 'CCA Patient Pay VS State Patient Pay'
         this.tipContent = `$${this.tipInfo.content.ccaPatientPay} VS $${this.tipInfo.content.mmisPatientPay}`;
         break;
       }
 
       case 'typePatientSpendDown': {
         this.tipType = 'SpendDown Variance';
-        this.tipSubtitle = 'CCA SpendDown vs State SpendDown'
+        this.tipSubtitle = 'CCA Spend Down vs State Spend Down'
         this.tipContent = `${this.tipInfo.content.ccaPatientSpendDown} VS ${this.tipInfo.content.mmisPatientSpendDown}`;
         break;
       }

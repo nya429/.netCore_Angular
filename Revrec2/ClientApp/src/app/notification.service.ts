@@ -16,6 +16,7 @@ export class NotificationService {
   notificationClicked = new Subject<Notification>();
   notifications: Notification[];
   clickednotification: Notification;
+  sseGUID: string;
 
   SSECheck;
 
@@ -28,13 +29,14 @@ export class NotificationService {
 
   subscribeNotification(userID: number) {
     const url = this.baseUrl + 'sse/subscribe/' + userID;
+
     console.log("SSE Subscribe", url)
     const eventSource = new EventSource(url);
 
     this.SSECheck = setInterval(() => {
       console.log('SSE Check...')
       if (eventSource.readyState == 1) {
-        console.log('SSE Connecting, get Notification')
+        console.log('SSE Connecting, get Notification', eventSource)
         this.getNotification();
         clearInterval(this.SSECheck);
       }
@@ -43,7 +45,14 @@ export class NotificationService {
     return Observable.create(observer => {
       eventSource.addEventListener('alert', (evt: MessageEvent) => {
         observer.next(evt.data);
-      })
+      });
+
+      const FnGetGUID = (evt: MessageEvent) => {
+        this.sseGUID = evt.data.substring(6, 42)
+        console.log(this.sseGUID)
+        eventSource.removeEventListener("ping", FnGetGUID);
+      }
+      eventSource.addEventListener("ping", FnGetGUID);
     }).subscribe(data => {
       let newNotifications = JSON.parse(data) as Notification[];
       if (!newNotifications)
@@ -65,7 +74,7 @@ export class NotificationService {
   }
 
   getNotification() {
-    const url = this.baseUrl + 'sse/discrepancyAssignmentUnread';
+    const url = this.baseUrl + 'sse/discrepancyAssignmentUnread/' + this.sseGUID;
     console.log("GET => getNotification", url)
     return this.http.get(url).subscribe(() => {
       console.log("GET => Notification Get sent")
@@ -80,10 +89,16 @@ export class NotificationService {
   getAndResetNotification(): Notification {
     const notificationData = { ...this.clickednotification };
     this.clickednotification = null;
+    console.log('getAndResetNotification', notificationData)
     return notificationData;
   }
 
   hasNotification() {
-    return !!this.notificationClicked;
+    return !!this.clickednotification;
+  }
+
+  /** Generate GUID */
+  S4() {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
   }
 }

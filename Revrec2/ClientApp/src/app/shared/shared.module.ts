@@ -31,7 +31,7 @@ import { DiscreapcnyUpdateDialogComponent } from './discrepancy-update-dialog/di
 @NgModule({
   imports: [
     CommonModule,
-    // BrowserModule,
+    BrowserModule,
     FormsModule,
     RouterModule,
     MaterialModule,

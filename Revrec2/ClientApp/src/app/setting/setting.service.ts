@@ -3,7 +3,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FORM_OPTIONS_MOCK } from './setting-ratecard/setting-ratecard-form-dialog/setting-ratecard-form-dialog.component';
 import { Subject, Observable, combineLatest } from 'rxjs';
-import { PagedList, ReponseList, Reponse } from '../model/response.model';
+import { PagedList, ResponseList, Response } from '../model/response.model';
 import {
   CCARateCell,
   CCARegion,
@@ -49,8 +49,8 @@ export class SettingService {
   public rateCardCreated = new Subject<RateCard>();
   public rateCardUpdated = new Subject<RateCard>();
 
-  public ccaRateCellListChanged = new Subject<ReponseList<CCARateCell>>();
-  public ccaRegionListChanged = new Subject<ReponseList<CCARegion>>();
+  public ccaRateCellListChanged = new Subject<ResponseList<CCARateCell>>();
+  public ccaRegionListChanged = new Subject<ResponseList<CCARegion>>();
 
   public rateCardOptionReady$ = new Observable<any>();
   public optionsReady$ = new Observable<any>();
@@ -118,7 +118,7 @@ export class SettingService {
 
     let requestBody = { ...pageRequest, ...filters };
     console.log("Get RateCards", url, requestBody)
-    return this.http.post<Reponse<PagedList<RateCard>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<RateCard>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -126,8 +126,6 @@ export class SettingService {
         console.log("Get RateCards =>", result.data)
         this.rateCardListChanged.next(result.data);
       }
-    }, error => {
-      console.error("Get RateCards =>", error);
     });
   }
 
@@ -135,7 +133,7 @@ export class SettingService {
     const url = this.baseUrl + 'ratecards/CreateRateCard'
     console.log("POST Create RateCard", url, rateCard)
     const requestBody = rateCard;
-    return this.http.post<Reponse<number>>(url, requestBody, {
+    return this.http.post<Response<number>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -144,18 +142,16 @@ export class SettingService {
         console.log("POST Create RateCard => success")
         this.rateCardCreated.next(rateCard);
       }
-    }, error => {
-      console.error("POST Create RateCard =>", error);
     });
   }
 
   updateRateCard(rateCard: RateCard) {
     const requestBody = rateCard;
     const rateCardId = rateCard.rateCardId;
-    
+
     const url = this.baseUrl + 'ratecards/UpdateRateCard/' + rateCardId;
     console.log("PATCH update RateCard", url, rateCard)
-    return this.http.patch<Reponse<any>>(url, requestBody, {
+    return this.http.patch<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -163,8 +159,6 @@ export class SettingService {
         console.log("PATCH Update Ratecard =>", result)
         this.rateCardUpdated.next(rateCard);
       }
-    }, error => {
-      console.error("PATCH Update Ratecard =>", error);
     });
   }
 
@@ -176,7 +170,7 @@ export class SettingService {
       product: product,
       ccaRateCell: ccaRateCell,
     };
-    return this.http.post<Reponse<ReponseList<CCARateCell>>>(url, requestBody, {
+    return this.http.post<Response<ResponseList<CCARateCell>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -185,8 +179,6 @@ export class SettingService {
         this.CCARateCellOptions = result.data.list;
         this.ccaRateCellListChanged.next(result.data);
       }
-    }, error => {
-      console.error('Get CCARateCells =>', error);
     });
   }
 
@@ -197,7 +189,7 @@ export class SettingService {
       product: product,
       ccaRegion: ccaRegion,
     };
-    return this.http.post<Reponse<ReponseList<CCARegion>>>(url, requestBody, {
+    return this.http.post<Response<ResponseList<CCARegion>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -206,8 +198,6 @@ export class SettingService {
         this.CCARegionOptions = result.data.list;
         this.ccaRegionListChanged.next(result.data);
       }
-    }, error => {
-      console.error('Get CCARegions =>', error);
     });
   }
 
@@ -249,25 +239,6 @@ export class SettingService {
     }
   }
 
-  // getOptionsMOCK(form: string, product?: string): string[] {
-  //   if (form === 'rateCell') {
-  //     if (product !== '') {
-  //       return this.formOptionMOCK.rateCell[product]
-  //     }
-  //     return this.formOptionMOCK.rateCell['ICO'].concat(this.formOptionMOCK.rateCell['SCO']);
-
-  //   } else if (form === 'region') {
-  //     if (product !== '') {
-  //       return this.formOptionMOCK.region[product]
-  //     }
-  //     return this.formOptionMOCK.region['ICO'].concat(this.formOptionMOCK.region['SCO']);
-  //   } else if (form === 'product') {
-  //     return this.formOptionMOCK.product;
-  //   } else {
-  //     return [];
-  //   }
-  // }
-
   getRateCardFormOptions() {
     return {
       productOptions: this.productOptions,
@@ -294,7 +265,7 @@ export class SettingService {
     const url = this.baseUrl + 'discrepancystatus/CreateDiscrepancyStatus'
     console.log("POST Create DiscrepancyStatus", url, discrepancyStatus)
     const requestBody = discrepancyStatus;
-    return this.http.post<Reponse<number>>(url, requestBody, {
+    return this.http.post<Response<number>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -304,8 +275,6 @@ export class SettingService {
         this.discrepancyStatusCreated.next(discrepancyStatus);
         this.getDiscrepancyStatusOptions();
       }
-    }, error => {
-      console.error("POST Create DiscrepancyStatus =>", error);
     });
   }
 
@@ -321,7 +290,7 @@ export class SettingService {
 
     const url = this.baseUrl + 'discrepancystatus/UpdateDiscrepancyStatusByID/' + discrepancyStatusID;
     console.log("PATCH Update RateCell Map", url, discrepancyStatus)
-    return this.http.patch<Reponse<any>>(url, requestBody, {
+    return this.http.patch<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -330,8 +299,6 @@ export class SettingService {
         this.discrepancyStatusUpdated.next(discrepancyStatus);
         this.getDiscrepancyStatusOptions();
       }
-    }, error => {
-      console.error('PATCH Update RateCell Map =>', error);
     });
   }
 
@@ -353,7 +320,7 @@ export class SettingService {
 
     let requestBody = { ...pageRequest, ...filters };
     console.log("Get DiscrepancyStatus", url, requestBody)
-    return this.http.post<Reponse<PagedList<DiscrepancyStatus>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<DiscrepancyStatus>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -361,8 +328,6 @@ export class SettingService {
         console.log("Get DiscrepancyStatus =>", result.data)
         this.discrepancyStatusListChanged.next(result.data);
       }
-    }, error => {
-      console.error("Get DiscrepancyStatus =>", error);
     });
   }
 
@@ -370,7 +335,7 @@ export class SettingService {
     const url = this.baseUrl + 'discrepancystatus/getDiscrepancyStatusOptions'
     console.log("GET Discrepancy Status Option", url)
 
-    return this.http.get<Reponse<ReponseList<DiscrepancyStatusOption>>>(url, {
+    return this.http.get<Response<ResponseList<DiscrepancyStatusOption>>>(url, {
       observe: 'body',
       responseType: 'json'
     })
@@ -380,8 +345,6 @@ export class SettingService {
           this.discrepancyStatusOptions = result.data.list;
           this.discrepacnyStatusOptionsReady.next();
         }
-      }, error => {
-        console.error("GET DiscrepancyStatusOptions =>", error);
       });
   }
 
@@ -390,7 +353,7 @@ export class SettingService {
     const url = this.baseUrl + 'discrepancycategory/GetDiscrepancyCategoryOptions'
     console.log("GET Discrepancy Category Option", url)
 
-    return this.http.get<Reponse<ReponseList<DiscrepancyCategoryOption>>>(url, {
+    return this.http.get<Response<ResponseList<DiscrepancyCategoryOption>>>(url, {
       observe: 'body',
       responseType: 'json'
     })
@@ -400,8 +363,6 @@ export class SettingService {
           this.discrepancyCategoryOptions = result.data.list;
           this.discrepacnyCategoryOptionsReady.next();
         }
-      }, error => {
-        console.error("GET Discrepancy Category Option =>", error);
       });
   }
 
@@ -417,7 +378,7 @@ export class SettingService {
 
     let requestBody = { ...pageRequest };
     console.log("Get discrepancyCategory", url, requestBody)
-    return this.http.post<Reponse<PagedList<DiscrepancyCategory>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<DiscrepancyCategory>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -426,8 +387,6 @@ export class SettingService {
         console.log("Get discrepancyCategory=>", result.data)
         this.discrepancyCategoryListChanged.next(result.data);
       }
-    }, error => {
-      console.error("Get discrepancyCategory=>", error);
     });
   }
 
@@ -444,7 +403,7 @@ export class SettingService {
 
     const url = this.baseUrl + 'discrepancycategory/UpdateDiscrepancyCategoryByID/' + discrepancyCategoryID;
     console.log("PATCH Update Discrepancycategory", url, discrepancyCategory)
-    return this.http.patch<Reponse<any>>(url, requestBody, {
+    return this.http.patch<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -454,8 +413,6 @@ export class SettingService {
         this.getDiscrepancyStatusOptions();
         this.getDiscrepancyCategoryOptions();
       }
-    }, error => {
-      console.error("PATCH Update Discrepancycategory =>", error);
     });
   }
 
@@ -463,7 +420,7 @@ export class SettingService {
     const url = this.baseUrl + 'discrepancycategory/CreateDiscreapancyCategory';
     const requestBody = discrepancyCategory;
     console.log("POST Create DiscrepancyCategory", url, requestBody)
-    return this.http.post<Reponse<number>>(url, requestBody, {
+    return this.http.post<Response<number>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -473,8 +430,6 @@ export class SettingService {
         this.discrepancyCategoryCreated.next(discrepancyCategory);
         this.getDiscrepancyCategoryOptions();
       }
-    }, error => {
-      console.error("POST Create DiscrepancyCategory =>", error);
     });
   }
 
@@ -497,7 +452,7 @@ export class SettingService {
 
     let requestBody = { ...pageRequest, ...filters };
     console.log("Get RateCell Map", url, requestBody)
-    return this.http.post<Reponse<PagedList<RateCellMap>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<RateCellMap>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -505,8 +460,6 @@ export class SettingService {
         console.log('Get RateCell Map =>', result.data)
         this.rateCellMapListChanged.next(result.data);
       }
-    }, error => {
-      console.error('Get RateCell Map =>', error);
     });
   }
 
@@ -520,7 +473,7 @@ export class SettingService {
     const url = this.baseUrl + 'ratecellmap/UpdateRateCellMapByID/' + rateCellMapId;
 
     console.log("PATCH Update RateCell Map", url, requestBody)
-    return this.http.patch<Reponse<any>>(url, requestBody, {
+    return this.http.patch<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -528,8 +481,6 @@ export class SettingService {
         console.log('PATCH Update RateCell Map =>', rateCellMap)
         this.rateCellMapUpdated.next(rateCellMap);
       }
-    }, error => {
-      console.error('PATCH Update RateCell Map =>', error);
     });
   }
 
@@ -537,7 +488,7 @@ export class SettingService {
     const url = this.baseUrl + 'ratecellmap/GetRateCellMapCount'
 
     console.log("GET RateCellUnmapped Count", url)
-    return this.http.get<Reponse<{ count: number }>>(url, {
+    return this.http.get<Response<{ count: number }>>(url, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -545,8 +496,6 @@ export class SettingService {
         console.log("GET RateCellUnmappedCount =>", result.data.count)
         this.rateCellMapUnmappdCountGot.next(result.data.count);
       }
-    }, error => {
-      console.error("GET RateCellUnmappedCount =>", error);
     });
   }
 
@@ -568,7 +517,7 @@ export class SettingService {
 
     let requestBody = { ...pageRequest, ...filters };
     console.log("POST Get Region Map", url, requestBody)
-    return this.http.post<Reponse<PagedList<RegionMap>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<RegionMap>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -576,8 +525,6 @@ export class SettingService {
         console.log("POST Get Region Map", result.data)
         this.regionMapListChanged.next(result.data);
       }
-    }, error => {
-      console.error("POST Get Region Map", error);
     });
   }
 
@@ -591,7 +538,7 @@ export class SettingService {
     const url = this.baseUrl + 'regionmap/UpdateRegionMapByID/' + regionMapID;
 
     console.log("PATCH Update Region Map", url, requestBody)
-    return this.http.patch<Reponse<any>>(url, requestBody, {
+    return this.http.patch<Response<any>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -599,8 +546,6 @@ export class SettingService {
         console.log("PATCH Update Region Map =>", regionMap)
         this.regionMapUpdated.next(regionMap);
       }
-    }, error => {
-      console.error("PATCH Update Region Map =>", error);
     });
   }
 
@@ -608,7 +553,7 @@ export class SettingService {
     const url = this.baseUrl + 'regionmap/GetRegionMapCount'
 
     console.log("GET Regionunmapped Count", url)
-    return this.http.get<Reponse<{ count: number }>>(url, {
+    return this.http.get<Response<{ count: number }>>(url, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -616,8 +561,6 @@ export class SettingService {
         console.log("GET Regionunmapped Count =>", result.data.count)
         this.regionMapUnmappdCountGot.next(result.data.count);
       }
-    }, error => {
-      console.error("GET Regionunmapped Count =>", error);
     });
   }
 
@@ -625,7 +568,7 @@ export class SettingService {
     const url = this.baseUrl + 'UserManagement/GetUserDropDownOptions'
     console.log("GET User Option", url)
 
-    return this.http.get<Reponse<ReponseList<UserOption>>>(url, {
+    return this.http.get<Response<ResponseList<UserOption>>>(url, {
       observe: 'body',
       responseType: 'json'
     })
@@ -635,8 +578,6 @@ export class SettingService {
           this.userOptions = result.data.list
           this.userOptionsReady.next();
         }
-      }, error => {
-        console.error("GET User Option =>", error);
       });
   }
 
@@ -657,7 +598,7 @@ export class SettingService {
 
     let requestBody = { ...pageRequest, ...filters };
     console.log("Get Users", url, requestBody)
-    return this.http.post<Reponse<PagedList<User>>>(url, requestBody, {
+    return this.http.post<Response<PagedList<User>>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -665,8 +606,6 @@ export class SettingService {
         console.log("Get Users=>", result.data)
         this.userListChanged.next(result.data);
       }
-    }, error => {
-      console.error("Get Users=>", error);
     });
   }
 
@@ -690,7 +629,7 @@ export class SettingService {
 
     const url = this.baseUrl + 'UserManagement/UpdateUserByUserId/' + userID;
     console.log("PATCH Update User", url, request)
-    return this.http.patch<Reponse<any>>(url, request, {
+    return this.http.patch<Response<any>>(url, request, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -699,8 +638,6 @@ export class SettingService {
         this.userUpdated.next(user);
         this.getUserOptions();
       }
-    }, error => {
-      console.error("PATCH Update User=>", error);
     });
   }
 
@@ -713,7 +650,7 @@ export class SettingService {
     const url = this.baseUrl + 'UserManagement/CreateNewUser/';
     const requestBody = user;
     console.log("POST Create User", url, requestBody)
-    return this.http.post<Reponse<number>>(url, requestBody, {
+    return this.http.post<Response<number>>(url, requestBody, {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
@@ -723,8 +660,6 @@ export class SettingService {
         this.userCreated.next(user);
         this.getUserOptions();
       }
-    }, error => {
-      console.error("POST Create User =>", error);
     });
   }
 }

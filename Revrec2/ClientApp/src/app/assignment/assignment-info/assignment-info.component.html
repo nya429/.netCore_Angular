@@ -95,9 +95,9 @@
 
         <!-- </app-monthly-summary-record-list> -->
 
-        <app-monthly-summary-record-list [containerH]='contentHeight' [masterPatientId]="masterPatientId" [isSubList]='true' [mockMSR]='true' *ngIf="activeLink=='Monthly Summary'"></app-monthly-summary-record-list>
+        <app-monthly-summary-record-list [containerH]='contentHeight' [masterPatientId]="masterPatientId" [isSubList]='true' *ngIf="activeLink=='Monthly Summary'"></app-monthly-summary-record-list>
         <!-- </app-monthly-summary-record-list> -->
-        <app-discrepancy-list [containerH]='contentHeight' [sourcePaged]="pagedSourceDiscrepancy" [masterPatientId]="masterPatientId" [isSubList]='true' [mockMSR]='false' (onDiscrepancyDetailClicked)='onDiscrepancyDetailClick($event)' (onPagedAndSorted)="onListPagedSorted($event, 'discrepancy')"
+        <app-discrepancy-list [containerH]='contentHeight' [sourcePaged]="pagedSourceDiscrepancy" [masterPatientId]="masterPatientId" [isSubList]='true' (onDiscrepancyDetailClicked)='onDiscrepancyDetailClick($event)' (onPagedAndSorted)="onListPagedSorted($event, 'discrepancy')"
             (onLocalSearch)="onLocalSearch($event)" *ngIf="activeLink=='Discrepancy'"></app-discrepancy-list>
         <!-- <router-outlet></router-outlet> -->
 

@@ -89,12 +89,12 @@ namespace Revrec2.Controllers
             return Ok();
         }
 
-        [HttpGet("discrepancyAssignmentUnread")]
-        public async Task<ActionResult> discrepancyAssignmentRead()
+        [HttpGet("discrepancyAssignmentUnread/{stringGuid}")]
+        public async Task<ActionResult> discrepancyAssignmentRead(string stringGuid)
         {
             // int eventUserID = 1;
             int eventUserID = Request.GetUserID();
-            await Task.Run(() => _notificationService.getNotification(eventUserID));
+            await Task.Run(() => _notificationService.getNotification(eventUserID, stringGuid));
             return Ok();
         }
         //

@@ -38,22 +38,30 @@ namespace Revrec2.Services
             SseClient client;
             _clients.TryRemove(clientId, out client);
         }
+
+        internal IEnumerable<KeyValuePair<Guid, SseClient>> getClients(int userId)
+        {
+            var clients = _clients.Where(client => client.Value.isUser(userId));
+            return clients;
+        }
         #endregion
 
-        // SSE Broadcast
+        // SSE HeartBeat Broadcast
         public Task SendEventsAsync(string notification, bool alert)
         {
             List<Task> clientsTasks = new List<Task>();
 
-            foreach (SseClient client in _clients.Values)
+            foreach (Guid clientId in _clients.Keys)
             {
-                clientsTasks.Add(client.SendSseEventAsync(notification, alert));
+                SseClient client;
+                _clients.TryGetValue(clientId, out client);
+                clientsTasks.Add(client.SendSseEventAsync($"GUID: {clientId}, {notification}" , alert));
             }
 
             return Task.WhenAll(clientsTasks);
         }
 
-        // SSE Uni
+        // SSE User Broadcast 
         public Task SendEventsAsync(string notification, bool alert, int userId)
         {
             List<Task> clientsTasks = new List<Task>();
@@ -70,6 +78,17 @@ namespace Revrec2.Services
             }
 
             return Task.WhenAll(clientsTasks);
+        }
+
+        // SSE Uni
+        public Task SendEventsAsync(string notification, bool alert, string stringGuid)
+        {
+            SseClient client;
+            bool isClientExist = _clients.TryGetValue(Guid.Parse(stringGuid), out client);
+            if (!isClientExist)
+                return Task.CompletedTask;
+
+            return client.SendSseEventAsync(notification, alert);
         }
     }
 }

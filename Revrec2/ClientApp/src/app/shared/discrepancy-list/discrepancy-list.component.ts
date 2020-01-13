@@ -5,13 +5,13 @@ import { Component, OnInit, ViewChild, ElementRef, Input, OnChanges, Output, Eve
 import { FormControl, FormGroup } from '@angular/forms';
 import { Sort, MatSnackBar, MatDialog, PageEvent, MatSortable, MatSort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 
 import { deepIsEqual } from './../../util/deepIsEqual';
 // import { PeriodicElement, ELEMENT_DATA, DisElement } from 'src/app/MOCK_DATA';
 import { DiscreapcnyUpdateDialogComponent } from '../discrepancy-update-dialog/discrepancy-update-dialog.component';
 import { SharedService } from '../shared.service';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { PagedList } from 'src/app/model/response.model';
 import { minLenValidator, execLenValidator } from '../date.validate.directive';
 import { SettingService } from 'src/app/setting/setting.service';
@@ -24,6 +24,7 @@ import { listItemSlideStateTrigger } from 'src/app/setting/setting.animation';
 import { MemberService } from 'src/app/member/member.service';
 import { NotificationService } from 'src/app/notification.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { switchMap } from 'rxjs/operators';
 
 const moment = _rollupMoment || _moment;
 
@@ -73,7 +74,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   /** Table Container State: @Input */
   @Input() containerH: number;
   @Input() isSubList: boolean;
-  @Input() mockMSR: boolean;
+  // @Input() mockMSR: boolean;
   @Input('isLookup') containerSourceLookUp: boolean;
 
 
@@ -97,16 +98,16 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input('sourcePaged')
   set dateSourcePaged(dateSourcePaged: PagedList<Discrepancy>) {
-    console.log('SOURCE PAGED SET')
+    // console.log('SOURCE PAGED SET')
     this._dateSourcePaged = dateSourcePaged;
     this.pagedData = [...this._dateSourcePaged.list];
     this.pageState.count = this.dateSourcePaged.count;
     this.pageState.pageSize = this.dateSourcePaged.pageSize;
     this.pageState.pageIndex = this.dateSourcePaged.pageIndex;
     this.isLookup = false;
-    this.showCommentary = false;
+    // this.showCommentary = false;
     this.selection.clear();
-    this.onNotificationClicked();
+    // this.onNotificationClicked();
   };
 
   get dateSourcePaged(): PagedList<Discrepancy> {
@@ -117,7 +118,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   @Input('masterPatientId')
   set masterPatientId(masterPatientId: number) {
     this._masterPatientId = masterPatientId;
-    this.showCommentary = false;
+    // this.showCommentary = false;
     this.testSlideState = false;
   };
 
@@ -131,6 +132,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   private memberDiscrepancyBulkUpdated$: Subscription;
   private dialogClose$: Subscription;
   private notification$: Subscription;
+  private router$: Subscription;
 
   // //MOCK 
   // dataSource = ELEMENT_DATA[0].discrepancies;
@@ -218,6 +220,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   commentPermissions: string;
 
   constructor(private route: ActivatedRoute,
+    private router: Router,
     private _snackBar: MatSnackBar,
     private service: SharedService,
     private settingService: SettingService,
@@ -237,30 +240,45 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     this.onStateInit();
   }
 
+  ngOnDestroy() {
+    this.discrepancyBulkUpdated$.unsubscribe();
+    this.searchForm$.unsubscribe();
+    this.memberDiscrepancyBulkUpdated$.unsubscribe();
+    // this.notification$.unsubscribe();
+    this.router$.unsubscribe();
+
+    if (this.dialogClose$) {
+      this.dialogClose$.unsubscribe();
+    }
+  }
+
+  ngOnChanges() { }
+
   onStateInit() {
     this.actionUserId = this.authService.getActionUserId();
+    this.initColumns();
 
-    // sub-list will not including member-info
-    if (this.masterPatientId && !this.mockMSR) {
-      this.displayedColumns.splice(1, 4);
-      this.displayedColumns.splice(2, 10);
-    } else {
-      this.displayedColumns.splice(17, 1);
-    }
-
-    if (!this.isAuthorized('bulk_update')) {
-      this.displayedColumns.shift();
-    }
-
-    if (!this.isAuthorized('commnet') && !this.isAuthorized('explore')) {
-      this.displayedColumns.pop();
-    }
-
-    this.notification$ = this.notificationService.notificationClicked.subscribe(n => {
-      this.onNotificationClicked();
-    });
+    // this.notification$ = this.notificationService.notificationClicked.subscribe(n => {
+    //   this.onNotificationClicked();
+    // });
 
     this.searchForm$ = this.searchForm.valueChanges.subscribe(() => this.onSearch());
+
+
+    this.router$ = this.route.queryParamMap.pipe(
+      switchMap((param: ParamMap) => of(+param.get('discrepancyId'))
+      )).subscribe(value => {
+        console.log('router$', value)
+       if(value) {
+        this.showCommentary = true;
+        this.selectDiscrepancyID = value;
+        this.selectMasterPatientID = this.masterPatientId;
+       } else {
+        this.showCommentary = false;
+        this.selectDiscrepancyID = null;
+        this.selectMasterPatientID = null;
+       }
+      });
 
     // this.discrepancyBulkUpdated$ = this.service.discrepancyBulkUpdated.subscribe((form: {
     //   discrepancyIDs: number[],
@@ -298,76 +316,99 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
         DueDate: any,
         DiscrepancyStatus: DiscrepancyStatusOption,
         DiscrepancyComment: string
-      }) => {
+      }) => this.onBulkUpdated(form));
+  }
 
-      // console.log('discrepancyBulkUpdated$', form.DiscrepancyStatus);
+  initColumns() {
+    // sub-list will not including member-info
+    if (this.masterPatientId && this.isSubList) {
+      this.displayedColumns.splice(1, 4);
+      this.displayedColumns.splice(2, 10);
+    } else {
+      this.displayedColumns.splice(17, 1);
+    }
 
-      let unDisplayedIds: number[] = [];
+    if (!this.isAuthorized('bulk_update')) {
+      this.displayedColumns.shift();
+    }
 
-      //bulk update list based on form
-      this.pagedData.map((discrepnacy: Discrepancy, index: number) => {
-        if (!form.discrepancyIDs.includes(discrepnacy.discrepancyID)) {
-          return discrepnacy;
-        }
+    if (!this.isAuthorized('commnet') && !this.isAuthorized('explore')) {
+      this.displayedColumns.pop();
+    }
+  }
 
-        // update status
-        discrepnacy.discrepancyStatus = form.DiscrepancyStatus ? form.DiscrepancyStatus.discrepancyStatus : discrepnacy.discrepancyStatus;
-        discrepnacy.discrepancyStatusID = form.DiscrepancyStatus ? form.DiscrepancyStatus.discrepancyStatusID : discrepnacy.discrepancyStatusID;
-        // update user
-        discrepnacy.assigned_UserID = form.Assigned_User ? form.Assigned_User.userID : discrepnacy.assigned_UserID;
-        discrepnacy.assigned_UserName = form.Assigned_User ? form.Assigned_User.userNameAD : discrepnacy.assigned_UserName;
-        // update duedate
-        discrepnacy.dueDate = form.DueDate ? form.DueDate : discrepnacy.dueDate;
+  onBulkUpdated(form:
+    {
+      discrepancyIDs: number[],
+      Assigned_User: UserOption,
+      DueDate: any,
+      DiscrepancyStatus: DiscrepancyStatusOption,
+      DiscrepancyComment: string
+    }) {
+    // console.log('discrepancyBulkUpdated$', form.DiscrepancyStatus);
 
-        // push discrepancyId if not display
-        if (form.DiscrepancyStatus && !form.DiscrepancyStatus.discrepancyCategoryDisplay) {
-          unDisplayedIds.push(discrepnacy.discrepancyID);
-        }
+    let unDisplayedIds: number[] = [];
+
+    //bulk update list based on form
+    this.pagedData.map((discrepnacy: Discrepancy, index: number) => {
+      if (!form.discrepancyIDs.includes(discrepnacy.discrepancyID)) {
         return discrepnacy;
-      });
-
-      // remove undisplayed row
-      /** @todo count-- size-- */
-      // console.log('UNDISPLAY', unDisplayedIds)
-
-      const undisplayed = this.pagedData.filter(discrepancy =>
-        unDisplayedIds.includes(discrepancy.discrepancyID)
-      );
-
-      //  TODO add discreapncies ----------------------------------------------
-      this.service.onAfterDiscrepancyBulkUpdated(
-        {
-          masterPatientId: this.masterPatientId,
-          // staticount: {
-          //   total: 0
-          //   assinged: form.discrepancyIDs.length,
-          //   // age: form.DiscrepancyStatus.discrepancyCategoryDisplay ? 
-          //   variance: form.DiscrepancyStatus.discrepancyCategoryDisplay ? 0 :
-          //     undisplayed.map(d => d.variance).reduce((a, b) =>
-          //       Math.abs(a) + Math.abs(b))
-
-          // }
-        }
-      );
-      // ----------------------------------------------
-
-
-      this.pagedData = this.pagedData.filter(discrepancy =>
-        // !unDisplayedIds.includes(discrepancy.discrepancyID)
-        !undisplayed.includes(discrepancy)
-      );
-
-      if (unDisplayedIds.length > 0) {
-        setTimeout(() => {
-          // console.log('refresh discrepacny list')
-          this.refreshDiscreapncyOnBulkUpdated();
-        }, 800);
-
-
       }
 
-      this.openSnackBar(`${form.discrepancyIDs.length} Discrepancy Bulk Update Sucessfully`, 'Dismiss');
+      // update status
+      discrepnacy.discrepancyStatus = form.DiscrepancyStatus ? form.DiscrepancyStatus.discrepancyStatus : discrepnacy.discrepancyStatus;
+      discrepnacy.discrepancyStatusID = form.DiscrepancyStatus ? form.DiscrepancyStatus.discrepancyStatusID : discrepnacy.discrepancyStatusID;
+      // update user
+      discrepnacy.assigned_UserID = form.Assigned_User ? form.Assigned_User.userID : discrepnacy.assigned_UserID;
+      discrepnacy.assigned_UserName = form.Assigned_User ? form.Assigned_User.userNameAD : discrepnacy.assigned_UserName;
+      // update duedate
+      discrepnacy.dueDate = form.DueDate ? form.DueDate : discrepnacy.dueDate;
+
+      // push discrepancyId if not display
+      if (form.DiscrepancyStatus && !form.DiscrepancyStatus.discrepancyCategoryDisplay) {
+        unDisplayedIds.push(discrepnacy.discrepancyID);
+      }
+      return discrepnacy;
     });
+
+    // remove undisplayed row
+    /** @todo count-- size-- */
+    // console.log('UNDISPLAY', unDisplayedIds)
+
+    const undisplayed = this.pagedData.filter(discrepancy =>
+      unDisplayedIds.includes(discrepancy.discrepancyID)
+    );
+
+    //  TODO add discreapncies ----------------------------------------------
+    this.service.onAfterDiscrepancyBulkUpdated(
+      {
+        masterPatientId: this.masterPatientId,
+        // staticount: {
+        //   total: 0
+        //   assinged: form.discrepancyIDs.length,
+        //   // age: form.DiscrepancyStatus.discrepancyCategoryDisplay ? 
+        //   variance: form.DiscrepancyStatus.discrepancyCategoryDisplay ? 0 :
+        //     undisplayed.map(d => d.variance).reduce((a, b) =>
+        //       Math.abs(a) + Math.abs(b))
+
+        // }
+      }
+    );
+    // ----------------------------------------------
+
+    this.pagedData = this.pagedData.filter(discrepancy =>
+      // !unDisplayedIds.includes(discrepancy.discrepancyID)
+      !undisplayed.includes(discrepancy)
+    );
+
+    if (unDisplayedIds.length > 0) {
+      setTimeout(() => {
+        // console.log('refresh discrepacny list')
+        this.refreshDiscreapncyOnBulkUpdated();
+      }, 800);
+    }
+
+    this.openSnackBar(`${form.discrepancyIDs.length} Discrepancy Bulk Update Sucessfully`, 'Dismiss');
   }
 
   refreshDiscreapncyOnBulkUpdated() {
@@ -393,18 +434,6 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.discrepancyBulkUpdated$.unsubscribe();
-    this.searchForm$.unsubscribe();
-    this.memberDiscrepancyBulkUpdated$.unsubscribe();
-    // this.notification$.unsubscribe();
-    if (this.dialogClose$) {
-      this.dialogClose$.unsubscribe();
-    }
-  }
-
-  ngOnChanges() { }
-
   onPage(e: PageEvent): void {
     this.isLookup = true;
     this.pageState.pageIndex = e.pageIndex;
@@ -426,7 +455,6 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     this.testSlideState = false;
   }
 
-
   isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
     const numRows = this.pagedData.length;
@@ -446,7 +474,6 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
       this.pagedData.forEach(row => this.selection.select(row));
     // this.memberListService.selectMember(this.selection.selected, this.pagedData.length);
   }
-
 
   isBubbleLighted(element: any,
     option: string): boolean {
@@ -553,7 +580,6 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
       }
     }
 
-
     this.editedElement = null;
     this.editedField = null;
     this.selectObject = null;
@@ -571,11 +597,27 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onCommentClick(discrepancy: Discrepancy): void {
-    this.showCommentary = true;
-    this.selectDiscrepancyID = discrepancy.discrepancyID;
-    this.selectMasterPatientID = discrepancy.masterPatientID;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { discrepancyId: discrepancy.discrepancyID, type: 'comment' },
+      // queryParamsHandling: 'merge',
+    })
+    // this.showCommentary = true;
+    // this.selectDiscrepancyID = discrepancy.discrepancyID;
+    // this.selectMasterPatientID = discrepancy.masterPatientID;
     this.selectDiscrepancy = discrepancy;
     // this.expandedElement = discrepancy;
+  }
+
+  onCommentaryDismissed() {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+    })
+    // this.showCommentary = false;
+    // this.selectDiscrepancyID = null;
+    // this.selectMasterPatientID = null;
+    this.selectDiscrepancy = null;
   }
 
   onDiscrepancyDetailClick(e: any): void {
@@ -598,12 +640,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     return Math.floor((new Date().getTime() - Date.parse(element.memberMonth)) / 86400000);
   }
 
-  onCommentaryDismissed() {
-    this.showCommentary = false;
-    this.selectDiscrepancyID = null;
-    this.selectMasterPatientID = null;
-    this.selectDiscrepancy = null;
-  }
+
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DiscreapcnyUpdateDialogComponent, {
@@ -645,8 +682,8 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  // not been used
   onNotificationClicked() {
-
     if (!this.notificationService.hasNotification())
       return;
 
@@ -654,10 +691,11 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     console.log('NOTIFICATION OBSERVED', notification);
     switch (notification.NotificationType) {
       case 'comment':
-        this.showCommentary = true;
-        this.selectDiscrepancyID = notification.NotificationObject['DiscrepancyID'];
-        this.selectMasterPatientID = notification.NotificationObject['MasterPatientID'];
-        return;
+        // this.on
+        // this.showCommentary = true;
+        // this.selectDiscrepancyID = notification.NotificationObject['DiscrepancyID'];
+        // this.selectMasterPatientID = notification.NotificationObject['MasterPatientID'];
+        // return;
       case 'discrepancy':
         // this.notificationService.onNotificationClick(notification);
         return;

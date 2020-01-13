@@ -51,7 +51,7 @@ export class MonthlySummaryRecordListComponent implements OnInit, OnInit, OnChan
   /** Table Container State: @Input */
   @Input() containerH: number;
   @Input() isSubList: boolean;
-  @Input() mockMSR: boolean;
+  // @Input() mockMSR: boolean;
 
   private _masterPatientId: number;
 

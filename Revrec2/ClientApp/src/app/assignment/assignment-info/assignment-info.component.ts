@@ -179,7 +179,7 @@ export class AssignmentInfoComponent implements OnInit, OnDestroy {
 
   initDiscrepancyByPatientID() {
     /** @Todo Seperate Main/Sub list in more elegant way  */
-    this.sharedService.getDiscrepancies({ pageSize: 10 }, { MasterPatientID: this.masterPatientId, assigneeIDs: [this.actionUserId] }, true);
+    this.sharedService.getDiscrepancies({ pageSize: 25 }, { MasterPatientID: this.masterPatientId, assigneeIDs: [this.actionUserId] }, true);
   }
 
   onListPagedSorted(e, type: string) {

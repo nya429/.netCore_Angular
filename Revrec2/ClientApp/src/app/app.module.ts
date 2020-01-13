@@ -4,7 +4,7 @@ import { AssignmentModule } from './assignment/assignment.module';
 import { MemberModule } from './member/member.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
@@ -31,6 +31,8 @@ import { DiscreapcnyUpdateDialogComponent } from './shared/discrepancy-update-di
 import { AppService } from './app.service';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { ReportModule } from './report/report.module';
+import { ErrorService } from './error.service';
+import { GlobalErrorHandler } from './error.handler';
 
 @NgModule({
   declarations: [
@@ -65,11 +67,16 @@ import { ReportModule } from './report/report.module';
   ],
   providers: [AuthGuard,
     {
-      deps: [AuthService],
+      deps: [AuthService, ErrorService],
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    }, 
+    {
+      deps: [ErrorService],
+      provide: ErrorHandler,
+      useClass: GlobalErrorHandler,
+    }, 
   ],
   bootstrap: [AppComponent]
 })

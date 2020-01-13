@@ -477,6 +477,36 @@ namespace Revrec2.Controllers
             return Ok(response);
         }
 
+        [HttpPost("GetDiscrepancyById/{discrepancyId}/GetRateCellCrossSourceList")]
+        public async Task<ActionResult> GetDiscrepancyRateCellCrossSourceList(int discrepancyId, [FromBody] ExplorerDetailsRequestDto request)
+        {
+            SqlParameter[] parameters =
+               {
+            
+                    new SqlParameter("@DiscrepancyID", discrepancyId),
+                    new SqlParameter("@StartDate", !(request.StartDate.HasValue) ? DBNull.Value : (object)request.StartDate),
+                    new SqlParameter("@EndDate", !(request.EndDate.HasValue) ? DBNull.Value : (object)request.EndDate),
+               
+               };
+
+            var response = new ResponseData<ResponseDataList<ExplorerDetailsDto>>
+            {
+                IsSuccess = true,
+                Code = Constants.ResponseCode.Success,
+                Message = "Success",
+            };
+
+            var query = _context.Query<ExplorerDetails>().FromSql($"dbo.spGetExplorerDetails @DiscrepancyID , @startDate, @endDate", parameters);
+            var explorerDetailsList = await query.AsNoTracking().ToArrayAsync();
+
+            response.Data = new ResponseDataList<ExplorerDetailsDto>
+            {
+                List = _mapper.Map<IEnumerable<ExplorerDetailsDto>>(explorerDetailsList)
+            };
+
+            return Ok(response);
+        }
+
         protected DataTable GenerateDataTableBulkIDs(string columnName, AssigneeIDs assigneeIDs)
         {
             DataTable dataTable = new DataTable();

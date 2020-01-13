@@ -298,7 +298,7 @@ export class AssignmentListComponent implements OnInit, OnDestroy {
   }
 
   onWorkListItemClick(element: MemberPaged) {
-    this.router.navigate(['/worklist', { outlets: { 'bio': [element.masterPatientID] } }]);
+    this.router.navigate(['/worklist', { outlets: { 'patient': [element.masterPatientID] } }]);
   }
 
   isHighlight(i: number): boolean {

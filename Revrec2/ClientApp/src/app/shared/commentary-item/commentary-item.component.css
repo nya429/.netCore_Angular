@@ -23,7 +23,6 @@
     transition: .3s;
 }
 
-
 .commentary-edit-highlightable {
     cursor: pointer;
     transition: .2s;
@@ -32,7 +31,6 @@
     border-left: 4px solid #317083;
     border-radius: 2.5px;
 }
-
 
 .commentary-edit-highlightable:hover {
     background-color: #3170831c;
@@ -44,6 +42,22 @@
 }
 
 .header-text-indicator {
-    color:darkcyan; 
+    color: darkcyan;
     padding: 0 4px;
+}
+
+.commentary-anchored-highlightable {
+    color: #317083;
+    font-weight: bolder;
+    animation-name: highlight-spark;
+    animation-duration: 2s;
+}
+
+@keyframes highlight-spark {
+    from {
+        background-color: #317083;
+    }
+    to {
+        background-color: #fff;
+    }
 }

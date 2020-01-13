@@ -25,7 +25,8 @@
         <a [matMenuTriggerFor]="menu" id="menuBtn" style="display:none;">@</a>
         <mat-menu #menu="matMenu" class="myMenu" (close)="onMenuClosed()">
             <div class="menuOpnBtnWrapper">
-                <button class="menuOpnBtn" mat-menu-item *ngFor="let user of getOptions('assigned_User')" (keyup)="$event.stopPropagation();" (keydown)="$event.stopPropagation();" (click)="onUserClick(user)">
+                <!-- (keyup)="$event.stopPropagation();" (keydown)="$event.stopPropagation();" -->
+                <button class="menuOpnBtn" mat-menu-item *ngFor="let user of getOptions('assigned_User')" (keyup)="onAnchorMenuKeyup($event)" (click)="onUserClick(user)">
                       {{ user.userNameAD }}
                   </button>
             </div>

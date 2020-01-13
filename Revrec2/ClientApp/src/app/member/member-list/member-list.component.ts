@@ -54,7 +54,7 @@ export class MemberListComponent implements OnInit, OnDestroy {
   // @Input('source') members: PeriodicElement[];
 
   @Input('isLookup') containerSourceLookUp: boolean;
-
+  // @Input('isLookup') containerSourceLookUp: boolean;
   @Input('bulkUpdatePermissions') bulkUpdatePermissions: string;
   @Input('bulkUpdateByFilterPermissions') bulkUpdateByFilterPermissions: string;
   @Input('infoPermissions') infoPermissions: string;
@@ -318,13 +318,27 @@ export class MemberListComponent implements OnInit, OnDestroy {
       : this.displayedColumns.splice(7, 0, 'rating_category');
   }
 
+  onRefresh() {
+    this.searchForm.patchValue({
+      includeZeroDiscrepancy: 0,
+      Name: '',
+      CCAID: '',
+      MMIS_ID: ''
+    }, { emitEvent: false });
+    this.pageState.pageIndex = 0;
+    this.pageState.sortBy = 'absoluteVarianceSum',
+      this.pageState.orderBy = 1;
+    this.service.getMembers({ ...this.searchForm.value, ...this.pageState });
+    this.membersLoading = true;
+  }
+
   // onMMISClick(element: PeriodicElement) {
-  //   this.router.navigate(['/members', { outlets: { 'bio': [element.mmis_id] } }]);
+  //   this.router.navigate(['/members', { outlets: { 'patient': [element.mmis_id] } }]);
   //   this.selectedIndex = this.dataSource.indexOf(element);
   // }
   onMMISClick(element: MemberPaged) {
-    if(this.isAuthorized('info')) {
-      this.router.navigate(['/members', { outlets: { 'bio': [element.masterPatientID] } }]);
+    if (this.isAuthorized('info')) {
+      this.router.navigate(['/members', { outlets: { 'patient': [element.masterPatientID] } }]);
     }
     // this.selectedPatientID = element.masterPatientID;
   }
