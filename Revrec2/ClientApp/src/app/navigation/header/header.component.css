@@ -129,6 +129,8 @@ input[type="text"] {
     padding: 12px 24px 0px 24px;
     font-size: 16px;
     color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis
 }
 
 .universal-search-result-fields {

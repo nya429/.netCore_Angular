@@ -4,7 +4,7 @@ export interface ExploreRateCell {
     memberMonth: string,
     mp_RateCell: string,
     mh834_RateCell: string,
-    mh834_LastAssessDate: string,
+    mh834_LastAssessedDate: string,
     cmp_RateCell: string,
     cmp_LastAssessDate: string
     cmp_Source: string

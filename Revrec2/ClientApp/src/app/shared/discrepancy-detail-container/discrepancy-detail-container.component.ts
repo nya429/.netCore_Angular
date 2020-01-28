@@ -6,6 +6,7 @@ import { Discrepancy } from 'src/app/model/discrepancy.model';
 import { initTransferState } from '@angular/platform-browser/src/browser/transfer_state';
 import { SharedService } from 'src/app/shared/shared.service';
 import { ErrorService } from 'src/app/error.service';
+import { fn } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-discrepancy-detail-container',
@@ -119,7 +120,15 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
       // Temprary Solution for Duplicate Member Month
       exploreRateCellList.forEach((e: ExploreRateCell) => {
         const month = e.memberMonth;
-        if (this.dataSource.find((e: ExploreRateCell) => e.memberMonth === month)) {
+        if (this.dataSource.find((d: ExploreRateCell) => d.memberMonth === month)) {
+          this.dataSource
+            .filter((d: ExploreRateCell) => d.memberMonth === month)
+            .forEach((d: ExploreRateCell) => {    
+              if (Date.parse(d.mh834_LastAssessedDate) < Date.parse(e.mh834_LastAssessedDate)) {
+                this.dataSource.pop();
+                this.dataSource.push(e);
+              }
+            })
           idDuplicated = true;
         }
         // Temprary Solution for Missing Member Month
@@ -199,22 +208,22 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
           let span = this.timespan[source][this.timespan[source].length - 1];
 
           if (span.ratecell != sourceRateCell) {
-
-             
-
+            /** @TODO Year + 1
+             *  "2019-09-01T00:00:00"
+            */
             const MONTH = new Date(Date.parse(month));
-            let mon = month.substr(5, 2);
+            const OFFSET = 1;
+            let monAlt = MONTH.getMonth();
+            let yearAlt = MONTH.getFullYear();
+            if (monAlt === 11) {
+              monAlt = + OFFSET
+              yearAlt = MONTH.getFullYear() + OFFSET
+            } else {
+              // 0 Based Month
+              monAlt = monAlt + OFFSET + 1
+            }
 
-            /** @TODO Year + 1*/
-            
-
-            // Month + 1
-            let mon1 = mon === '12' ?
-              '01' :
-              (Number(mon) + 1 < 10 ?
-                '0' + (Number(mon) + 1).toString() : (Number(mon) + 1).toString());
-
-            span.end = month.substr(0, 5) + mon1 + month.substr(7);
+            span.end = yearAlt.toString() + "-" + (monAlt < 10 ? "0" + monAlt : monAlt).toString() + "-01T00:00:00"
 
             this.timespan[source][this.timespan[source].length - 1] = span;
             this.timespan[source].push({ ratecell: sourceRateCell, start: month, end: '' });
@@ -236,7 +245,7 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
     if (source === 'mP') {
       return '';
     }
-    return " Last Assessed on:" + this.formatMonth(this.dataSource[0][source + "_LastAssessedDate"]);
+    return " Last Assessed on: " + this.formatMonth(this.dataSource[0][source + "_LastAssessedDate"]);
   }
 
   initSource() {
@@ -365,4 +374,5 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
   //   this.renderer.setStyle(this.tooltip.nativeElement, "top", -16 + "px");
   //   this.renderer.setStyle(this.tooltip.nativeElement, "left", e.layerX + "px");
   // }
+
 }

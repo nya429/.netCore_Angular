@@ -107,7 +107,10 @@ export class MemberInfoComponent implements OnInit, OnDestroy {
 
 
     /** Member Info $ */
-    this.memberInfoChanged$ = this.service.memebrFetched.subscribe(data => {
+    this.memberInfoChanged$ = this.service.memebrFetched
+    .pipe(
+      switchMap((member: Member) => of(member))
+    ).subscribe(data => {
       this.member = data
       this.memebrLookingUP = false;
       // console.log('MasterPatient Fetched', this.masterPatientId, this.member)

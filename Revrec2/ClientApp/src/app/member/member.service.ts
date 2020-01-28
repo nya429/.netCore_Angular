@@ -8,6 +8,7 @@ import { MemberPaged, Member } from '../model/member.model';
 import { SharedService } from '../shared/shared.service';
 import { UserOption } from '../model/user.model';
 import { DiscrepancyStatusOption } from '../model/setting.model';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -84,11 +85,11 @@ export class MemberService {
       observe: 'body',
       responseType: 'json'
     }).subscribe(result => {
-      if (result.isSuccess) {
-        console.log("Get Members =>", result.data)
-        this.memberListChanged.next(result.data);
-      }
-    });
+        if (result.isSuccess) {
+          console.log("Get Members =>", result.data)
+          this.memberListChanged.next(result.data);
+        }
+      });
   }
 
   getMemberByMasterPatientId(con) {
