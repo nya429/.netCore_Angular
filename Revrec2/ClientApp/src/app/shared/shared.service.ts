@@ -235,6 +235,8 @@ export class SharedService {
       AssigneeID: discrepancy.assigned_UserID,
       DiscrepancyStatusID: discrepancy.discrepancyStatusID,
       DueDate: discrepancy.dueDate,
+      discrepancy: discrepancy,
+      assignmentChanged: discrepancy.assigned_UserID !== discrepancyPrev.assigned_UserID
     };
 
     const discrepancyID = discrepancy.discrepancyID;
@@ -277,6 +279,7 @@ export class SharedService {
   bulkUpdateDiscrepancyByIds(
     form: {
       discrepancyIDs: number[],
+      discrepancies: Discrepancy[],
       Assigned_User: UserOption,
       DueDate: any,
       DiscrepancyStatus: DiscrepancyStatusOption,
@@ -285,10 +288,11 @@ export class SharedService {
 
     const requestBody = {
       DiscrepancyIDs: {
-        BulkID: form.discrepancyIDs.map((discrepancyID: number) => {
-          return { UpdateID: discrepancyID };
+        BulkID: form.discrepancies.map((discrepancy: Discrepancy) => {
+          return { UpdateID: discrepancy.discrepancyID };
         })
       },
+      discrepancies: form.discrepancies,
       DiscrepancyStatusId: form.DiscrepancyStatus ? form.DiscrepancyStatus.discrepancyStatusID : "",
       Assigned_UserID: form.Assigned_User ? form.Assigned_User.userID : "",
       DueDate: form.DueDate,

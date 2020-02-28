@@ -239,14 +239,12 @@ namespace Revrec2.Controllers
             response.Code = parameters.FirstOrDefault(p => p.ParameterName.Equals("@ReturnCode")).Value.toInt();
             response.Message = "Success";
 
-            if (request.AssigneeID.HasValue)
+            if (request.AssigneeID.HasValue && request.AssignmentChanged)
             {
                 string actionUserName = Request.GetUserName();
 
-                List<int> discrepancyIds = new List<int>()
-                {
-                    discrepancyID
-                };
+                List<KeyValuePair<int, int>> discrepancyIds = new List<KeyValuePair<int, int>>();
+                discrepancyIds.Add(new KeyValuePair<int, int>(discrepancyID, request.discrepancy.MasterPatientID));
                 _discrepancyAssignmentService.discrepancyAssignement(request.AssigneeID ?? default(int), actionUserName, discrepancyIds);
             }
 
@@ -297,7 +295,7 @@ namespace Revrec2.Controllers
                 )
             {
                 string actionUserName = Request.GetUserName();
-                var list = request.DiscrepancyIDs.BulkID.Select(bulkID => bulkID.UpdateID).ToList();
+                List<KeyValuePair<int, int>> list = request.Discrepancies.Select((discrepancy) => new KeyValuePair<int, int> (discrepancy.DiscrepancyID, discrepancy.MasterPatientID)).ToList();
                 _discrepancyAssignmentService.discrepancyAssignement(request.Assigned_UserID ?? default(int), actionUserName, list);
             }
 

@@ -33,7 +33,7 @@
                 </mat-form-field>
                 <mat-form-field class='mat-form-field-narrow'>
                     <input [errorStateMatcher]="errorMatcher" #startDateInputEl matInput placeholder="Start Date" formControlName="startDate" [matDatepicker]="picker1" (keyup)="fireWhenEmpty(startDateInputEl, 'startDate')">
-                    <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                    <mat-error *ngIf="searchForm.get('startDate').getError('matDatepickerParse')">
                         date input format error
                     </mat-error>
                     <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>

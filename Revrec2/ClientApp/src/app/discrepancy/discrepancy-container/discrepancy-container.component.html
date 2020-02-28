@@ -120,9 +120,15 @@
         <br>
         <mat-card style='padding: 0;'>
             <div class="discrepancy-list-container-wrapper" #reconList style=" height: calc(100vh - 94px - 209px);">
-                <app-discrepancy-list [isLookup]='isLookup' [sourcePaged]="pagedSourceDiscrepancy" [isSubList]='false' [containerH]='contentHeight' (onPagedAndSorted)="onListPagedSorted($event)" (onLocalSearch)="onLocalSearch($event)"></app-discrepancy-list>
+                <app-discrepancy-list [isLookup]='isLookup' [sourcePaged]="pagedSourceDiscrepancy" [isSubList]='false' [containerH]='contentHeight' (onPagedAndSorted)="onListPagedSorted($event)" (onLocalSearch)="onLocalSearch($event)" (onDiscrepancyDetailClicked)='onDiscrepancyDetailClick($event)'></app-discrepancy-list>
                 <!-- (onUpdated)="onUpdate($event)" -->
             </div>
         </mat-card>
+    </div>
+</div>
+
+<div *ngIf='displayedDiscrepancy' class="info-overlay">
+    <div class='info-container'>
+        <app-discrepancy-detail-container (onDismissed)='onDiscrepancyDetailDismissed()'></app-discrepancy-detail-container>
     </div>
 </div>

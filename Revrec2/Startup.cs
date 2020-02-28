@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Revrec2.Services;
 using Revrec2.Extensions;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace Revrec2
 {
@@ -42,6 +43,13 @@ namespace Revrec2
             });
             
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.EnableForHttps = true;
+                // options.MimeTypes = new[] { "application/json" };
+            });
 
             if (_env.IsProduction())
             {
@@ -101,6 +109,8 @@ namespace Revrec2
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILogger<Startup> logger)
         {
+            // app.UseResponseCompression();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -111,6 +121,7 @@ namespace Revrec2
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
 
             app.ConfigureExceptionHandler(logger);
 
@@ -124,7 +135,6 @@ namespace Revrec2
                     .AllowAnyHeader());
 
             app.UseAuthentication();
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

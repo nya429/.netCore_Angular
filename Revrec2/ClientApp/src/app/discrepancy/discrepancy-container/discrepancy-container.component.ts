@@ -36,6 +36,7 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
 
   // Display State: List: {Empty, NonEmpty}, Add(Stepper), Edit, 
   isLookup: boolean;
+  displayedDiscrepancy: Discrepancy;
 
   /** search filter */
   searchForm: FormGroup;
@@ -264,7 +265,8 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
 
   // Temp Solution for Month
   getMonths() {
-    const monthStart = '2015-01-01';
+    // Revrec2 file processing back to 2018-01-01
+    const monthStart = '2018-01-01';
 
     const e = new Date(Date.parse(monthStart));
     const eMonth = e.getUTCMonth() + 1;
@@ -292,5 +294,13 @@ export class DiscrepancyContainerComponent implements OnInit, OnDestroy {
     this._snackBar.open(message, action, {
       duration: 1000,
     });
+  }
+
+  onDiscrepancyDetailClick(e) {
+    this.displayedDiscrepancy = e;
+  }
+
+  onDiscrepancyDetailDismissed() {
+    this.displayedDiscrepancy = null;
   }
 }

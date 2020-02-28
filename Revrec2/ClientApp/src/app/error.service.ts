@@ -44,7 +44,7 @@ export class ErrorService {
 
     this.zone.run(() => {
       {
-        let _snackBarRef: MatSnackBarRef<any> = this._snackBar.open("There was an internal error, please contact technical support.", 'copy', { duration: 3000 })
+        let _snackBarRef: MatSnackBarRef<any> = this._snackBar.open("There was an internal error, please contact technical support.", 'copy', { duration: 5500 })
         _snackBarRef.afterDismissed().subscribe(() => {
           console.log("afterDismissed")
           let listener = (e: ClipboardEvent) => {

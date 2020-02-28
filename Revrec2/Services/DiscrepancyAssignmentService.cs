@@ -24,7 +24,7 @@ namespace Revrec2.Services
             _sseService = sseService;
         }
 
-        public async void discrepancyAssignement(int userId, string actionUserName, List<int> discrepancyIds)
+        public async void discrepancyAssignement(int userId, string actionUserName, List<KeyValuePair<int, int>> discrepancyIds)
         {
             NotificationDto notification = new NotificationDto()
             {

@@ -69,11 +69,14 @@ namespace Revrec2.DTOs
         public int? AssigneeID { get; set; }
         public int? DiscrepancyStatusID { get; set; }
         public DateTime? DueDate { get; set; }
+        public DiscrepancyRecordForListDto discrepancy { get; set; }
+        public bool AssignmentChanged { get; set; }
     }
 
     public class DiscrepancyRecordForUpdateDto
     {
         public AssigneeIDs DiscrepancyIDs { get; set; }
+        public List<DiscrepancyRecordByIdForListDto> Discrepancies { get; set; }
         public int? DiscrepancyStatusID { get; set; }
         public int? Assigned_UserID { get; set; }
         public DateTime? DueDate { get; set; }

@@ -7,6 +7,7 @@ import { initTransferState } from '@angular/platform-browser/src/browser/transfe
 import { SharedService } from 'src/app/shared/shared.service';
 import { ErrorService } from 'src/app/error.service';
 import { fn } from '@angular/compiler/src/output/output_ast';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-discrepancy-detail-container',
@@ -49,7 +50,7 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
 
   /** Side Component State */
   isSideComponentContainerDisplay = false;
-  links = ["comment", "history"];
+  links = ["comment"];
   /** @input */
   activeLink = this.links[0];
   sideComponentHeight: number;
@@ -59,6 +60,9 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
   /** Comparison State */
   discrepancyType = ['RC', 'RE', 'PP', 'SP'];
   displayedDiscrepancyType = this.discrepancyType[0];
+
+  /** search from */
+  searchForm: FormGroup;
 
 
   /** Comparison State */
@@ -89,11 +93,13 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
   };
 
   constructor(private service: SharedService,
-    private errorService: ErrorService
+    private errorService: ErrorService,
+    private fb: FormBuilder
     // private renderer: Renderer2
   ) { }
 
   ngOnInit() {
+    this.initForm();
     this.initState();
   }
 
@@ -123,7 +129,7 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
         if (this.dataSource.find((d: ExploreRateCell) => d.memberMonth === month)) {
           this.dataSource
             .filter((d: ExploreRateCell) => d.memberMonth === month)
-            .forEach((d: ExploreRateCell) => {    
+            .forEach((d: ExploreRateCell) => {
               if (Date.parse(d.mh834_LastAssessedDate) < Date.parse(e.mh834_LastAssessedDate)) {
                 this.dataSource.pop();
                 this.dataSource.push(e);
@@ -144,10 +150,19 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.getSpan();
         this.turnSourceHorizantal();
-      }, 500);
+      }, 400);
     })
 
     this.initSource();
+  }
+
+  initForm() {
+    this.searchForm = this.fb.group({
+      startDate: '',
+      endDate: '',
+    }, {
+        validator: this.dateInputValidator
+      });
   }
 
   turnSourceHorizantal() {
@@ -375,4 +390,14 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
   //   this.renderer.setStyle(this.tooltip.nativeElement, "left", e.layerX + "px");
   // }
 
+  dateInputValidator(form: FormGroup) {
+    const condition = form.get('startDate').getError('matDatepickerParse') || form.get('endDate').getError('matDatepickerParse')
+    return condition ? { dateInputError: true } : null;
+  }
+
+  fireWhenEmpty(el, formControlName: string): void {
+    if (!el.value || el.value === '') {
+      this.searchForm.patchValue({ [formControlName]: '' }, { emitEvent: true })
+    }
+  }
 }

@@ -30,7 +30,7 @@
         "bootstrap": "^4.1.3",
         "classlist.js": "^1.1.20150312",
         "core-js": "^2.5.4",
-        "d3": "^4.12.2",
+        "d3": "^4.13.0",
         "d3-force": "^2.0.0",
         "d3-scale-chromatic": "^1.2.0",
         "hammerjs": "^2.0.8",

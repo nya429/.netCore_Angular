@@ -108,7 +108,32 @@
                                     <div class="button-group-tip">
                                         Please click the system below to see the comparison of each rate cell
                                     </div>
+
                                 </mat-card-subtitle>
+                                <div *ngIf="0" class="comparison-legend">
+                                    <form [formGroup]="searchForm">
+                                        <mat-form-field class='mat-form-field-narrow'>
+                                            <!-- [errorStateMatcher]="errorMatcher"  -->
+                                            <input #startDateInputEl matInput placeholder="Start Date" formControlName="startDate" [matDatepicker]="picker1" (keyup)="fireWhenEmpty(startDateInputEl, 'startDate')">
+                                            <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                                                date input format error
+                                            </mat-error>
+                                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker1 startView="year"></mat-datepicker>
+                                            <!-- [startAt]="startDate" -->
+                                        </mat-form-field>
+                                        <mat-form-field class='mat-form-field-narrow'>
+                                            <!-- [errorStateMatcher]="errorMatcher" -->
+                                            <input #endDateInputEl matInput placeholder="End Date" formControlName="endDate" [matDatepicker]="picker2" (keyup)="fireWhenEmpty(endDateInputEl, 'endDate')">
+                                            <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                                                date input format error
+                                            </mat-error>
+                                            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker2 startView="year"></mat-datepicker>
+                                            <!-- [startAt]="startDate" -->
+                                        </mat-form-field>
+                                    </form>
+                                </div>
                                 <div class="comparison-legend">
                                     <div class="comparison-legend-item">
                                         <div class="comparison-legend-item-icon" id="discrepancy-month">

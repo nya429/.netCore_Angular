@@ -24,6 +24,7 @@ a {
     bottom: -19px;
     right: 50%;
     left: 50%;
+    z-index: 2;
 }
 
 .member-mp-info-container {

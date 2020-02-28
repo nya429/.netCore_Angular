@@ -1,8 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 
-
-/* You can add global styles to this file, and also import other style files */
-
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 html,
 body {
@@ -11,8 +8,8 @@ body {
 }
 
 ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {

@@ -1,0 +1,36 @@
+<div class="container-fluid report-container">
+    <mat-card>
+        <div class="row" fxLayout="row" fxLayoutAlign="begin begin" style='padding:15px;'>
+            <div fxFlex="80" class="chart-container col-sm-9">
+                <div #BarChart class='bar-chart' style='height: 500px;'></div>
+            </div>
+            <div fxFlex="20" #Filter class="filter-container col-sm-3">
+                Filterss
+                <div>
+                    <mat-radio-group aria-label="Select an option" (change)="onRadioClicked($event)">
+                        <h5>Bar Schema</h5>
+                        <mat-radio-button value="stacked">Stacked</mat-radio-button>
+                        <mat-radio-button value="grouped">Grouped</mat-radio-button>
+                        <!-- <mat-radio-button value="percent">Percent</mat-radio-button> -->
+                    </mat-radio-group>
+                    <br>
+                    <section class="category-selection">
+                        <h5>Category</h5>
+                        <mat-checkbox class="row" *ngFor="let key of chartState.keys" [disabled]='isCategoryDisable(key)' (change)="$event ? updateCategory(key) : null" [(ngModel)]="key.active">{{key.name}}
+                        </mat-checkbox>
+                        <!-- </form> -->
+                    </section>
+                    <section class="month-selection">
+                        <h5>Months</h5>
+                        <mat-checkbox class="row" (change)="$event ? masterToggle() : null" [checked]="isAllSelected()">(All)
+                        </mat-checkbox>
+                        <mat-checkbox class="row" *ngFor="let month of getMonths()" [value]="month" (change)="$event ? onMonthSelect(month) : null" [checked]="selection.isSelected(month)">{{month}}
+                        </mat-checkbox>
+                        <!-- </form> -->
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    </mat-card>
+</div>

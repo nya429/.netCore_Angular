@@ -55,7 +55,7 @@ export class SettingUserFormDialogComponent implements OnInit {
         validators: [Validators.required]
       }),
       Email: new FormControl('', {
-        validators: [Validators.required,  Validators.pattern('[a-zA-Z]+@commonwealthcare.org')]
+        validators: [Validators.required, Validators.pattern('[a-zA-Z]+@commonwealthcare.org')]
       }),
       administrator: new FormControl(false, {
 
@@ -85,14 +85,39 @@ export class SettingUserFormDialogComponent implements OnInit {
 
   ccaemilValidator(form: FormGroup) {
     let firstName = form.get('FirstName').value as string;
-    firstName = firstName.substring(0,1).toLowerCase().replace(/[^a-zA-Z ]/g, "");
+    let firstName2 = firstName.toLowerCase().replace(/[^a-zA-Z ]/g, "");
+    // firstName = firstName.substring(0,1).toLowerCase().replace(/[^a-zA-Z ]/g, "");
+
     let lastName = form.get('LastName').value as string;
     lastName = lastName.toLowerCase().replace(/[^a-zA-Z ]/g, "");
 
-    let condition = form.get('Email').value === firstName + lastName + "@commonwealthcare.org"
+    // let condition = form.get('Email').value === firstName + lastName + "@commonwealthcare.org"
 
-    console.log( firstName + lastName + "@commonwealthcare.org", condition)
-    return condition ? null : { ccaemailValidator: true };
+    let firstNameAltCharList = "(";
+    let i = 1;
+    while (i <= firstName2.length) {
+      if (i != firstName2.length) {
+        firstNameAltCharList = firstNameAltCharList + firstName2.substring(1, i) + "|"
+      } else {
+        firstNameAltCharList = firstNameAltCharList + firstName2.substring(1, i) + ")"
+      }
+      i++;
+    }
+
+    if(!firstName2 || !lastName) {
+      firstNameAltCharList = "()";
+      lastName = "";
+      firstName2 = "";
+    }
+    // console.log(`${firstName2[0]}${firstNameAltCharList}${lastName}@commonwealthcare.org`)
+    const reg = RegExp(`${firstName2[0]}${firstNameAltCharList}${lastName}@commonwealthcare.org`, 'i');
+
+    let condition2 = reg.test(form.get('Email').value)
+
+    // console.log(firstName + lastName + "@commonwealthcare.org", condition)s
+    // console.log(`${firstName2[0]}${firstNameAltCharList}${lastName}@commonwealthcare.org`, condition2)
+
+    return condition2 ? null : { ccaemailValidator: true };
   }
 
   isFormsValid(): boolean {

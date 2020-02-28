@@ -1,0 +1,22 @@
+.report-container {
+    position: relative;
+    padding: 24px;
+    overflow: auto;
+}
+
+.chart-container {
+    /* border: 1px solid red; */
+    /* background-color: rgba(200, 100, 0, .6); */
+    padding: 35px;
+}
+
+.filter-container {
+    border: 1px solid red;
+    background-color: rgba(200, 100, 0, .6);
+    padding: 35px;
+}
+
+mat-radio-button,
+mat-checkbox {
+    padding-right: 10px;
+}

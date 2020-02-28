@@ -1,0 +1,121 @@
+<div class="container-fluid  report-container">
+    <mat-card class="">
+        <div fxLayout="row" fxLayoutAlign="begin begin">
+            <div fxFlex="80" class="chart-container col-sm-9">
+                <div class="row chart-header">
+                    <div class="col-sm-9">
+                        <div>
+                            <div class="chart-header-title">
+                                <h5>
+                                    Total Discrepancies by Resolved/Unresolved
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <!-- <div class="chart-header-filter">
+                            <mat-radio-group aria-label="Select an option" (change)="onRadioClicked($event)" [(ngModel)]="chartState.schemaActive">
+                                <h5>Visualization: {{chartState.schemaActive}}</h5>
+                                <mat-radio-button *ngFor='let option of chartState.schemaOptions' [value]="option">{{option}}</mat-radio-button>
+
+                            </mat-radio-group>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="row chart-header">
+                    <div style="padding:14px 7px">
+
+                        <button mat-button [matMenuTriggerFor]="menu1" matBadgePosition="after">Category
+                            <mat-icon aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+                        </button>
+                        <mat-menu #menu1="matMenu" [overlapTrigger]="false" yPosition="below" (click)="$event.stopPropagation()">
+
+                            <mat-checkbox mat-ripple class="menu-item" *ngFor="let key of chartState.keys" (click)="$event.stopPropagation()" [disabled]='isCategoryDisable(key)' (change)="$event ? updateCategory(key) : null" [(ngModel)]="key.active">{{key.name}}
+                            </mat-checkbox>
+
+                        </mat-menu>
+                    </div>
+                    <!-- <mat-divider [vertical]="true"></mat-divider> -->
+                    <div style="padding:14px 7px">
+
+                        <span style="font-size: 14px;">
+                            Visualization:
+                        </span>
+                        <button mat-button [matMenuTriggerFor]="menu2" matBadgePosition="after" style="min-width: 110px;max-width: 110px;">{{chartState.schemaActive}}
+                            <mat-icon aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+                        </button>
+                        <mat-menu #menu2="matMenu" [overlapTrigger]="false" yPosition="below" (click)="$event.stopPropagation()">
+                            <mat-radio-group aria-label="Select an option" (change)="onRadioClicked($event)" [(ngModel)]="chartState.schemaActive">
+                                <mat-radio-button mat-ripple class="menu-item" *ngFor='let option of chartState.schemaOptions' [value]="option" (click)="$event.stopPropagation()">{{option}}</mat-radio-button>
+                            </mat-radio-group>
+                        </mat-menu>
+                    </div>
+
+                    <div style="padding:14px 7px">
+                        <button mat-button [matMenuTriggerFor]="menu3" matBadgePosition="after">Month
+                                <mat-icon aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+                            </button>
+                        <mat-menu #menu3="matMenu" [overlapTrigger]="false" yPosition="below" (click)="$event.stopPropagation()">
+                            <mat-checkbox mat-ripple class="menu-item" (click)="$event.stopPropagation()" (change)="$event ? masterToggle() : null" [checked]="isAllSelected()">(All)
+                            </mat-checkbox>
+                            <mat-checkbox mat-ripple class="menu-item" *ngFor="let month of getMonths()" [value]="month" (click)="$event.stopPropagation()" (change)="$event ? onMonthSelect(month) : null" [checked]="selection.isSelected(month)">{{month}}
+                            </mat-checkbox>
+                        </mat-menu>
+                    </div>
+                    <!-- <mat-divider [vertical]="true"></mat-divider> -->
+                    <div>
+                        <form [formGroup]="searchForm">
+                            <mat-form-field class='mat-form-field-narrow'>
+                                <!-- [errorStateMatcher]="errorMatcher"  -->
+                                <input #startDateInputEl matInput placeholder="Start Date" formControlName="startDate" [matDatepicker]="picker1" (keyup)="fireWhenEmpty(startDateInputEl, 'startDate')">
+                                <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                                    date input format error
+                                </mat-error>
+                                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                <mat-datepicker #picker1 startView="year"></mat-datepicker>
+                                <!-- [startAt]="startDate" -->
+                            </mat-form-field>
+                            <mat-form-field class='mat-form-field-narrow'>
+                                <!-- [errorStateMatcher]="errorMatcher" -->
+                                <input #endDateInputEl matInput placeholder="End Date" formControlName="endDate" [matDatepicker]="picker2" (keyup)="fireWhenEmpty(endDateInputEl, 'endDate')">
+                                <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                                    date input format error
+                                </mat-error>
+                                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                                <mat-datepicker #picker2 startView="year"></mat-datepicker>
+                                <!-- [startAt]="startDate" -->
+                            </mat-form-field>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div #BarChart class='bar-chart'></div>
+                    </div>
+                </div>
+            </div>
+            <div #Report fxFlex="20" class="filter-container col-sm-3">
+                <div>
+                    <h5>Filters</h5>
+                </div>
+                <div>
+                    <div class="category-selection">
+                        <h5>Category</h5>
+                        <mat-checkbox class="row" *ngFor="let key of chartState.keys" [disabled]='isCategoryDisable(key)' (change)="$event ? updateCategory(key) : null" [(ngModel)]="key.active" (click)="$event.stopPropagation()">{{key.name}}
+                        </mat-checkbox>
+                        <!-- </form> -->
+                    </div>
+                    <br>
+                    <div class="month-selection">
+                        <h5>Months</h5>
+                        <mat-checkbox class="row" (change)="$event ? masterToggle() : null" [checked]="isAllSelected()">(All)
+                        </mat-checkbox>
+                        <mat-checkbox class="row" *ngFor="let month of getMonths()" [value]="month" (change)="$event ? onMonthSelect(month) : null" [checked]="selection.isSelected(month)">{{month}}
+                        </mat-checkbox>
+                        <!-- </form> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card>
+</div>

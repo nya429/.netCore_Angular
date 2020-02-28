@@ -1,0 +1,64 @@
+.report-container {
+    position: relative;
+    padding: 24px;
+    overflow: auto;
+}
+
+.chart-container {
+    /* border: 1px solid red; */
+    /* background-color: rgba(200, 100, 0, .6); */
+    /* padding: 20px; */
+}
+
+.filter-container {
+    border: 1px solid red;
+    height: calc(100vh - 214px);
+    max-height: calc(100vh - 214px);
+    overflow: auto;
+}
+
+mat-radio-button,
+mat-checkbox {
+    padding: 0 24px;
+    /* margin: 0 12px; */
+}
+
+.bar-chart {
+    min-height: 500px;
+}
+
+.month-selection {
+    max-height: 30%;
+    /* overflow: auto; */
+}
+
+.chart-header {
+    /* float: right; */
+    /* display: inline-block; */
+    /* border: 1px solid red; */
+}
+
+.menu-item {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    outline: 0;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    line-height: 48px;
+    height: 48px;
+    text-align: left;
+    text-decoration: none;
+    max-width: 100%;
+    position: relative;
+}
+
+.menu-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}

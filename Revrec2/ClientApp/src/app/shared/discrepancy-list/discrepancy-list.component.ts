@@ -654,6 +654,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
         return;
 
       form.discrepancyIDs = this.selection.selected.map((discrepancy: Discrepancy) => discrepancy.discrepancyID);
+      form.discrepancies = this.selection.selected.map((discrepancy: Discrepancy) => discrepancy);
 
       this.service.bulkUpdateDiscrepancyByIds(form);
       // @TEST
