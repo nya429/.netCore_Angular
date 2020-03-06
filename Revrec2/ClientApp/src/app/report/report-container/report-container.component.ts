@@ -9,7 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class ReportContainerComponent implements OnInit {
   links = [{ segment: 'gdp', description: 'Revrec 1.0 Story' },
-  { segment: 'operational', description: 'Operatioanal' },
+  { segment: 'operational', description: 'Operational' },
   { segment: 'financial', description: 'Financial' },
   { segment: 'productivity', description: 'Productivity' }
 ];

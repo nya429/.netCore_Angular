@@ -239,7 +239,9 @@ export class ReportFinancialComponent implements OnInit {
       .attr('class', 'g-stack')
       .attr('id', (d, i) => this.chartState.keys[i].name)
       .attr('transform', `translate(${this.padding.left}, ${this.padding.top})`)
-      .attr('fill', (d, i) => { console.log(i, this.colors(i)); return this.colors(i) })
+      .attr('fill', (d, i) => { 
+        // console.log(i, this.colors(i)); 
+        return this.colors(i) })
       // .attr('fill', 'red')
       .selectAll('rect')
       .data(d => d)

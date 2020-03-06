@@ -15,9 +15,7 @@
                     <div class="col-sm-3">
                         <!-- <div class="chart-header-filter">
                             <mat-radio-group aria-label="Select an option" (change)="onRadioClicked($event)" [(ngModel)]="chartState.schemaActive">
-                                <h5>Visualization: {{chartState.schemaActive}}</h5>
-                                <mat-radio-button *ngFor='let option of chartState.schemaOptions' [value]="option">{{option}}</mat-radio-button>
-
+                                <mat-radio-button mat-ripple class="menu-item" *ngFor='let option of chartState.schemaOptions' [value]="option" (click)="$event.stopPropagation()">{{option}}</mat-radio-button>
                             </mat-radio-group>
                         </div> -->
                     </div>
@@ -62,6 +60,8 @@
                             </mat-checkbox>
                         </mat-menu>
                     </div>
+
+
                     <!-- <mat-divider [vertical]="true"></mat-divider> -->
                     <div>
                         <form [formGroup]="searchForm">
@@ -87,10 +87,29 @@
                             </mat-form-field>
                         </form>
                     </div>
+
+                    <div style="padding:14px 7px">
+
+                        <button mat-icon-button aria-label="Save Report">
+                            <mat-icon class="material-icons-outlined">save</mat-icon>
+                        </button>
+                        <button (click)="download_csv()" mat-icon-button aria-label="Save Report">
+                            <mat-icon class="material-icons-outlined">save_alt</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Save Report">
+                            <mat-icon class="material-icons-outlined">refresh</mat-icon>
+                        </button>
+                        <button [color]="chartState.sorted ? 'primary' : '' " (click)="testSort()" mat-icon-button aria-label="Save Report">
+                            <mat-icon style="transform: rotate(-90deg) scale(1, -1)" class="material-icons-outlined">sort</mat-icon>
+                        </button>
+
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <div #BarChart class='bar-chart'></div>
+                        <div #BarChart class='bar-chart'>
+                            <!-- <div class="tooltip" id="tooltip-div" style="height: 100px; width: 200px; left: 0px; top: 0px;"></div> -->
+                        </div>
                     </div>
                 </div>
             </div>

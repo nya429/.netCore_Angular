@@ -6,10 +6,17 @@ import { Subject } from 'rxjs';
 })
 export class ReportService {
   windowResized = new Subject<null>();
-  
+  operationalReportReady = new Subject<any>();
+
+
+
   constructor() { }
 
   onWindowResize() {
     this.windowResized.next();
+  }
+
+  getReport() {
+    
   }
 }
