@@ -19,7 +19,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
   ],
 })
 export class TooltipComponent implements OnInit {
-  @Input() tipInfo: {tipType: string, content: any};
+  @Input() tipInfo: {tipType: string, tipTitle: string, content: any};
 
   tipType: string;
   tipSubtitle: string;
@@ -87,6 +87,13 @@ export class TooltipComponent implements OnInit {
         this.tipType = 'Discreapcny Category Description';
         this.tipSubtitle = ''
         this.tipContent = `${this.tipInfo.content.discrepancyCategoryDescription}`;
+        break;
+      }
+
+      case 'filterList': {
+        this.tipType = `Selected ${this.tipSubtitle}`;
+        this.tipSubtitle = ''
+        this.tipContent = `${this.tipInfo.content}`;
         break;
       }
 

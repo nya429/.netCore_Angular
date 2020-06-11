@@ -1,0 +1,71 @@
+<div>
+    <div class='productivity-detail-filter'>
+        <mat-button-toggle-group #group='matButtonToggleGroup' name="checkPointType" aria-label="Check Point Type" (change)="onCheckPointTypeChange($event)" [value]="defaultCheckPointType">
+            <mat-button-toggle [disabled]='isLoading' value="M">Monthly</mat-button-toggle>
+            <mat-button-toggle [disabled]='isLoading' value="W">Weekly</mat-button-toggle>
+            <mat-button-toggle [disabled]='isLoading' value="D">Daily</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <mat-paginator *ngIf='isSubList && pageState.count > 15' class='sublist-paginator' [hidePageSize]='true' [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageState.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
+    </div>
+    <br>
+    <div [ngStyle]="{'max-height.px': containerH - 200,
+    'height.px': containerH - 200}" class="productivity-detail-list">
+
+        <div id='loading-wrapper' *ngIf='!displayedDataSource'>
+            <mat-progress-bar mode="query"></mat-progress-bar>
+        </div>
+
+        <table *ngIf="displayedDataSource" mat-table [dataSource]="displayedDataSource" matSort (matSortChange)="onSort($event)" class="mat-elevation-z8">
+
+            <!-- Discrepancy Status Column -->
+            <ng-container matColumnDef="dateTime">
+                <th mat-header-cell *matHeaderCellDef> Date </th>
+                <td mat-cell *matCellDef="let element"> {{element.dateTime | sqlDateFormat}}{{ group.value === 'D' ? ' ': ' - '}}{{ group.value === 'D' ? '' : element.endDate | sqlDateFormat}} </td>
+                <!-- <td mat-footer-cell *matFooterCellDef> Total: </td> -->
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="userName">
+                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <td mat-cell *matCellDef="let element"> </td>
+                <!-- <td mat-footer-cell *matFooterCellDef> Total: </td> -->
+            </ng-container>
+
+            <!-- Total Count Column -->
+            <ng-container matColumnDef="countDiscrepancy">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Assigned </th>
+                <td mat-cell *matCellDef="let element" [ngClass]="{'value-de-highlight': element.countDiscrepancy === 0}"> {{element.countDiscrepancy}} </td>
+                <!-- <td mat-footer-cell *matFooterCellDef> {{getTotalCount()}} </td> -->
+            </ng-container>
+
+            <!--  Inflow Column -->
+            <ng-container matColumnDef="countInFlow">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Inflow </th>
+                <td mat-cell *matCellDef="let element" [ngClass]="{'value-de-highlight': element.countInFlow === 0}"> {{element.countInFlow}} </td>
+            </ng-container>
+
+            <!--  Sum Column -->
+            <ng-container matColumnDef="countOutFlow">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> OutFlow </th>
+                <td mat-cell *matCellDef="let element" [ngClass]="{'value-de-highlight': element.countOutFlow === 0}"> {{element.countOutFlow}} </td>
+            </ng-container>
+
+            <!--  OutStanding Column -->
+            <ng-container matColumnDef="countOutStanding">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> OutStanding </th>
+                <td mat-cell *matCellDef="let element" [ngClass]="{'value-de-highlight': element.countOutStanding === 0}"> {{element.countOutStanding }} </td>
+            </ng-container>
+
+            <!--  Triage Column -->
+            <ng-container matColumnDef="countTriage">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Triage </th>
+                <td mat-cell *matCellDef="let element" [ngClass]="{'value-de-highlight': element.countTriage === 0}"> {{ element.countTriage }} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" [ngClass]="{'sublist-header': isSubList}"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'sublist-row': isSubList}" class='list-row '></tr>
+        </table>
+    </div>
+    <mat-paginator *ngIf="!isSubList" [hidePageSize]='false' [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageState.pageIndex" [length]="pageState.count" (page)="onPage($event)" color='warm' showFirstLastButtons></mat-paginator>
+</div>

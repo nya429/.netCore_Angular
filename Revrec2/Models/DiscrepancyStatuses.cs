@@ -37,6 +37,8 @@ namespace Revrec2
         public int? discrepancyStatusID { get; private set; }
         public string discrepancyStatus { get; private set; }
         public bool DiscrepancyCategoryDisplay { get; private set; }
+        public bool DiscrepancyCategoryIsResolved { get; private set; }
+        public bool DiscrepancyCategoryAddStatus { get; private set; }
         public string DiscrepancyCategory { get; private set; }
     }
 }

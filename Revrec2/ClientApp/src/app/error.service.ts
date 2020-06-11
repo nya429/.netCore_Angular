@@ -46,7 +46,7 @@ export class ErrorService {
       {
         let _snackBarRef: MatSnackBarRef<any> = this._snackBar.open("There was an internal error, please contact technical support.", 'copy', { duration: 5500 })
         _snackBarRef.afterDismissed().subscribe(() => {
-          console.log("afterDismissed")
+          // console.log("afterDismissed")
           let listener = (e: ClipboardEvent) => {
             let clipboard = e.clipboardData || window["clipboardData"];
             clipboard.setData("text", errors);

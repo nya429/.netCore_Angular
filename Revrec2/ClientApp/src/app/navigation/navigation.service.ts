@@ -21,7 +21,9 @@ export class NavigationService {
     return data;
   }
 
-  hasNavData() {
+  hasNavData(nextRoute? : string) {
+    if (nextRoute) 
+      return !!this._queryData && this._queryData['nextRoute'] === nextRoute
     return !!this._queryData;
   }
 }

@@ -1,0 +1,13 @@
+<div class="mat-elevation-z8 productivity-container">
+    <div class='productivity-container-filter'>
+        <h6>My Productivity</h6>
+        <app-dual-calendar [timeSpanFetched]="timeSpanFetched" (dateApplied)='onDateApplied($event)'>
+        </app-dual-calendar>
+
+    </div>
+    <br>
+
+    <app-report-productivity-detail [userID]='userID' [isSubList]='false' [dataSource]='dataSourceDetail ' [TimeSpanApplied]='timeSpanFetched ' [defaultCheckPointType]='defaultCheckPointType.checkPointType' (checkPointTypeChanged)="onCheckPointTypeChanged($event)"
+        [containerH]='containerH' (onPagedAndSorted)="onProductivityDetailPaged($event)"></app-report-productivity-detail>
+
+</div>

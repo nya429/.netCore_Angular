@@ -68,7 +68,7 @@
 
             <!--  Program Column -->
             <ng-container matColumnDef="program">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Program </th>
+                <th mat-header-cell *matHeaderCellDef> Program </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.program}} </td> -->
                 <td mat-cell *matCellDef="let element">{{element.product}}</td>
                 <td mat-footer-cell *matFooterCellDef></td>
@@ -84,7 +84,7 @@
 
             <!--  Org_ratecell Column -->
             <ng-container matColumnDef="org_ratecell">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org ratecell </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> CCA RateCell </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.org_ratecell}} </td> -->
                 <td mat-cell *matCellDef="let element"> {{element.ccaRateCell}} </td>
                 <td mat-footer-cell *matFooterCellDef></td>
@@ -92,7 +92,7 @@
 
             <!--  org_region Column -->
             <ng-container matColumnDef="org_region">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org region </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> CCA Region </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.org_region}}</td> -->
                 <td mat-cell *matCellDef="let element"> {{element.ccaRegion}}</td>
                 <td mat-footer-cell *matFooterCellDef></td>
@@ -100,7 +100,7 @@
 
             <!--  org_premium Column -->
             <ng-container matColumnDef="org_premium">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org premium </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> CCA Premium </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.org_premium.toFixed(2) | currency}}</td>
                 <td mat-footer-cell *matFooterCellDef> {{getTotalMock('org_premium') | currency}} </td> -->
                 <td mat-cell *matCellDef="let element"> {{element.ccaAmount| currency}}</td>
@@ -109,7 +109,7 @@
 
             <!--  org_pp Column -->
             <ng-container matColumnDef="org_pp">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> org patient pay </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> CCA PatientPay </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.org_pp.toFixed(2) | currency}} </td>
                 <td mat-footer-cell *matFooterCellDef> {{getTotalMock('org_pp') | currency}} </td> -->
 
@@ -119,7 +119,7 @@
 
             <!--  org_sp Column -->
             <ng-container matColumnDef="org_sp">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-right'> org spend down </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap mat-table-border-right'> CCA SpendDown </th>
                 <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.org_sp.toFixed(2) | currency}} </td>
                 <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'> {{getTotalMock('org_sp') | currency}} </td> -->
                 <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{(element.ccaPatientSpendDown) | currency}} </td>
@@ -129,7 +129,7 @@
 
             <!--  org_expect Column -->
             <ng-container matColumnDef="org_expect">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-right'> org expected </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap mat-table-border-right'> CCA Expected </th>
                 <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{(element.org_premium - element.org_sp - element.org_pp).toFixed(2) | currency}} </td>
                 <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'> {{getTotalMock('org_premium') - getTotalMock('org_sp') - getTotalMock('org_pp') | currency}} </td> -->
 
@@ -139,7 +139,7 @@
 
             <!--  payor_ratecell Column -->
             <ng-container matColumnDef="payor_ratecell">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor ratecell </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> MMIS RateCell </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.payor_ratecell}} </td> -->
                 <td mat-cell *matCellDef="let element"> {{element.mmisRateCell}} </td>
                 <td mat-footer-cell *matFooterCellDef></td>
@@ -148,7 +148,7 @@
 
             <!--  payor_region Column -->
             <ng-container matColumnDef="payor_region">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor region </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> MMIS Region </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.payor_region}} </td> -->
                 <td mat-cell *matCellDef="let element"> {{element.mmisRegion}} </td>
                 <td mat-footer-cell *matFooterCellDef></td>
@@ -158,7 +158,7 @@
 
             <!--  payor_premium Column -->
             <ng-container matColumnDef="payor_premium">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor premium </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> MMIS Premium </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.payor_premium.toFixed(2) | currency}} </td>
                 <td mat-footer-cell *matFooterCellDef>{{getTotalMock('payor_premium') | currency}}</td> -->
                 <td mat-cell *matCellDef="let element"> {{element.mmisAmount | currency}} </td>
@@ -167,7 +167,7 @@
 
             <!--  payor_pp Column -->
             <ng-container matColumnDef="payor_pp">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap'> payor patient pay </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap'> MMIS PatientPay </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.payor_pp.toFixed(2) | currency}} </td>
                 <td mat-footer-cell *matFooterCellDef>{{getTotalMock('payor_pp') | currency}}</td> -->
                 <td mat-cell *matCellDef="let element"> {{element.mmisPatientPay | currency}} </td>
@@ -176,7 +176,7 @@
 
             <!--  payor_sp Column -->
             <ng-container matColumnDef="payor_sp">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-right'> payor spend down </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap mat-table-border-right'> MMIS SpendDown </th>
                 <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.payor_sp.toFixed(2) | currency}} </td>
                 <td mat-footer-cell *matFooterCellDef class='mat-table-border-right'>{{getTotalMock('payor_sp') | currency}}</td> -->
                 <td mat-cell *matCellDef="let element" class='mat-table-border-right'> {{element.mmisPatientSpendDown | currency}} </td>
@@ -185,7 +185,7 @@
 
             <!--  payor_paid Column -->
             <ng-container matColumnDef="payor_paid">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-left'> payor paid </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap mat-table-border-left'> MMIS Paid </th>
                 <!-- <td mat-cell *matCellDef="let element"> {{element.payor_paid.toFixed(2) | currency}} </td>
                 <td mat-footer-cell *matFooterCellDef class='mat-table-border-left'> {{getTotalMock('payor_paid') | currency}} </td> -->
                 <td mat-cell *matCellDef="let element"> {{element.paidCapitationAmount | currency}} </td>
@@ -195,9 +195,9 @@
 
             <!--  unexplained Column -->
             <ng-container matColumnDef="unexplained">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-header-cell-wrap mat-table-border-left'> payment error </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-header-cell-wrap mat-table-border-left'> Payment Error </th>
                 <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
-                    <mat-chip [toolTipDisplay]="isBubbleLightedMOCK(element, 'pe')" [awesomeTooltip]="{tipType: 'pe', content: element}" [selected]="isBubbleLightedMOCK(element, 'pe')" color="primary"> {{(element.payor_paid - (element.payor_premium - element.payor_sp - element.payor_pp)).toFixed(2) | currency}} </mat-chip>
+                    <mat-chip [toolTipDisplay]="isBubbleLightedMOCK(element, 'pe')" [infoTooltip]="{tipType: 'pe', content: element}" [selected]="isBubbleLightedMOCK(element, 'pe')" color="primary"> {{(element.payor_paid - (element.payor_premium - element.payor_sp - element.payor_pp)).toFixed(2) | currency}} </mat-chip>
 
                 </td>
                 <td mat-footer-cell *matFooterCellDef class='mat-table-border-left'>
@@ -209,7 +209,7 @@
                 <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
                     <mat-chip-list>
 
-                        <mat-chip [toolTipDisplay]="isBubbleLighted(element, 'pe')" [awesomeTooltip]="{tipType: 'payment_error', content: element}" [selected]="isBubbleLighted(element, 'pe')" color="primary"> {{element.paymentError| currency}} </mat-chip>
+                        <mat-chip [toolTipDisplay]="isBubbleLighted(element, 'pe')" [infoTooltip]="{tipType: 'payment_error', content: element}" [selected]="isBubbleLighted(element, 'pe')" color="primary"> {{element.paymentError| currency}} </mat-chip>
                     </mat-chip-list>
 
                 </td>
@@ -224,15 +224,15 @@
 
             <!--  amount Column -->
             <ng-container matColumnDef="variance" stickyEnd>
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class='mat-table-border-left'> variance </th>
+                <th mat-header-cell *matHeaderCellDef class='mat-table-border-left'> Variance </th>
                 <!-- <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
-                    <mat-chip [toolTipDisplay]="isBubbleLightedMOCK(element, 'va')" [selected]="isBubbleLightedMOCK(element, 'va')" [awesomeTooltip]="{tipType: 'va', content: element}" color="accent">
+                    <mat-chip [toolTipDisplay]="isBubbleLightedMOCK(element, 'va')" [selected]="isBubbleLightedMOCK(element, 'va')" [infoTooltip]="{tipType: 'va', content: element}" color="accent">
                         {{element.variance.toFixed(2) | currency}}
                     </mat-chip>
                 </td> -->
                 <td mat-cell *matCellDef="let element" class='mat-table-border-left'>
                     <mat-chip-list>
-                        <mat-chip [toolTipDisplay]="isBubbleLighted(element, 'va')" [selected]="isBubbleLighted(element, 'va')" [awesomeTooltip]="{tipType: 'payment_variance', content: element}" color="accent">
+                        <mat-chip [toolTipDisplay]="isBubbleLighted(element, 'va')" [selected]="isBubbleLighted(element, 'va')" [infoTooltip]="{tipType: 'payment_variance', content: element}" color="accent">
                             {{element.variance | currency}}
                         </mat-chip>
                     </mat-chip-list>

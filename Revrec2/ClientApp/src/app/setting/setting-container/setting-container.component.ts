@@ -4,6 +4,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, ParamMap } from '@angular/router';
 import { filter, switchMap } from 'rxjs/operators';
 import { Subscription, of } from 'rxjs';
+import { Link } from 'src/app/auth/auth.endpoint';
 
 @Component({
   selector: 'app-setting-container',
@@ -11,9 +12,9 @@ import { Subscription, of } from 'rxjs';
   styleUrls: ['./setting-container.component.css']
 })
 export class SettingContainerComponent implements OnInit {
-  links = [];
+  links: Link[] = [] as Link[];
   /** @input */
-  activeLink;
+  activeLink: string;
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -26,7 +27,7 @@ export class SettingContainerComponent implements OnInit {
 
   ngOnInit() { }
 
-  onNavigate(link) {
+  onNavigate(link: string) {
     this.activeLink = link;
   }
 }

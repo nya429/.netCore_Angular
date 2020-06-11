@@ -15,7 +15,7 @@
 
             <mat-form-field class='bulk-update-field'>
                 <mat-select placeholder="Status" formControlName="DiscrepancyStatus" name="discrepancyStatus">
-                    <mat-option *ngFor="let discrepancyStatus of getOptions('discrepancyStatus')" [value]="discrepancyStatus"><strong style="color: #224e63">{{discrepancyStatus.discrepancyCategory.slice(0,1)}} : </strong> {{discrepancyStatus.discrepancyStatus}}
+                    <mat-option *ngFor="let discrepancyStatus of getOptions('discrepancyStatusUpdate')" [value]="discrepancyStatus"><strong style="color: #224e63">{{discrepancyStatus.discrepancyCategory.slice(0,1)}} : </strong> {{discrepancyStatus.discrepancyStatus}}
                     </mat-option>
                 </mat-select>
             </mat-form-field>

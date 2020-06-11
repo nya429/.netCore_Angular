@@ -55,4 +55,5 @@ namespace Revrec2.Models
         public const string Helpdesk = "Helpdesk";
         public const string Specialist = "Specialist";
     }
+
 }

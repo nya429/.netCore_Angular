@@ -40,7 +40,7 @@ export class DiscreapcnyUpdateDialogComponent implements OnInit, OnDestroy {
       type: string | null,
       formOptions: {
         userOptions: UserOption[] | null,
-        discrepancyStatusOptions: DiscrepancyStatusOption[] | null
+        discrepancyStatusUpdateOptions: DiscrepancyStatusOption[] | null
       }
     }) {
 
@@ -79,8 +79,8 @@ export class DiscreapcnyUpdateDialogComponent implements OnInit, OnDestroy {
     switch (option) {
       case 'user':
         return this.data.formOptions.userOptions;
-      case 'discrepancyStatus':
-        return this.data.formOptions.discrepancyStatusOptions;
+      case 'discrepancyStatusUpdate':
+        return this.data.formOptions.discrepancyStatusUpdateOptions;
       default:
         return [];
     }

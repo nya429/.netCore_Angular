@@ -35,3 +35,4 @@ $revrec-theme: mat-light-theme( $revrec-primary, $revrec-accent, $revrec-warn);
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include angular-material-theme($revrec-theme);
+@include mat-progress-bar-theme($revrec-theme);

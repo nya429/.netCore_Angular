@@ -1,3 +1,4 @@
+import { ReportProductivityDetailComponent } from './report/report-productivity-detail/report-productivity-detail.component';
 import { ComingsoonComponent } from './shared/comingsoon/comingsoon.component';
 import { AppComponent } from './app.component';
 import { NgModule } from '@angular/core';
@@ -29,9 +30,13 @@ const appRoutes: Routes = [
     },
     {
         path: 'home',
-        redirectTo: '/reports/gdp',
-        pathMatch: 'full'
-        // component: ReportContainerComponent,
+        // redirectTo: '/reports/operational',
+        pathMatch: 'full',
+        canActivate: [AuthGuard],
+        data: {
+            expectedRoles: '1111'
+        },
+        component: HomeComponent,
         // pathMatch: 'full'
     },
     {
@@ -39,7 +44,8 @@ const appRoutes: Routes = [
         component: UnauthorizedComponent,
         pathMatch: 'full'
     },
-    { path: '', redirectTo: '/reports/gdp', pathMatch: 'full' },
+
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
 
 ];
 @NgModule({

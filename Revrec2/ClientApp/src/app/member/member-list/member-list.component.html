@@ -34,8 +34,15 @@
             </section>
             <mat-divider vertical></mat-divider>
             <section fxLayout="row" fxLayoutAlign="begin center">
-                <button (click)="onRefresh()" mat-icon-button>
+                <button (click)="onRefresh()" mat-icon-button matTooltip="Refresh List" [disabled]='membersLoading || containerSourceLookUp'>
                     <mat-icon>refresh</mat-icon>
+                </button>
+
+                <button (click)="onDownload()" mat-icon-button matTooltip="Download to CSV" [disabled]='!isReportReady() || isReportDownloading()'>
+                    <mat-icon  *ngIf='!isReportDownloading()' class="material-icons-outlined">save_alt</mat-icon>
+                    <div *ngIf='isReportDownloading()'class="spinner-grow" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </button>
             </section>
 
@@ -94,7 +101,8 @@
                     <ng-container matColumnDef="mmiS_MMIS_ID">
                         <th mat-header-cell *matHeaderCellDef>
                             <mat-form-field style='width: 110px;'>
-                                <input matInput type="number" placeholder="MMIS ID" formControlName="MMIS_ID">
+                                <!-- change to type=text from type=number, due to type=number will fire valuechanges twice when input lose focus -->
+                                <input matInput type="text" placeholder="MMIS ID" formControlName="MMIS_ID">
                             </mat-form-field>
                         </th>
                         <td mat-cell *matCellDef="let element">
@@ -106,7 +114,8 @@
                     <ng-container matColumnDef="ccaid">
                         <th mat-header-cell *matHeaderCellDef>
                             <mat-form-field style='width: 90px;'>
-                                <input matInput type="number" placeholder="CCA ID" formControlName="CCAID">
+                                <!-- change to type=text from type=number, due to type=number will fire valuechanges twice when input lose focus -->
+                                <input matInput type="text" placeholder="CCA ID" formControlName="CCAID">
                             </mat-form-field>
                         </th>
                         <td mat-cell *matCellDef="let element"> {{ element.ccaid }}</td>

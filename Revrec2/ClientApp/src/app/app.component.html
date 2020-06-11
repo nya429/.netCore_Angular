@@ -14,8 +14,8 @@
             <!-- *ngIf='!authed || !optionReadyed' -->
             <div *ngIf="authed === 'undetermined'  || !optionReadyed " class="token-load-view ">
                 <div class='token-load-view-title'>
-                    <h4 *ngIf="authed === 'undetermined'">Finding who you are</h4>
-                    <h4 *ngIf="isAuthed() && !optionReadyed">Getting things ready</h4>
+                    <h4 *ngIf="authed === 'undetermined'">Signing you in</h4>
+                    <h4 *ngIf="isAuthed() && !optionReadyed">Almost done...</h4>
                     <div class="lds-ellipsis ">
                         <div></div>
                         <div></div>

@@ -21,7 +21,16 @@ namespace Revrec2.DTOs
         public DateTime? DiscoverDateEnd { get; set; }
         public DateTime? ResolutionDateStart { get; set; }
         public DateTime? ResolutionDateEnd { get; set; }
+        public int? VarianceSign { get; set; }
         public int IncludeResolved { get; set; }
+        public int? TypeRateCell { get; set; }
+        public int? TypeRegion { get; set; }
+	    public int? TypePatientPay { get; set; }
+	    public int? TypePatientSpendDown { get; set; }
+	    public int? TypePaymentError { get; set; }
+        public int? MemberEnrollmentStatusId { get; set; }
+        public int? MemberIsEnrolled { get; set; }
+        public int? ExportAll { get; set; }
         public int? PageIndex { get; set; }
         public int? PageSize { get; set; }
         public string SortBy { get; set; }
@@ -113,6 +122,7 @@ namespace Revrec2.DTOs
         public string MemberFirstName { get; set; }
         public string MemberLastName { get; set; }
         public string Product { get; set; }
+        public string MemberEnrollmentStatus { get; set; }
         public DateTime MemberMonth { get; set; }
         public decimal? Variance { get; set; }
         public decimal? PaymentError { get; set; }
@@ -149,6 +159,7 @@ namespace Revrec2.DTOs
         public string Action_UserName { get; set; }
         public int? DiscrepancyStatusID { get; set; }
         public string DiscrepancyStatus { get; set; }
+        public string DiscrepancyCategory { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? DiscoverDate { get; set; }
         public DateTime? ResolvedDate { get; set; }

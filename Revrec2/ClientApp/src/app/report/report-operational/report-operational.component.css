@@ -4,6 +4,11 @@
     overflow: auto;
 }
 
+#dual-calendar-container {
+    padding: 0px 12px;
+    margin-top: -3px;
+}
+
 .chart-container {
     /* border: 1px solid red; */
     /* background-color: rgba(200, 100, 0, .6); */
@@ -11,10 +16,10 @@
 }
 
 .filter-container {
-    border: 1px solid red;
-    height: calc(100vh - 214px);
+    /* border: 1px solid red; */
+    /* height: calc(100vh - 214px);
     max-height: calc(100vh - 214px);
-    overflow: auto;
+    overflow: auto; */
 }
 
 mat-radio-button,

@@ -7,7 +7,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ParamMap, ActivatedRoute, UrlSegment, RouterState, Router, NavigationEnd } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar, MatSnackBarRef } from '@angular/material';
 
 import { of, Subscription, } from 'rxjs';
 import { switchMap, filter, map } from 'rxjs/operators';
@@ -39,6 +39,7 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
   // private singleMemberListFetch$: Subscription;
   private memberDiscrepancyBulkUpdated$: Subscription;
   private afterDiscrepancyBulkUpdated$: Subscription;
+  private memberReportDownloaded$: Subscription;
   private dialogClose$: Subscription;
   private router$: Subscription;
 
@@ -130,10 +131,12 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
     })
   }
 
-  openSnackBar(message: string, action: string) {
-    this._snackBar.open(message, action, {
-      duration: 1500,
-    });
+  openSnackBar(message: string, action: string, duration: number = 1) {
+    const config = duration ? {
+      duration: duration * 1000
+    } : null;
+
+    return this._snackBar.open(message, action, config);
   }
 
   initState() {
@@ -246,6 +249,25 @@ export class MemberContainerComponent implements OnInit, OnDestroy {
 
   onListPagedSorted(e) {
     this.service.getMembers(e);
+  }
+
+  onDownloaded(e) {
+    this.service.getAllMember(e)
+
+    const _snakbar: MatSnackBarRef<any> = this.openSnackBar('Download....', 'Abort', 0);
+    // console.log(_snakbar.instance)
+    const snakbar$ = _snakbar.onAction().subscribe(() => {
+      // console.log('abort')
+      this.abortDownload();
+    });
+
+    this.memberReportDownloaded$ = this.service.memberReportDownloaded.subscribe(() => {
+      this.openSnackBar('Download Finished', 'Ok', 2);
+    })
+  }
+
+  abortDownload() {
+    this.service.abortDownload();
   }
 
   onUniversalNav() {

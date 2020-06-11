@@ -49,6 +49,7 @@ namespace Revrec2.Models
         public string Action_UserName { get; set; }
         public int? DiscrepancyStatusID { get; set; }
         public string DiscrepancyStatus { get; set; }
+        public string DiscrepancyCategory { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? DiscoverDate { get; set; }
         public DateTime? ResolvedDate { get; set; }
@@ -75,6 +76,7 @@ namespace Revrec2.Models
         public string MemberFirstName { get; set; }
         public string MemberLastName { get; set; }
         public string Product { get; set; }
+        public string MemberEnrollmentStatus { get; set; }
         public DateTime MemberMonth { get; set; }
         public decimal? Variance { get; set; }
         public decimal? PaymentError { get; set; }
@@ -111,6 +113,7 @@ namespace Revrec2.Models
         public string Action_UserName { get; set; }
         public int? DiscrepancyStatusID { get; set; }
         public string DiscrepancyStatus { get; set; }
+        public string DiscrepancyCategory { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? DiscoverDate { get; set; }
         public DateTime? ResolvedDate { get; set; }
@@ -164,6 +167,7 @@ namespace Revrec2.Models
         public string Assigned_UserName { get; set; }
         public int? Action_UserID { get; set; }
         public int? DiscrepancyStatusID { get; set; }
+        public string DiscrepancyCategory { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? DiscoverDate { get; set; }
         public DateTime? ResolvedDate { get; set; }
@@ -246,5 +250,13 @@ namespace Revrec2.Models
         public string Match_MH834ToMP { get; set; }
         public string Match_CMPToMP { get; set; }
         public string Match_CMPToMH834 { get; set; }
+    }
+
+    public class TestReport {
+        public DateTime memberMonth { get; set; }
+
+        public int? Resolved { get; set; }
+
+        public int? Unresolved { get; set; }
     }
 }

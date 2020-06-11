@@ -13,6 +13,7 @@ namespace Revrec2.DTOs
         public string MMIS_ID { get; set; }
         public int? IncludeZeroDiscrepancy { get; set; }
         public int? AssigneeID { get; set; }
+        public int? ExportAll { get; set; }
         public int? PageIndex { get; set; }
         public int? PageSize { get; set; }
         public string SortBy { get; set; }

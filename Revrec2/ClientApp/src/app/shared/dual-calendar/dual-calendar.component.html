@@ -1,0 +1,53 @@
+<div>
+    <button [disabled]='!isDateReady()' mat-button #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu" matBadgePosition="after">
+   
+            <span *ngIf='isDateReady()'>  Time Span: {{getAppliedDate('startDate')}} - {{getAppliedDate('endDate')}}</span>
+            <mat-icon *ngIf='isDateReady()' aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+    
+        <div *ngIf='!isDateReady()'class="spinner-grow" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </button>
+    <mat-menu #menu="matMenu" [overlapTrigger]="false" yPosition="below" (click)="$event.stopPropagation()">
+        <div class="container" (click)="$event.stopPropagation()">
+
+            <div class="row" (click)="$event.stopPropagation()">
+                <div class="col-sm-6" (click)="$event.stopPropagation()">
+                    Start Date:
+                    <span *ngIf="!!searchForm.value['startDate']">
+                        {{ searchForm.value['startDate'].format('YYYY-MM-DD')}}
+                    </span>
+                </div>
+                <div class="col-sm-6" (click)="$event.stopPropagation()">
+                    End Date:
+                    <span *ngIf="!!searchForm.value['endDate']">
+                        {{ searchForm.value['endDate'].format('YYYY-MM-DD')}}
+                    </span>
+                    <span *ngIf="searchForm.getError('startoverEnd')">
+                        Error
+                    </span>
+                </div>
+            </div>
+            <div class="row" (click)="$event.stopPropagation()">
+                <div class="col-sm-6" style="min-width: 250px" (click)="$event.stopPropagation()">
+                    <mat-calendar #calendar1 (click)="$event.stopPropagation()" [(selected)]=" searchForm.value['startDate']" (selectedChange)="updateDateFromCalendar($event,'startDate', calendar1)" startView="multi-year" (yearSelected)="chosenYearHandler($event,'startDate')"
+                        (monthSelected)="chosenMonthHandler($event,'startDate')">>
+                    </mat-calendar>
+                </div>
+                <div class="col-sm-6" style="min-width: 250px" (click)="$event.stopPropagation()">
+                    <mat-calendar #calendar2 (click)="$event.stopPropagation()" [(selected)]=" searchForm.value['endDate']" (selectedChange)="updateDateFromCalendar($event,'endDate', calendar2)" startView="multi-year" (yearSelected)="chosenYearHandler($event,'endDate')"
+                        (monthSelected)="chosenMonthHandler($event,'endDate')">
+                    </mat-calendar>
+                </div>
+            </div>
+            <div class="row" (click)="$event.stopPropagation()">
+                <div class="col" (click)="$event.stopPropagation()">
+                    <div class="float-right">
+                        <button mat-button (click)='onCalendarMenuCancel()'>Cancel</button>
+                        <button mat-flat-button color="primary" (click)='onCalendarMenuApply()' [disabled]='this.searchForm.invalid || this.searchForm.pristine'>Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-menu>
+</div>

@@ -40,6 +40,21 @@ const ColumnsSetting: string[] = [
   animations: [columnExpandTrigger]
 })
 export class MemberListComponent implements OnInit, OnDestroy {
+  @ViewChild('table') private tableContainer: ElementRef;
+  @ViewChild(MatSort) sort: MatSort;
+
+  @Input('isLookup') containerSourceLookUp: boolean;
+  // @Input('isLookup') containerSourceLookUp: boolean;
+  @Input('bulkUpdatePermissions') bulkUpdatePermissions: string;
+  @Input('bulkUpdateByFilterPermissions') bulkUpdateByFilterPermissions: string;
+  @Input('infoPermissions') infoPermissions: string;
+
+
+  @Output() onDownloaded = new EventEmitter<any>();
+  @Output() onPagedAndSorted = new EventEmitter<any>();
+  @Output() actionClicked = new EventEmitter<void>();
+  @Output() memberSelected = new EventEmitter<SelectionModel<MemberPaged>>();
+  
   private memberNamesFetched$: Subscription;
   private searchForm$: Subscription;
   private singleMemberListFetch$: Subscription;
@@ -53,17 +68,7 @@ export class MemberListComponent implements OnInit, OnDestroy {
   // MOCK
   // @Input('source') members: PeriodicElement[];
 
-  @Input('isLookup') containerSourceLookUp: boolean;
-  // @Input('isLookup') containerSourceLookUp: boolean;
-  @Input('bulkUpdatePermissions') bulkUpdatePermissions: string;
-  @Input('bulkUpdateByFilterPermissions') bulkUpdateByFilterPermissions: string;
-  @Input('infoPermissions') infoPermissions: string;
-  @ViewChild('table') private tableContainer: ElementRef;
-  @ViewChild(MatSort) sort: MatSort;
 
-  @Output() onPagedAndSorted = new EventEmitter<any>();
-  @Output() actionClicked = new EventEmitter<void>();
-  @Output() memberSelected = new EventEmitter<SelectionModel<MemberPaged>>();
   /** @Output() memberSelected = new EventEmitter<SelectionModel<PeriodicElement>>(); */
 
   /**  Local list  */
@@ -372,6 +377,19 @@ export class MemberListComponent implements OnInit, OnDestroy {
       this.membersLoading = true;
     }, 1000);
   }
+
+  onDownload() {
+    this.onDownloaded.emit({ ...this.searchForm.value, ...this.pageState, ...{exportAll: 1} });
+  }
+
+  isReportReady() {
+    return !this.membersLoading && this.dateSourcePaged.count > 0
+  }
+
+  isReportDownloading() {
+    return this.service.isReportDownloading;
+  }
+
 
   //   getNames() {
   //   if (!this.searchForm.get('Name').valid) {

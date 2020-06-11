@@ -5,17 +5,44 @@ import { RouterModule, Routes } from '@angular/router';
 import { ReportOperationalComponent } from './report-operational/report-operational.component';
 import { ReportFinancialComponent } from './report-financial/report-financial.component';
 import { ReportProductivityComponent } from './report-productivity/report-productivity.component';
+import { AuthGuard } from '../auth/auth-guard.service';
 
 const reportRoutes: Routes = [
   {
     path: 'reports',
     component: ReportContainerComponent,
     children: [
-      { path: 'gdp', component: TableauContainerComponent },
-      { path: 'operational', component: ReportOperationalComponent },
-      { path: 'financial', component: ReportFinancialComponent },
-      { path: 'productivity', component: ReportProductivityComponent },
-      { path: '', redirectTo: 'gdp', pathMatch: 'full' },
+      {
+        path: 'productivity', component: ReportProductivityComponent,
+        canActivate: [AuthGuard],
+        data: {
+          expectedRoles: '1010'
+        }
+      },
+      {
+        path: 'tableau', component: TableauContainerComponent,
+        canActivate: [AuthGuard],
+        data: {
+          expectedRoles: '1111'
+        }
+      },
+      {
+        path: 'operational', component: ReportOperationalComponent,
+        canActivate: [AuthGuard],
+        data: {
+          expectedRoles: '1010'
+        }
+      },
+      {
+        path: 'financial', component: ReportFinancialComponent,
+        canActivate: [AuthGuard],
+        data: {
+          expectedRoles: '1010'
+        }
+      },
+
+
+      // { path: '', redirectTo: 'operational', pathMatch: 'full' },
     ]
   },
 ];

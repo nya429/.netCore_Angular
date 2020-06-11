@@ -105,35 +105,39 @@
                                             {{type}}
                                         </mat-button-toggle>
                                     </mat-button-toggle-group> -->
-                                    <div class="button-group-tip">
-                                        Please click the system below to see the comparison of each rate cell
+                                    <div class="comparison-legend">
+                                        <form [formGroup]="searchForm">
+                                            <mat-form-field class='mat-form-field-narrow'>
+                                                <!-- [errorStateMatcher]="errorMatcher"  -->
+                                                <input [errorStateMatcher]="errorMatcher" #startDateInputEl matInput placeholder="Start Date" formControlName="startDate" [matDatepicker]="picker1" (keyup)="fireWhenEmpty(startDateInputEl, 'startDate')">
+                                                <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                                                    date input format error
+                                                </mat-error>
+                                                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                                                <mat-datepicker #picker1 startView="multi-year" (yearSelected)="chosenYearHandler($event, 'startDate')" (monthSelected)="chosenMonthHandler($event, picker1, 'startDate')"></mat-datepicker>
+                                                <!-- [startAt]="startDate" -->
+                                            </mat-form-field>
+                                            <span> - </span>
+                                            <mat-form-field class='mat-form-field-narrow'>
+                                                <!-- [errorStateMatcher]="errorMatcher" -->
+                                                <input [errorStateMatcher]="errorMatcher" #endDateInputEl matInput placeholder="End Date" formControlName="endDate" [matDatepicker]="picker2" (keyup)="fireWhenEmpty(endDateInputEl, 'endDate')">
+                                                <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
+                                                    Date input format error
+                                                </mat-error>
+                                                <mat-error *ngIf="searchForm.getError('startoverEnd')">
+                                                    End Date should be greater
+                                                </mat-error>
+                                                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                                                <mat-datepicker #picker2 startView="multi-year" (yearSelected)="chosenYearHandler($event, 'endDate')" (monthSelected)="chosenMonthHandler($event, picker2, 'endDate')"></mat-datepicker>
+                                                <!-- [startAt]="startDate" -->
+                                            </mat-form-field>
+                                            <button mat-raised-button color="primary" style="margin-left: 12px" [disabled]="!searchForm.valid || (!searchForm.get('startDate').value && !searchForm.get('endDate').value)" (click)='getRateCellCrossSourceListByDiscrepancy()'>Apply</button>
+                                        </form>
                                     </div>
 
+
                                 </mat-card-subtitle>
-                                <div *ngIf="0" class="comparison-legend">
-                                    <form [formGroup]="searchForm">
-                                        <mat-form-field class='mat-form-field-narrow'>
-                                            <!-- [errorStateMatcher]="errorMatcher"  -->
-                                            <input #startDateInputEl matInput placeholder="Start Date" formControlName="startDate" [matDatepicker]="picker1" (keyup)="fireWhenEmpty(startDateInputEl, 'startDate')">
-                                            <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
-                                                date input format error
-                                            </mat-error>
-                                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-                                            <mat-datepicker #picker1 startView="year"></mat-datepicker>
-                                            <!-- [startAt]="startDate" -->
-                                        </mat-form-field>
-                                        <mat-form-field class='mat-form-field-narrow'>
-                                            <!-- [errorStateMatcher]="errorMatcher" -->
-                                            <input #endDateInputEl matInput placeholder="End Date" formControlName="endDate" [matDatepicker]="picker2" (keyup)="fireWhenEmpty(endDateInputEl, 'endDate')">
-                                            <mat-error *ngIf="searchForm.get('endDate').getError('matDatepickerParse')">
-                                                date input format error
-                                            </mat-error>
-                                            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                                            <mat-datepicker #picker2 startView="year"></mat-datepicker>
-                                            <!-- [startAt]="startDate" -->
-                                        </mat-form-field>
-                                    </form>
-                                </div>
+
                                 <div class="comparison-legend">
                                     <div class="comparison-legend-item">
                                         <div class="comparison-legend-item-icon" id="discrepancy-month">
@@ -161,7 +165,10 @@
                                     </div>
                                 </div>
                             </mat-card-header>
-
+                            <br>
+                            <div class="button-group-tip">
+                                Please click the system below to see the comparison of each rate cell
+                            </div>
                             <mat-card-content class="table-container" style='overflow-x: auto;'>
                                 <table *ngIf="displayedColumns_hor" mat-table [dataSource]="dataSource_hor" class="mat-elevation-z8">
 
@@ -203,6 +210,9 @@
                                 <!-- <div id="table-tooltip" #tableTooltip>
                                     tootip
                                 </div> -->
+                                <div *ngIf='isLookup' id='loding-wrapper'>
+                                    <mat-spinner></mat-spinner>
+                                </div>
                             </mat-card-content>
                         </mat-card>
                     </div>
@@ -226,7 +236,7 @@
                 <mat-icon>{{link}}</mat-icon>{{link | titlecase}}
             </a>
         </nav>
-        <app-commentary-container *ngIf="activeLink == 'comment'" [displayDiscrepancyInfo]="false " [masterPatientID]='discrepancy.masterPatientID' [discrepancyID]='discrepancy.discrepancyID' [discrepancy]='discrepancy' [containerH]='sideComponentHeight' (commentaryDismissed)='onDismiss()'></app-commentary-container>
+        <app-commentary-container *ngIf="activeLink == 'comment'" [displayDiscrepancyInfo]="false" [masterPatientID]='discrepancy.masterPatientID' [discrepancyID]='discrepancy.discrepancyID' [discrepancy]='discrepancy' [containerH]='sideComponentHeight' (commentaryDismissed)='onDismiss()'></app-commentary-container>
 
         <div class='history-container' *ngIf="activeLink=='history'">
             Not Built yet

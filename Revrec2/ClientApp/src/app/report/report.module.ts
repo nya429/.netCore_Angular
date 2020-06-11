@@ -10,6 +10,10 @@ import { ReportContainerComponent } from './report-container/report-container.co
 import { ReportFinancialComponent } from './report-financial/report-financial.component';
 import { ReportOperationalComponent } from './report-operational/report-operational.component';
 import { ReportProductivityComponent } from './report-productivity/report-productivity.component';
+import { ReportOperationalDetailComponent } from './report-operational-detail/report-operational-detail.component';
+import { SharedModule } from '../shared/shared.module';
+import { ReportProductivityDetailComponent } from './report-productivity-detail/report-productivity-detail.component';
+import { ReportProductivityDetailContainerComponent } from './report-productivity-detail-container/report-productivity-detail-container.component';
 
 @NgModule({
   imports: [
@@ -18,17 +22,23 @@ import { ReportProductivityComponent } from './report-productivity/report-produc
     MaterialModule,
     ReportRoutingModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SharedModule
   ],
   declarations: [
     ReportContainerComponent,
     TableauContainerComponent,
     ReportOperationalComponent,
+    ReportOperationalDetailComponent,
     ReportFinancialComponent,
-    ReportProductivityComponent
+    ReportProductivityComponent,
+    ReportProductivityDetailComponent,
+    ReportProductivityDetailContainerComponent,
+    // ReportOperationalDetail2Component
   ],
   exports: [
-
+    // ReportProductivityComponent,
+    ReportProductivityDetailContainerComponent
   ]
 
 })

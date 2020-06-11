@@ -27,6 +27,7 @@ import { DiscrepancySnackbarComponent } from './discrepancy-list/discrepancy-sna
 import { CommentaryItemComponent } from './commentary-item/commentary-item.component';
 import { DiscrepancyDetailContainerComponent } from './discrepancy-detail-container/discrepancy-detail-container.component';
 import { DiscreapcnyUpdateDialogComponent } from './discrepancy-update-dialog/discrepancy-update-dialog.component';
+import { DualCalendarComponent } from './dual-calendar/dual-calendar.component';
 
 @NgModule({
   imports: [
@@ -63,6 +64,7 @@ import { DiscreapcnyUpdateDialogComponent } from './discrepancy-update-dialog/di
     MonthlySummaryRecordListComponent,
     TooltipComponent,
     DiscrepancyDetailContainerComponent,
+    DualCalendarComponent,
   ],
   exports: [
     // Pipe
@@ -88,6 +90,7 @@ import { DiscreapcnyUpdateDialogComponent } from './discrepancy-update-dialog/di
     MonthlySummaryRecordListComponent,
     TooltipComponent, 
     DiscrepancyDetailContainerComponent,
+    DualCalendarComponent,
   ],
   providers: [ 
     DateValidatorDirective, 

@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { HttpHeaders, HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../auth/auth.service';
@@ -10,6 +10,11 @@ import { DiscrepancyListRequest, Discrepancy } from '../model/discrepancy.model'
 import { UserOption } from '../model/user.model';
 import { DiscrepancyStatusOption } from '../model/setting.model';
 import { ExploreRateCell } from '../model/explore.model';
+import { ReportService } from '../report/report.service';
+
+import * as _moment from 'moment';
+// tslint:disable-next-line:no-duplicate-imports
+import { default as _rollupMoment, Moment } from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +38,7 @@ export class SharedService {
   public discrepancyUpdated = new Subject<Discrepancy[]>();
   public discrepancyBulkUpdated = new Subject<any>();
   public afterDiscrepancyBulkUpdated = new Subject<any>();
+  public onContainerSearched = new Subject<any>();
 
   public exploreRateCellListChanged = new Subject<ExploreRateCell[]>();
 
@@ -40,8 +46,71 @@ export class SharedService {
 
   constructor(private http: HttpClient,
     private authService: AuthService,
+    // private reportService: ReportService,
     @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl + 'api/';
+  }
+
+  private _getDiscrepancy(con1, con2, exportAll?: boolean) {
+    const url = this.baseUrl + 'discrepancy/GetDiscrepancyRecordListByFilters'
+    // console.log(con2.includeResolved)
+    const pageRequest = {
+      pageIndex: con1.pageIndex ? con1.pageIndex : 0,
+      pageSize: con1.pageSize ? con1.pageSize : 25,
+      sortBy: con1.sortBy ? con1.sortBy : '',
+      orderBy: con1.orderBy ? con1.orderBy : '',
+    };
+
+    const filters: DiscrepancyListRequest = {
+      MMIS_ID: con2.MMIS_ID ? con2.MMIS_ID : '',
+      CCAID: con2.CCAID ? con2.CCAID : '',
+      name: con2.Name ? con2.Name.trim() : '',
+      MasterPatientID: con2.MasterPatientID ? con2.MasterPatientID : null,
+      discoverDateStart: con2.discoverDateStart ? con2.discoverDateStart : '',
+      discoverDateEnd: con2.discoverDateEnd ? con2.discoverDateEnd : '',
+      resolutionDateStart: con2.resolutionDateStart ? con2.resolutionDateStart : '',
+      resolutionDateEnd: con2.resolutionDateEnd ? con2.resolutionDateEnd : '',
+      hasComment: con2.hasComment ? (con2.hasComment === true ? 1 : 0) : 0,
+      includeResolved: con2.includeResolved ? (con2.includeResolved === true ? 1 : 0) : 0,
+      varianceSign: con2.varianceSign ? (con2.varianceSign === 'positive' ? 1 : 0) : null,
+      typeRateCell: con2.discrepancyTypes && (con2.discrepancyTypes as [String]).length ? ((con2.discrepancyTypes as [String]).includes('Rate Cell') ? 1 : 0) : null,
+      typeRegion: con2.discrepancyTypes && (con2.discrepancyTypes as [String]).length ? ((con2.discrepancyTypes as [String]).includes('Region') ? 1 : 0) : null,
+      typePatientPay: con2.discrepancyTypes && (con2.discrepancyTypes as [String]).length ? ((con2.discrepancyTypes as [String]).includes('Patient Pay') ? 1 : 0) : null,
+      typePatientSpendDown: con2.discrepancyTypes && (con2.discrepancyTypes as [String]).length ? ((con2.discrepancyTypes as [String]).includes('Patient Spend Down') ? 1 : 0) : null,
+      typePaymentError: con2.discrepancyTypes && (con2.discrepancyTypes as [String]).length ? ((con2.discrepancyTypes as [String]).includes('Payment Error') ? 1 : 0) : null,
+      /** @TODO TEMP Value 20 => non-member */
+      // work with list
+      memberEnrollmentStatusId: (con2.memberEnrollmentStatus !== 20
+        && con2.memberEnrollmentStatus !== 21) ? con2.memberEnrollmentStatus : null,
+      /** @TODO TEMP Value 20 => non-member */
+      // work with report
+      memberIsEnrolled: (con2.memberIsEnrolled === 1 || con2.memberIsEnrolled === 0) ? con2.memberIsEnrolled : (con2.memberEnrollmentStatus === 20 ? 0 :
+        (con2.memberEnrollmentStatus === 21 ? 1 : null)),
+      months: {
+        BulkDate: con2.months ? con2.months.map((month: string) => { return { UpdateDate: month } }) : []
+      },
+      programs: {
+        BulkText: con2.programs ? con2.programs.map((product: string) => { return { UpdateText: product } }) : []
+      },
+      ccaRateCellIds: {
+        BulkID: con2.ccaRateCellIds ? con2.ccaRateCellIds.map((ccaRateCellId: number) => { return { UpdateID: ccaRateCellId } }) : []
+      },
+      discrepancyStatusIDs: {
+        BulkID: con2.discrepancyStatusIDs ? con2.discrepancyStatusIDs.map((discrepancyStatusID: number) => { return { UpdateID: discrepancyStatusID } }) : []
+      },
+      assigneeIDs: {
+        BulkID: con2.assigneeIDs ? con2.assigneeIDs.map((assigneeID: number) => { return { UpdateID: assigneeID } }) : []
+      },
+      exportAll: exportAll ? 1 : 0
+    };
+
+    let requestBody = { ...pageRequest, ...filters };
+    console.log(" Get Discrepancies", url, requestBody)
+
+    return this.http.post<Response<PagedList<Discrepancy>>>(url, requestBody, {
+      observe: 'body',
+      responseType: 'json'
+    });
   }
 
   getpagedListInl(): PagedList<any> {
@@ -174,50 +243,18 @@ export class SharedService {
     });
   }
 
-  getDiscrepancies(con1, con2, isSublist: boolean) {
-    const url = this.baseUrl + 'discrepancy/GetDiscrepancyRecordListByFilters'
-    // console.log(con2.includeResolved)
-    const pageRequest = {
-      pageIndex: con1.pageIndex ? con1.pageIndex : 0,
-      pageSize: con1.pageSize ? con1.pageSize : 25,
-      sortBy: con1.sortBy ? con1.sortBy : '',
-      orderBy: con1.orderBy ? con1.orderBy : '',
-    };
+  resetSort() {
+    this.onContainerSearched.next();
+  }
 
-    const filters: DiscrepancyListRequest = {
-      MMIS_ID: con2.MMIS_ID ? con2.MMIS_ID : '',
-      CCAID: con2.CCAID ? con2.CCAID : '',
-      name: con2.Name ? con2.Name.trim() : '',
-      MasterPatientID: con2.MasterPatientID ? con2.MasterPatientID : null,
-      discoverDateStart: con2.discoverDateStart ? con2.discoverDateStart : '',
-      discoverDateEnd: con2.discoverDateEnd ? con2.discoverDateEnd : '',
-      resolutionDateStart: con2.resolutionDateStart ? con2.resolutionDateStart : '',
-      resolutionDateEnd: con2.resolutionDateEnd ? con2.resolutionDateEnd : '',
-      hasComment: con2.hasComment ? (con2.hasComment === true ? 1 : 0) : 0,
-      includeResolved: con2.includeResolved ? (con2.includeResolved === true ? 1 : 0) : 0,
-      months: {
-        BulkDate: con2.months ? con2.months.map((month: string) => { return { UpdateDate: month } }) : []
-      },
-      programs: {
-        BulkText: con2.programs ? con2.programs.map((product: string) => { return { UpdateText: product } }) : []
-      },
-      ccaRateCellIds: {
-        BulkID: con2.ccaRateCellIds ? con2.ccaRateCellIds.map((ccaRateCellId: number) => { return { UpdateID: ccaRateCellId } }) : []
-      },
-      discrepancyStatusIDs: {
-        BulkID: con2.discrepancyStatusIDs ? con2.discrepancyStatusIDs.map((discrepancyStatusID: number) => { return { UpdateID: discrepancyStatusID } }) : []
-      },
-      assigneeIDs: {
-        BulkID: con2.assigneeIDs ? con2.assigneeIDs.map((assigneeID: number) => { return { UpdateID: assigneeID } }) : []
-      },
-    };
+  getDiscrepancyReport(con1, con2) {
+    // if (exportAll) {
+    return this._getDiscrepancy(con1, con2, true);
+    // }
+  }
 
-    let requestBody = { ...pageRequest, ...filters };
-    console.log(" Get Discrepancies", url, requestBody)
-    return this.http.post<Response<PagedList<Discrepancy>>>(url, requestBody, {
-      observe: 'body',
-      responseType: 'json'
-    }).subscribe(result => {
+  getDiscrepancies(con1, con2, isSublist: boolean, exportAll?: boolean) {
+    return this._getDiscrepancy(con1, con2, exportAll).subscribe(result => {
       if (result.isSuccess) {
         console.log(" Get Discrepancies =>", result.data)
         /** @Todo Seperate Main/Sub list in more elegant way  */
@@ -255,15 +292,15 @@ export class SharedService {
     });
   }
 
-  getRateCellCrossSourceListByDiscrepancyId(discrepancyId: number) {
+  getRateCellCrossSourceListByDiscrepancyId(discrepancyId: number, form: { startDate: Moment | string, endDate: Moment | string }) {
     const requestBody = {
-      StartDate: '',
-      EndDate: '',
+      StartDate: form.startDate ? (form.startDate as Moment).format("YYYY-MM-DD") : "",
+      EndDate: form.endDate ? (form.endDate as Moment).format("YYYY-MM-DD") : "",
     };
 
     const url = this.baseUrl + 'discrepancy/GetDiscrepancyById/' + discrepancyId + '/GetRateCellCrossSourceList';
 
-    console.log('POST get rate cell cross source')
+    console.log('POST get rate cell cross source', discrepancyId, requestBody)
 
     return this.http.post<Response<ResponseList<ExploreRateCell>>>(url, requestBody, {
       observe: 'body',

@@ -7,12 +7,49 @@ import { initTransferState } from '@angular/platform-browser/src/browser/transfe
 import { SharedService } from 'src/app/shared/shared.service';
 import { ErrorService } from 'src/app/error.service';
 import { fn } from '@angular/compiler/src/output/output_ast';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+import * as _moment from 'moment';
+// tslint:disable-next-line:no-duplicate-imports
+import { default as _rollupMoment, Moment } from 'moment';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDatepicker, ErrorStateMatcher } from '@angular/material';
+import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 
+
+const moment = _rollupMoment || _moment;
+
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'YYYY-MM',
+  },
+  display: {
+    dateInput: 'YYYY-MM',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
+class CrossFieldErrorMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    return form.invalid;
+  }
+}
 @Component({
   selector: 'app-discrepancy-detail-container',
   templateUrl: './discrepancy-detail-container.component.html',
   styleUrls: ['./discrepancy-detail-container.component.css'],
+  providers: [
+    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
+    // application's root module. We provide it at the component level here, due to limitations of
+    // our example generation script.
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+    },
+
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
   animations: [
     trigger('container', [
       transition(':enter', [
@@ -63,8 +100,9 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
 
   /** search from */
   searchForm: FormGroup;
-
-
+  errorMatcher = new CrossFieldErrorMatcher();
+  /** spinner state */
+  isLookup: boolean;
   /** Comparison State */
   sourceSystems = {
     mP: 'Market Prominence',
@@ -73,6 +111,7 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
   };
   displayedColumns: string[] = ['month', 'cca_RateCell', 'MH834_RateCell', 'GC_RateCell'];
   dataSource: ExploreRateCell[];
+
 
   displayedColumns_hor: string[];
   dataSource_hor = [];
@@ -117,41 +156,10 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
     this.isSideComponentContainerDisplay = false;
 
     this.exploreRateCellListChanged$ = this.service.exploreRateCellListChanged.subscribe((exploreRateCellList: ExploreRateCell[]) => {
-      console.log(exploreRateCellList)
-      this.dataSource = []
-
-      let idDuplicated = false;
-
-
-      // Temprary Solution for Duplicate Member Month
-      exploreRateCellList.forEach((e: ExploreRateCell) => {
-        const month = e.memberMonth;
-        if (this.dataSource.find((d: ExploreRateCell) => d.memberMonth === month)) {
-          this.dataSource
-            .filter((d: ExploreRateCell) => d.memberMonth === month)
-            .forEach((d: ExploreRateCell) => {
-              if (Date.parse(d.mh834_LastAssessedDate) < Date.parse(e.mh834_LastAssessedDate)) {
-                this.dataSource.pop();
-                this.dataSource.push(e);
-              }
-            })
-          idDuplicated = true;
-        }
-        // Temprary Solution for Missing Member Month
-        else {
-          this.dataSource.push(e);
-        }
-      })
-
-      if (idDuplicated) {
-        this.errorService.sendCustomizedError(["Duplicated Month"])
+        this.exploreRateCellListChanged(exploreRateCellList);
+        this.isLookup = false;
       }
-
-      setTimeout(() => {
-        this.getSpan();
-        this.turnSourceHorizantal();
-      }, 400);
-    })
+    );
 
     this.initSource();
   }
@@ -165,7 +173,45 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
       });
   }
 
+  exploreRateCellListChanged(exploreRateCellList: ExploreRateCell[]) {
+    if (exploreRateCellList.length === 0)
+      return;
+
+    this.dataSource = [];
+
+    let idDuplicated = false;
+    // Temprary Solution for Duplicate Member Month
+    exploreRateCellList.forEach((e: ExploreRateCell) => {
+      const month = e.memberMonth;
+      if (this.dataSource.find((d: ExploreRateCell) => d.memberMonth === month)) {
+        this.dataSource
+          .filter((d: ExploreRateCell) => d.memberMonth === month)
+          .forEach((d: ExploreRateCell) => {
+            if (Date.parse(d.mh834_LastAssessedDate) < Date.parse(e.mh834_LastAssessedDate)) {
+              this.dataSource.pop();
+              this.dataSource.push(e);
+            }
+          })
+        idDuplicated = true;
+      }
+      // Temprary Solution for Missing Member Month
+      else {
+        this.dataSource.push(e);
+      }
+    })
+
+    if (idDuplicated) {
+      this.errorService.sendCustomizedError(["Duplicated Month"])
+    }
+
+    setTimeout(() => {
+      this.getSpan();
+      this.turnSourceHorizantal();
+    }, 400);
+  }
+
   turnSourceHorizantal() {
+    this.dataSource_hor = [];
     // this.displayedColumns_hor = this.dataSource.map(d => d.month);
     this.displayedColumns_hor = this.dataSource.map(d => d.memberMonth);
     this.displayedColumns_hor.unshift('Source');
@@ -199,12 +245,16 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
       });
       this.dataSource_hor.push(sourceRow);
     });
-
-    console.log(this.dataSource_hor)
+    // console.log(this.dataSource_hor);
   }
 
   getSpan() {
-    // const sources = ['cca', 'MH834', 'GC'];
+    this.timespan = {
+      mP: [] as { ratecell: string, start: string, end: string }[],
+      mH834: [] as { ratecell: string, start: string, end: string }[],
+      cmP: [] as { ratecell: string, start: string, end: string }[],
+    };
+
     const sources = ['mP', 'mH834', 'cmP'];
 
     this.dataSource.forEach((monthRow: ExploreRateCell, index) => {
@@ -265,7 +315,13 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
 
   initSource() {
     this.getDiscrepancy();
-    this.service.getRateCellCrossSourceListByDiscrepancyId(this.discrepancy.discrepancyID);
+    this.service.getRateCellCrossSourceListByDiscrepancyId(this.discrepancy.discrepancyID, this.searchForm.value);
+    this.isLookup = true;
+  }
+
+  getRateCellCrossSourceListByDiscrepancy() {
+    this.service.getRateCellCrossSourceListByDiscrepancyId(this.discrepancy.discrepancyID, this.searchForm.value)
+    this.isLookup = true;
   }
 
   onDismissClick() {
@@ -391,13 +447,54 @@ export class DiscrepancyDetailContainerComponent implements OnInit, OnDestroy {
   // }
 
   dateInputValidator(form: FormGroup) {
-    const condition = form.get('startDate').getError('matDatepickerParse') || form.get('endDate').getError('matDatepickerParse')
-    return condition ? { dateInputError: true } : null;
+    const conditionStartOverEnd = (
+      !!form.get('startDate').value
+      && !!form.get('endDate').value
+    )
+      && form.get('startDate').value.diff(form.get('endDate').value) > 0
+    const condition = form.get('startDate').getError('matDatepickerParse')
+      || form.get('endDate').getError('matDatepickerParse')
+
+    let error = {}
+    if (condition)
+      error['dateInputError'] = true
+    if (conditionStartOverEnd)
+      error['startoverEnd'] = true
+
+    return condition || conditionStartOverEnd ? error : null;
   }
 
   fireWhenEmpty(el, formControlName: string): void {
     if (!el.value || el.value === '') {
       this.searchForm.patchValue({ [formControlName]: '' }, { emitEvent: true })
     }
+  }
+
+  chosenYearHandler(normalizedYear: Moment, formControlName: string) {
+    var ctrlValue = this.searchForm.value[formControlName];
+    if (!ctrlValue)
+      ctrlValue = moment();
+    ctrlValue.year(normalizedYear.year());
+    this.searchForm.get(formControlName).setValue(ctrlValue);
+  }
+
+  chosenMonthHandler(normalizedMonth: Moment, datepicker: MatDatepicker<Moment>, formControlName: string) {
+    var ctrlValue = this.searchForm.value[formControlName];
+    if (!ctrlValue)
+      ctrlValue = moment();
+
+    ctrlValue.month(normalizedMonth.month());
+
+    if (formControlName === 'startDate') {
+      ctrlValue.date(1)
+    } else if (formControlName === 'endDate') {
+      /** 
+       *  e.g. 
+      */
+      ctrlValue.endOf('month')
+    }
+
+    this.searchForm.get(formControlName).setValue(ctrlValue);
+    datepicker.close();
   }
 }

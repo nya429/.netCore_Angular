@@ -1,20 +1,33 @@
-import { filter } from 'rxjs/operators';
-import { ReportService } from './../report.service';
-import { Component, OnInit, ElementRef, ViewChild, Input, HostListener } from '@angular/core';
-import { transition } from '@angular/animations';
+import { DiscrepancyStatusOption } from './../../model/setting.model';
+import { Component, OnInit, ElementRef, ViewChild, Input, HostListener, OnDestroy } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { ReportOperational } from './../../model/report.model';
+import { ReportService } from './../report.service';
+import { transition } from '@angular/animations';
 import * as d3 from 'd3';
 import * as d3Chromatic from 'd3-scale-chromatic';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { SettingService } from 'src/app/setting/setting.service';
+import { SharedService } from 'src/app/shared/shared.service';
+// import { appendFile } from 'fs';
+import * as _moment from 'moment';
+// tslint:disable-next-line:no-duplicate-imports
+import { default as _rollupMoment, Moment } from 'moment';
+import { NavigationService } from 'src/app/navigation/navigation.service';
+import { Router } from '@angular/router';
+const moment = _rollupMoment || _moment;
 
+type MonthGrouped = { year: number, month: string[] };
 @Component({
   selector: 'app-report-operational',
   templateUrl: './report-operational.component.html',
   styleUrls: ['./report-operational.component.css']
 })
-export class ReportOperationalComponent implements OnInit {
+export class ReportOperationalComponent implements OnInit, OnDestroy {
   @ViewChild('BarChart') private chartContainer: ElementRef;
-  @ViewChild('Report') private reportContainer: ElementRef;
+  // @ViewChild('Report') private reportContainer: ElementRef;
 
   @Input() private data: Array<any>;
 
@@ -23,25 +36,18 @@ export class ReportOperationalComponent implements OnInit {
   element;
   element2;
 
+  private windowResize$: Subscription;
+  private reportChanged$: Subscription;
 
-  dataMock;
+  reportData: ReportOperational[];
   filterdDataMock;
   monthStr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-  private sorted = false;
-  private month = [];
-  private key = 4;
-
-  private activeKeys = [];
-  private activeMonth = [];
-
+  /** @TODO   */
+  private isFilterExists;
 
   private resizeTimer;
   private rawData;
   private stackedData;
-
-  selection = new SelectionModel<string>(true, []);
-
 
   private margin: any = { top: 90, bottom: 20, left: 20, right: 20 };
   private padding = { left: 108, right: 36, top: 48, bottom: 144 };
@@ -71,9 +77,7 @@ export class ReportOperationalComponent implements OnInit {
   private tooltipSVG: any;
   private tooltipDiv: any;
 
-  private schema: string = 'stacked';
-
-  public searchForm: FormGroup;
+  // public searchForm: FormGroup;
   public chartState = {
     xindex: [],
     sorted: false,
@@ -96,29 +100,73 @@ export class ReportOperationalComponent implements OnInit {
     },
     rectActive: {
       selected: null,
+    },
+    selectedDetail: {
+      isSelected: false,
+      month: '',
+      isEnrolled: null,
+      isResolved: null
+    },
+    timeSpanApplied: {
+      startDate: null,
+      endDate: null
+    },
+    timeSpanFetched: {
+      startDate: null,
+      endDate: null
     }
   }
 
-  constructor(private fb: FormBuilder,
-    private service: ReportService) {
-    this.initData();
+  btns = [{
+    Name: 'Export',
+    Icon: 'export data',
+    Description: "Download as CSV",
+    onClick: (data) => this.onExportDiscrepancy(data),
 
-  }
+  }, {
+    Name: 'Redirect',
+    Icon: 'export data',
+    Description: "Download as CSV",
+    onClick: (data) => this.onRedirectDiscrepancy(data),
+  },
+    // {
+    //   Name: 'Detail',
+    //   Icon: 'more',
+    //   Description: "Download as CSV",
+    //   onClick: (data) => this.getReportDetail(data),
+    // }
+  ];
+
+  selectedBar;
+
+  public months = [];
+  // public monthtest = {};
+  public monthGrouped = {};
+  public objectKeys = Object.keys;
+  public selection = new SelectionModel<string>(true, []);
+
+
+  constructor(private fb: FormBuilder,
+    private service: ReportService,
+    private settingService: SettingService,
+    private sharedService: SharedService,
+    private navService: NavigationService,
+    private router: Router) { }
 
   ngOnInit() {
-    this.masterToggle();
+    this.initData();
+    this.initState();
     this.element = this.chartContainer.nativeElement;
-    this.element2 = this.reportContainer.nativeElement;
-    this.initForm();
-    this.updateData();
+  }
 
-    setTimeout(() => {
-      this.updateBase()
-      this.updateScale();
-      this.initLegend();
-      this.initChart();
-      this.service.windowResized.subscribe(() => this.onResize());
-    }, 400);
+  ngOnDestroy() {
+    if (this.windowResize$) {
+      this.windowResize$.unsubscribe();
+    }
+
+    if (this.reportChanged$) {
+      this.reportChanged$.unsubscribe();
+    }
   }
 
   onResize() {
@@ -135,36 +183,47 @@ export class ReportOperationalComponent implements OnInit {
     }, 500)
   }
 
-  getMonths() {
-    // Revrec2 file processing back to 2018-01-01
-    const monthStart = '2018-01-01';
+  groupMonths() {
+    this.months = this.service.getMonths(this.reportData);
+    if (this.months.length === 0)
+      return;
 
-    const e = new Date(Date.parse(monthStart));
-    const eMonth = e.getUTCMonth() + 1;
-    const eYear = e.getFullYear() + 1;
+    const sortedMonths = this.months.sort((a, b) => Date.parse(a) - Date.parse(b));
 
-    const current = new Date();
-    const currentMonth = current.getUTCMonth() + 1;
-    const currentYear = current.getFullYear();
 
-    let months = [];
-    // for (let year = currentYear; year > eYear; year--) {
-    for (let year = eYear; year <= currentYear; year++) {
-      for (let month = 1; month <= 12; month++) {
-        if (year === currentYear && month > currentMonth) {
+    const dateStart = sortedMonths[0];
+    const startMonth = new Date(Date.parse(dateStart)).getUTCMonth() + 1;
+    const startYear = new Date(Date.parse(dateStart)).getUTCFullYear();
+
+    const dateEnd = sortedMonths[sortedMonths.length - 1];
+    const endMonth = new Date(Date.parse(dateEnd)).getUTCMonth() + 1;
+    const endYear = new Date(Date.parse(dateEnd)).getUTCFullYear();
+
+    this.chartState.timeSpanFetched.startDate = dateStart;
+    this.chartState.timeSpanFetched.endDate = dateEnd;
+
+    this.monthGrouped = {} as MonthGrouped;
+    for (let year = startYear; year <= endYear; year++) {
+      var obj = { year: year, month: [] };
+      this.monthGrouped[year] = []
+      var _strMonth = year === startYear ? startMonth : 1;
+      for (let month = _strMonth; month <= 12; month++) {
+        if (year === endYear && month > endMonth) {
           break;
-        } else if (year !== currentYear || (year === currentYear && month <= currentMonth)) {
+        } else if (year !== endYear || (year === endYear && month <= endYear)) {
           const mon = `${year}-${month > 9 ? month : "0" + month}-01`;
-          months.push(mon);
+          // obj.month.push(mon);
+          this.monthGrouped[year].push(mon)
         }
       }
     }
-    return months;
+
+    console.log('DEBUT sortedMonths', this.monthGrouped);
   }
 
   updateBase() {
     this.width = this.element.offsetWidth - this.margin.left - this.margin.right;
-    this.height = this.element2.offsetHeight - this.margin.top - this.margin.bottom;
+    this.height = this.element.offsetHeight - this.margin.top - this.margin.bottom;
 
 
     this.width = this.width <= 0 ? 1024 : this.width;
@@ -188,7 +247,6 @@ export class ReportOperationalComponent implements OnInit {
     } else {
       this.chartState.xindex = d3.range(this.filterdDataMock.length)
     }
-
     // this.chartState.xindex = d3.range(this.filterdDataMock.length);
 
     // month related 
@@ -208,8 +266,10 @@ export class ReportOperationalComponent implements OnInit {
   initLegend() {
     var size = 16;
     var fontSize = 16;
-    const data = this.chartState.keys
 
+    const data = this.chartState.keys.map(key => {
+      return { name: key.name.split('_').slice(1).join(' '), active: key.active }
+    })
 
     this.legend = this.svg.append('g')
       .attr("class", "g-legend")
@@ -225,8 +285,10 @@ export class ReportOperationalComponent implements OnInit {
       .attr("id", d => d.name)
       .attr('opacity', (d, i) => d.active ? 1 : 0)
       .attr('transform', (d, i) => {
-        var len = data.filter((d, index) => i > index && d.active).reduce((acc, cur) => acc + cur.name.length, 0);
-        return `translate(${- len * fontSize * 0.7 - size * (i + 1.4)}, ${this.padding.top / 3})`;
+        var len = data
+          .filter((d, index) => i >= index && d.active && index > 0)
+          .reduce((acc, cur) => acc + cur.name.length, 0);
+        return `translate(${- len * fontSize * 0.6 - size * (i + 1.4)}, ${this.padding.top / 3})`;
       })
 
     this.legend
@@ -247,7 +309,9 @@ export class ReportOperationalComponent implements OnInit {
   updateLegend() {
     var size = 16;
     var fontSize = 16;
-    const data = this.chartState.keys
+    const data = this.chartState.keys.map(key => {
+      return { name: key.name.split('_').slice(1).join(' '), active: key.active }
+    })
 
     this.legend = this.svg
       .select('.g-legend')
@@ -256,8 +320,10 @@ export class ReportOperationalComponent implements OnInit {
       .transition()
       .attr('opacity', (d, i) => d.active ? 1 : 0)
       .attr('transform', (d, i) => {
-        var len = data.filter((d, index) => i > index && d.active).reduce((acc, cur) => acc + cur.name.length, 0);
-        return `translate(${- len * fontSize * 0.7 - size * (i + 1.4)}, ${this.padding.top / 3})`;
+        var len = data
+          .filter((d, index) => i >= index && d.active && index > 0)
+          .reduce((acc, cur) => acc + cur.name.length, 0);
+        return `translate(${- len * fontSize * 0.6 - size * (i + 1.4)}, ${this.padding.top / 3})`;
       })
   }
 
@@ -386,6 +452,7 @@ export class ReportOperationalComponent implements OnInit {
 
     this.updateChart();
     this.appendFilters();
+    this.initToolTipDIV();
     this.appendEventListener();
   }
 
@@ -417,8 +484,11 @@ export class ReportOperationalComponent implements OnInit {
         }
       })
       .on('click', (d, i, nodes) => {
-        const node = nodes[i]
+        console.log('rect click', d3.event, this.chartState.transitioning)
 
+        d3.event.stopPropagation();
+
+        const node = nodes[i]
         if (this.chartState.transitioning) {
           return;
         }
@@ -426,30 +496,36 @@ export class ReportOperationalComponent implements OnInit {
         this.displayTooltipDIV(d)
       })
 
-    // this.svg.on('click', () => {
+    if (this.tooltipDiv) {
+      this.tooltipDiv.on('click', () => {
 
-
-    //   this.chart
-    // })
-
-
-
-    this.initToolTipDIV();
-  }
-
-  @HostListener('document:click', ['$event.target'])
-  onClick(targetElement) {
-    console.log(targetElement, this.rectBars.nodes(), this.tooltipDiv)
-
-    if (!this.chartState.rectActive.selected) return;
-
-    const clickedInside = this.tooltipDiv.nodes() === targetElement ;
-
-    console.log(clickedInside);
-    if (!clickedInside) {
-      this.onRemoveEffect();
+        d3.event.stopPropagation();
+      })
     }
+
+    this.element.addEventListener('click', ($event) => {
+
+      $event.stopPropagation();
+      console.log('container clicked')
+      if (this.chartState.rectActive.selected) {
+        this.onRemoveEffect();
+      }
+    })
   }
+
+  // @HostListener('document:click', ['$event.target'])
+  // onClick(targetElement) {
+  //   console.log('document click')
+
+
+  //   const clickedInside = this.tooltipDiv.nodes() === targetElement;
+
+  //   console.log(clickedInside);
+  //   if (!this.chartState.rectActive.selected) return;
+  //   if (!clickedInside) {
+  //     this.onRemoveEffect();
+  //   }
+  // }
 
   onRectMouseOver(self) {
     const bar = d3.select(self);
@@ -505,6 +581,14 @@ export class ReportOperationalComponent implements OnInit {
         .attr('opacity', d => d === bar.datum() ? 1 : 0.6)
         .attr('stroke-width', d => d === bar.datum() ? 1 : 0)
 
+      this.tooltipDiv
+        .select('#tooltip-action')
+        .transition()
+        .duration(300)
+        .style('top', '-38px')
+
+      // triggerDetail by Click
+      this.getReportDetail(bar.datum());
     } else {
 
     }
@@ -555,31 +639,32 @@ export class ReportOperationalComponent implements OnInit {
       .attr('flood-color', '#777s')
   }
 
-  appendtext() {
-    /**
-     * Bar Text
-     */
-    const texts = this.svg.append('g')
-      .attr('class', 'g-bar-text')
-      .selectAll('.bar-text')
-      .data(this.dataMock.map(d => d.value))
-      .enter()
-      .append('text')
-      .attr('transform', `translate(${this.padding.left}, ${this.padding.top})`)
-      .attr('x', (d, i) => this.xScale(i))
-      .attr('y', d => this.yScale(0) + this.padding.top)
-      .attr('dx', d => this.xScale.bandwidth() / 2 - 16)
-      .attr('dy', d => 0)
-      .text(d => d)
-      .attr('fill', 'rgb(78, 121, 167, 0)')
-      .transition()
-      .attr('fill', 'white')
-      .delay((d, i) => i * 50)
-      .duration(500)
-      .ease(d3.easeQuadOut)
-      .attr('y', d => this.yScale(d) + this.padding.top)
-      .attr('height', d => this.height - this.padding.top - this.padding.bottom - this.yScale(d));
-  }
+  // appendtext() {
+  //   /**
+  //    * Bar Text
+  //    */
+  //   console.log(this.dataMock)
+  //   const texts = this.svg.append('g')
+  //     .attr('class', 'g-bar-text')
+  //     .selectAll('.bar-text')
+  //     .data(this.dataMock.map(d => d.value))
+  //     .enter()
+  //     .append('text')
+  //     .attr('transform', `translate(${this.padding.left}, ${this.padding.top})`)
+  //     .attr('x', (d, i) => this.xScale(i))
+  //     .attr('y', d => this.yScale(0) + this.padding.top)
+  //     .attr('dx', d => this.xScale.bandwidth() / 2 - 16)
+  //     .attr('dy', d => 0)
+  //     .text(d => d)
+  //     .attr('fill', 'rgb(78, 121, 167, 0)')
+  //     .transition()
+  //     .attr('fill', 'white')
+  //     .delay((d, i) => i * 50)
+  //     .duration(500)
+  //     .ease(d3.easeQuadOut)
+  //     .attr('y', d => this.yScale(d) + this.padding.top)
+  //     .attr('height', d => this.height - this.padding.top - this.padding.bottom - this.yScale(d));
+  // }
 
   stacked() {
     const self = this;
@@ -702,6 +787,8 @@ export class ReportOperationalComponent implements OnInit {
 
 
   percent() {
+    const self = this;
+
     this.yScale.domain([0, 1])
 
     this.rectBars
@@ -718,6 +805,7 @@ export class ReportOperationalComponent implements OnInit {
         return this.yScale(d[0] / total) - this.yScale(d[1] / total);
       })
       .transition()
+      .call(this.endAll, this.transitionCallBack, self)
       .attr('width', this.xScale.bandwidth() - this.paddingScale(this.rectPadding))
       .attr('x', (d, i) => this.xScale(i) + this.paddingScale(this.rectPadding) / 2)
     // .selectAll('title')
@@ -752,29 +840,35 @@ export class ReportOperationalComponent implements OnInit {
   }
 
   initData() {
+    this.isFilterExists = !!this.retrieveFilters();
+    const timespan = this.isFilterExists ? this.retrieveFilters().timeSpan : {};
+
+    this.service.getReportOperational({ ...timespan });
     /** @TODO Raw Month
      *  this should get from RawData extract from Rawdata
      */
-    this.month = this.getMonths();
+    return;
+    //this.months = 
+    // this.getMonths();
     /** @TODO Raw data from DB */
-    this.rawData = d3
-      .range(this.chartState.keys.length)
-      .map(() => bumps(this.month.length));
+    // this.rawData = d3
+    //   .range(this.chartState.keys.length)
+    //   .map(() => bumps(this.months.length));
 
-    this.colors = d3.scaleOrdinal(['#98b8c7', '#6f9bb0', '#31708e', '#81BEB0', '#D4EAD9'])
-      .domain([0, this.chartState.keys.length])
+    // this.colors = d3.scaleOrdinal(['#98b8c7', '#6f9bb0', '#31708e', '#81BEB0', '#D4EAD9'])
+    //   .domain([0, this.chartState.keys.length])
 
     /** @TODO 
      *  this should be the mock data converted from rawData used by Chart
      *  dataMock should not be changed
      */
-    this.dataMock = this.month.map((m, i) => {
-      var object = { 'month': m }
-      this.chartState.keys.forEach((key, index) => object[key.name] = this.rawData[index][i])
-      return object;
-    })
+    // this.dataMock = this.months.map((m, i) => {
+    //   var object = { 'month': m }
+    //   this.chartState.keys.forEach((key, index) => object[key.name] = this.rawData[index][i])
+    //   return object;
+    // })
 
-    console.log("DEBUG_DATAMOCK", this.dataMock)
+    // console.log("DEBUG_DATAMOCK", this.dataMock)
     // var test2 = d3.stack().keys(this.chartState.keys.map(key => key.name))(this.dataMock)
 
     // // console.log(test2);
@@ -786,28 +880,69 @@ export class ReportOperationalComponent implements OnInit {
     // console.log(test3)
   }
 
-  updateData(m?) {
-    /**
-     * Manipulate Data based on ChartState.Key
-     * IF Key.active == false
-     * Then value = 0 
-     */
-    // var dataset = this.rawData
-    //   .map((d, i) =>
-    //     this.chartState.keys[i].active ? d : d.map(d => 0))
-    //   /**
-    //   * Manipulate Data based on Month Selection
-    //   * Exclude the month not been selected
-    //   */
-    //   .map(x => x.filter((y, i) =>
-    //     /** @TODO Change way to exclude month 
-    //      *  Current exclude this? 
-    //      */
-    //     this.selection.selected.includes(this.month[i]))
-    //     // this.dataMock.map(m => m.month).includes(this.month[i]))
-    //   );
+  initState() {
+    this.reportChanged$ = this.service.reportOperationalReady.subscribe((reports: ReportOperational[]) => {
+      this.onReportChanged(reports)
+    });
 
-    this.filterdDataMock = this.dataMock
+    this.service.windowResized.subscribe(() => this.onResize());
+  }
+
+  onReportChanged(reports: ReportOperational[]) {
+    reports.forEach((report: ReportOperational) => report.month = report.month.slice(0, 10));
+    this.reportData = reports;
+
+    if (this.reportData.length === 0)
+      return;
+
+  
+    if (this.isFilterExists && this.retrieveFilters().keys) {
+      const keysParams = this.retrieveFilters().keys;
+      this.chartState.keys = keysParams;
+      this.chartState.activeKeyCountPrev = this.retrieveFilters().activeKeyCountPrev;
+    } else {
+      const keys = this.objectKeys(this.reportData[0]).filter(key => key !== 'month');
+      this.chartState.keys = keys.map(key => {
+        return { 'name': key, 'active': true }
+      });
+    }
+
+
+    if (this.isFilterExists && this.retrieveFilters().schemaActive) {
+      this.chartState.schemaActive = this.retrieveFilters().schemaActive;
+    } 
+
+    this.colors = d3.scaleOrdinal(['#31708e', '#6f9bb0', '#98b8c7', '#81BEB0', '#D4EAD9'])
+      .domain([0, this.chartState.keys.length])
+
+    /**@FIXME Adjust execute order*/
+
+    this.groupMonths();
+    this.clearSelection();
+
+    // if (this.isFilterExists && this.retrieveFilters().monthSelected) {
+    //   this.retrieveFilters().monthSelected.forEach(month => this.selection.select(month));
+    //   this.selection.sort((a, b) => Date.parse(a) - Date.parse(b))
+    // } else {
+      this.masterToggle();
+    // }
+    // return;
+
+    this.updateData();
+    if (this.svg) {
+      this.onRemoveEffect();
+      this.clearChart();
+    }
+    this.updateBase()
+    this.updateScale();
+    this.initLegend();
+    this.initChart();
+
+    this.isFilterExists = false;
+  }
+
+  updateData() {
+    this.filterdDataMock = this.reportData
       .map((d, i) => {
         var obj = { ...d };
         this.chartState.keys.forEach(key => {
@@ -815,19 +950,20 @@ export class ReportOperationalComponent implements OnInit {
         })
         return obj;
       })
-      .filter((d, i) => this.selection.selected.includes(d.month))
+      .filter((d: ReportOperational, i) => this.selection.selected.includes(d.month))
 
 
     // start, end,  index, [value1, value2, ..... valueN]
     this.stackedData = d3.stack()
       .keys(this.chartState.keys.map(key => key.name))(this.filterdDataMock)
-      .map((d, i) => d.map(data => {
-        var array = this.chartState.keys.map(key => data.data[key.name]);
-        data.push(i);
-        data.push(array);
-        data.key = d.key;
-        return data;
-      })
+      .map((d, i) =>
+        d.map(data => {
+          var array = this.chartState.keys.map(key => data.data[key.name]);
+          data.push(i);
+          data.push(array);
+          data.key = d.key;
+          return data;
+        })
       );
     console.log("DEBUG Filtered_Data", this.filterdDataMock)
     console.log("DEBUG Stacked_Data", this.stackedData)
@@ -857,8 +993,6 @@ export class ReportOperationalComponent implements OnInit {
       .data(d => d)
       .selectAll('title')
       .data((d, i) => {
-        // console.log(d, i);
-        // console.log('title', d, i);
         return d[3][d[2]]
       })
 
@@ -888,24 +1022,6 @@ export class ReportOperationalComponent implements OnInit {
     }
   }
 
-  testSort() {
-    if (this.chartState.sorted = !this.chartState.sorted) {
-      this.chartState.xindex = d3.range(this.filterdDataMock.length).sort((a, b) => {
-        var diff = d3.sum(this.chartState.keys.map(d => this.filterdDataMock[a][d.name]))
-          - d3.sum(this.chartState.keys.map(d => this.filterdDataMock[b][d.name]))
-        return diff
-      });
-    } else {
-      this.chartState.xindex = d3.range(this.filterdDataMock.length)
-    }
-
-    this.xScale
-      .domain(this.chartState.xindex);
-
-    this.onRemoveEffect();
-    this.transitionSort();
-  }
-
   transitionSort() {
     if (this.chartState.schemaActive === 'Grouped') {
       this.rectBars.transition()
@@ -927,36 +1043,7 @@ export class ReportOperationalComponent implements OnInit {
       .attr("transform", (d, i) => `translate(${this.xScale(i) + this.xScale.bandwidth() / 2}, ${0})`)
   }
 
-  /** @Output */
-  onMonthSelect(month: string) {
-    this.selection.toggle(month);
-    this.selection.sort((a, b) => Date.parse(a) - Date.parse(b));
-
-    // this.dataMock = this.selection.selected.map((m, i) => {
-    //   return { 'month': m, 'value': this.rawData[0][this.month.indexOf(m)], 'value1': this.rawData[1][this.month.indexOf(m)], 'value2': this.rawData[2][this.month.indexOf(m)], 'value3': this.rawData[3][this.month.indexOf(m)] }
-    // })
-    // console.log(this.dataMock)
-
-    this.updateData(month);
-
-    this.clearChart();
-    this.onRemoveEffect();
-    this.updateScale();
-    this.initLegend();
-    this.initChart();
-  }
-
-  masterToggle() {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.month.forEach(month => this.selection.select(month));
-
-    this.selection.sort((a, b) => Date.parse(a) - Date.parse(b));
-
-    // this.dataMock = this.selection.selected.map((m, i) => {
-    //   return { 'month': m, 'value': this.rawData[0][this.month.indexOf(m)], 'value1': this.rawData[1][this.month.indexOf(m)], 'value2': this.rawData[2][this.month.indexOf(m)], 'value3': this.rawData[3][this.month.indexOf(m)] }
-    // })
-
+  refreshChart() {
     if (this.svg) {
       this.updateData();
       this.clearChart();
@@ -967,13 +1054,71 @@ export class ReportOperationalComponent implements OnInit {
     }
   }
 
+  onMonthSelect(month: string) {
+    this.monthToggle(month)
+    this.refreshChart();
+  }
+
+  monthToggle(month) {
+    this.selection.toggle(month);
+    this.selection.sort((a, b) => Date.parse(a) - Date.parse(b));
+  }
+
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.months.forEach(month => this.selection.select(month));
+
+    this.selection.sort((a, b) => Date.parse(a) - Date.parse(b))
+  }
+
+  clearSelection() {
+    this.selection.clear();
+  }
+
+  onMasterToggle() {
+    this.masterToggle();
+    this.refreshChart();
+  }
+
+  yearToggle(year) {
+    this.isYearSelected(year) ?
+      this.monthGrouped[year].forEach(month => this.selection.deselect(month)) :
+      this.monthGrouped[year].forEach(month => this.selection.select(month));
+
+    this.selection.sort((a, b) => Date.parse(a) - Date.parse(b));
+  }
+
+  onYearToggle(year) {
+    this.yearToggle(year);
+    this.refreshChart();
+  }
+
+
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.month.length;
+    const numRows = this.months.length;
     return numSelected == numRows;
   }
 
-  onRadioClicked($e) {
+  isYearSelected(year) {
+    const numSelected = this.getNumYearSelected(year).length;
+    const numRows = this.monthGrouped[year].length
+    return numSelected == numRows;
+  }
+
+  selectYearSelection(year) {
+    this.getNumYearSelected(year).forEach(month => this.selection.select(month));
+  }
+
+  getNumYearSelected(year) {
+    return this.selection.selected.filter(y =>
+      //  new Date(Date.parse(y)).getUTCFullYear() == year
+      y.substring(0, 4) == year
+    );
+  }
+
+  onSchemaSelected($e) {
     this.onRemoveEffect();
     this.updateChart();
   }
@@ -985,25 +1130,14 @@ export class ReportOperationalComponent implements OnInit {
     return condition && condition2;
   }
 
-  initForm() {
-    this.searchForm = this.fb.group({
-      startDate: '',
-      endDate: '',
-    }, {
-        validator: this.dateInputValidator
-      });
-  }
-
-  dateInputValidator(form: FormGroup) {
-    const condition = form.get('startDate').getError('matDatepickerParse') || form.get('endDate').getError('matDatepickerParse')
-    return condition ? { dateInputError: true } : null;
-  }
-
-  fireWhenEmpty(el, formControlName: string): void {
-    if (!el.value || el.value === '') {
-      this.searchForm.patchValue({ [formControlName]: '' }, { emitEvent: true })
-    }
-  }
+  // initForm() {
+  //   this.searchForm = this.fb.group({
+  //     startDate: '',
+  //     endDate: '',
+  //   }, {
+  //       validator: this.dateInputValidator
+  //     });
+  // }
 
   initToolTipSVG() {
     this.svg
@@ -1058,11 +1192,40 @@ export class ReportOperationalComponent implements OnInit {
       .style('left', `0px`)
       .style('top', `0px`)
       .style('box-shadow', '0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12)')
-      .style('background-color', `#fff`)
       .style('border-radius', `6px`)
-      .style('padding', `12px`)
+
+    // .style('padding', `12px`)
 
     this.tooltipDiv
+      .append('section')
+      .attr('id', 'tooltip-action')
+      .style('width', '100%')
+      .style('position', 'absolute')
+      .style('padding', `6px 12px`)
+      .style('background-color', `#fff`)
+      .style('border-radius', `6px 6px 0 0`)
+      .style('top', '-6px')
+      .selectAll('button')
+      .data(this.btns)
+      .enter()
+      .append('button')
+      .attr('class', 'btn btn-light')
+      .attr('id', d => `btn-${d.Name}`)
+      .style('padding', '0px 6px')
+      .style('font-sisze', '12px')
+      .style('margin-right', '6px')
+      .text(d => d.Name)
+    // .on('click', d => d.onClick)
+    //
+
+    this.tooltipDiv
+      .append('section')
+      .attr('id', 'tooltip-info')
+      .style('padding', `6px 12px 12px 12px`)
+      .style('border-radius', ` 0 0 6px 6px`)
+      .style('position', 'relative')
+      .style('background-color', `#fff`)
+      .style('min-width', `210px`)
       .selectAll('div')
       .data(text)
       .enter()
@@ -1093,13 +1256,14 @@ export class ReportOperationalComponent implements OnInit {
       })
       .attr('x', d3.event.pageX - clientRect.x + 30)
       .attr('y', d3.event.pageY - clientRect.y + 30)
+
   }
 
   displayTooltipDIV(data) {
     const clientRect = this.svg.node().getBoundingClientRect();
 
     const text = [
-      { name: 'Description', value: data.key },
+      { name: 'Description', value: data.key.split('_').slice(1).join(' ') },
       { name: 'Month', value: data.data['month'] },
       { name: 'Count', value: data.data[data.key] },
       { name: 'Total', value: d3.sum(data[3]) },
@@ -1107,6 +1271,7 @@ export class ReportOperationalComponent implements OnInit {
     ]
 
     this.tooltipDiv
+      .style('display', 'block')
       .style('opacity', () => this.chartState.rectActive.selected ? 1 : 0.9)
       .style('left', `${d3.event.pageX - clientRect.x + 30}px`)
       .style('top', `${d3.event.pageY - clientRect.y + 30}px`)
@@ -1115,16 +1280,28 @@ export class ReportOperationalComponent implements OnInit {
       .data(text)
 
     this.tooltipDiv
+      .select('#tooltip-info')
       .selectAll('div')
       .data(text)
       .selectAll('span')
       .data(d => Object.entries(d))
       .text(d => d[1])
+
+    this.tooltipDiv
+      .select('#tooltip-action')
+      .selectAll('button')
+      .data(this.btns)
+      .on('click', d => d.onClick(data))
   }
 
   hideTooltipDIV() {
     if (!this.tooltipDiv) return;
     this.tooltipDiv.style('opacity', 0)
+      .style('display', 'none')
+
+    this.tooltipDiv
+      .select('#tooltip-action')
+      .style('top', '-6px')
   }
 
   endAll(transition, callback, self) {
@@ -1145,58 +1322,188 @@ export class ReportOperationalComponent implements OnInit {
   }
 
   transitionCallBack(transitioning, self) {
+    // console.log(self, self.chartState)
     self.chartState.transitioning = transitioning;
+  }
+
+
+
+  onDateApplied(e) {
+    this.chartState.timeSpanApplied = {
+      endDate: e.endDate ? e.endDate : null,
+      startDate: e.startDate ? e.startDate : null
+    };
+    this.service.getReportOperational(e);
+  }
+
+  onSaveFilters() {
+
+    let chartStateParams = {
+      schemaActive: this.chartState.schemaActive,
+      keys: this.chartState.keys,
+      activeKeyCountPrev: this.chartState.activeKeyCountPrev,
+      timeSpan: this.chartState.timeSpanApplied,
+      monthSelected: this.selection.selected
+    };
+    localStorage.setItem('report_operational', JSON.stringify(chartStateParams));
+
+    // this.openSnackBar('Filters Saved', 'Dismiss');
+  }
+
+  retrieveFilters() {
+    if (!localStorage.getItem('report_operational'))
+      return null;
+
+    const chartStateParams = JSON.parse(localStorage.getItem('report_operational'));
+    return chartStateParams;
   }
 
   download_csv() {
     const report = this.filterdDataMock;
-    downloadTest(report);
-  }
-}
-
-function downloadTest(report) {
-  const data = report;
-  const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
-  const header = Object.keys(data[0]);
-  let csv = data.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
-  csv.unshift(header.join(','));
-  let csvArray = csv.join('\r\n');
-
-  var a = document.createElement('a');
-  var blob = new Blob([csvArray], { type: 'text/csv' }),
-    url = window.URL.createObjectURL(blob);
-
-  a.href = url;
-  a.download = "myFile.csv";
-  a.click();
-  window.URL.revokeObjectURL(url);
-  a.remove();
-}
-
-
-function bumps(m) {
-  const values = [];
-
-  for (let i = 0; i < m; ++i) {
-    values[i] = Math.floor(500 + 1000 * Math.random());
+    const FILENAME = `Revrec2Discrepancies_Operational_${moment().format('MMM_DD_YYYY_hhmmA')}.csv`;
+    this.service.downloadTest(report, FILENAME);
   }
 
-  // Add five random bumps.
-  for (let j = 0; j < 4; ++j) {
-    const x = 1 / (1 + Math.random());
-    const y = 1 * Math.random() - 0.5;
-    const z = 10 / (1 + Math.random());
-    for (let i = 0; i < m; i++) {
-      const w = (i / m - y) * z;
-      values[i] += Math.floor(x * Math.exp(-w * w));
+  onRefresh() {
+    this.service.getReportOperational(this.chartState.timeSpanApplied);
+  }
+
+  onSort() {
+    if (this.chartState.transitioning)
+      return;
+
+    if (this.chartState.sorted = !this.chartState.sorted) {
+      this.chartState.xindex = d3.range(this.filterdDataMock.length).sort((a, b) => {
+        var diff = d3.sum(this.chartState.keys.map(d => this.filterdDataMock[a][d.name]))
+          - d3.sum(this.chartState.keys.map(d => this.filterdDataMock[b][d.name]))
+        return diff
+      });
+    } else {
+      this.chartState.xindex = d3.range(this.filterdDataMock.length)
     }
+
+    this.xScale
+      .domain(this.chartState.xindex);
+
+    this.onRemoveEffect();
+    this.transitionSort();
   }
 
-  // Ensure all values are positive.
-  for (let i = 0; i < m; ++i) {
-    values[i] = Math.max(0, values[i]);
+  onExportDiscrepancy(rect: any) {
+    const keys = rect.key.split('_');
+    const month = rect.data.month;
+    const isEnrolled = keys[1];
+    const isResolved = keys[2];
+    // const pageRequest = {
+    //   pageIndex: con1.pageIndex ? con1.pageIndex : 0,
+    //   pageSize: con1.pageSize ? con1.pageSize : 25,
+    //   sortBy: con1.sortBy ? con1.sortBy : '',
+    //   orderBy: con1.orderBy ? con1.orderBy : '',
+    // };
+    var discrepancyStatuses = this.settingService.getOptions('discrepancyStatus').filter((ds: DiscrepancyStatusOption) => {
+      return isResolved === 'Resolved' ? ds.discrepancyCategoryIsResolved : !ds.discrepancyCategoryIsResolved
+    });
+    const filters = {
+      memberIsEnrolled: isEnrolled === 'Member' ? 1 : 0,
+      months: [month],
+      discrepancyStatusIDs: discrepancyStatuses.map((ds: DiscrepancyStatusOption) => ds.discrepancyStatusID),
+      exportAll: 1,
+      includeResolved: true
+    }
+    // console.log(filters, discrepancyStatuses, this.settingService.getOptions('discrepancyStatus'))
+    var report$ = this.sharedService.getDiscrepancyReport({}, filters)
+      .subscribe(result => {
+        // console.log(result)
+        // this.isReportDownloading = false;
+        // console.log(" Get Discrepancy Report =>", result.data)
+        // this.openSnackBar('Download Finished', 'Ok', 2);
+
+        const FILENAME = `Revrec2Operational_${month}_${isEnrolled}_${isResolved}_${moment().format('MMM_DD_YYYY_hhmmA')}.csv`;
+        this.service.downloadTest(result.data.list, FILENAME);
+      });
   }
 
-  return values;
+
+  onRedirectDiscrepancy(rect: any) {
+    const keys = rect.key.split('_');
+    const month = rect.data.month;
+    const isEnrolled = keys[1];
+    const isResolved = keys[2];
+
+    var discrepancyStatuses = this.settingService.getOptions('discrepancyStatus').filter((ds: DiscrepancyStatusOption) => {
+      return isResolved === 'Resolved' ? ds.discrepancyCategoryIsResolved : !ds.discrepancyCategoryIsResolved
+    });
+    const filters = {
+      /** @TODO TEMP Value 20 => non-member */
+      memberEnrollmentStatus: isEnrolled === 'Member' ? 21 : 20,
+      months: [month],
+      discrepancyStatusIDs: discrepancyStatuses.map((ds: DiscrepancyStatusOption) => ds.discrepancyStatusID),
+      includeResolved: true
+    }
+    const navData = {
+      previousRoute: 'report/operational',
+      nextRoute: 'discrepancies',
+      data: filters
+    };
+    this.navService.onNav(navData);
+    this.router.navigate(['/discrepancies']);
+
+  }
+
+  getReportDetail(rect) {
+    const keys = rect.key.split('_');
+    const mon = rect.data.month;
+    const isEnrolled = keys[1] === 'Member' ? 1 : 0;
+    const isResolved = keys[2] === 'Resolved' ? 1 : 0
+
+    if (this.chartState.selectedDetail.month === mon
+      && this.chartState.selectedDetail.isEnrolled === isEnrolled
+      && this.chartState.selectedDetail.isResolved === isResolved)
+      return;
+
+    this.chartState.selectedDetail.isEnrolled = isEnrolled;
+    this.chartState.selectedDetail.isResolved = isResolved;
+    this.chartState.selectedDetail.month = mon
+    this.chartState.selectedDetail.isSelected = true;
+
+    this.service.getReportOperationalDetail(this.chartState.selectedDetail);
+  }
+
+  reportDetailLabel() {
+    const isEnrolled = this.chartState.selectedDetail.isEnrolled === null ? '' :
+      (this.chartState.selectedDetail.isEnrolled ? 'Member' : 'Non-Member');
+    const isResolved = this.chartState.selectedDetail.isResolved === null ? '' :
+      (this.chartState.selectedDetail.isResolved ? 'Resolved' : 'Unresolved');
+
+    return this.chartState.selectedDetail.isSelected ? `${this.chartState.selectedDetail.month}  - ${isEnrolled} ${isResolved} ` : 'Detail';
+  }
 }
+
+
+
+// function bumps(m) {
+//   const values = [];
+
+//   for (let i = 0; i < m; ++i) {
+//     values[i] = Math.floor(500 + 1000 * Math.random());
+//   }
+
+//   // Add five random bumps.
+//   for (let j = 0; j < 4; ++j) {
+//     const x = 1 / (1 + Math.random());
+//     const y = 1 * Math.random() - 0.5;
+//     const z = 10 / (1 + Math.random());
+//     for (let i = 0; i < m; i++) {
+//       const w = (i / m - y) * z;
+//       values[i] += Math.floor(x * Math.exp(-w * w));
+//     }
+//   }
+
+//   // Ensure all values are positive.
+//   for (let i = 0; i < m; ++i) {
+//     values[i] = Math.max(0, values[i]);
+//   }
+
+//   return values;
+// }
 

@@ -1,18 +1,30 @@
+.setting-rate-cards-actions-conatiner {
+    padding-bottom: 12px;
+    padding-right: 6px
+}
+
 .mat-form-field-action {
     display: inline-block;
 }
 
 .mat-form-field-narrow {
-    width: 115px;
-    padding-right: 10px;
+    width: 144px;
+    padding-right: 12px;
+    padding-left: 12px;
 }
 
 .mat-form-field-normal {
-    width: 140px;
-    padding-right: 10px;
+    width: 180px;
+    /* padding-right: 12px; */
 }
 
-.info-overlay {
+.mat-form-field-wide {
+    width: 240px;
+    /* padding-right: 12px; */
+}
+
+.info-overlay,
+.filters-overlay {
     position: absolute;
     width: 100%;
     height: 100vh;
@@ -30,4 +42,74 @@
     top: calc(10vh + 33px);
     bottom: 0;
     margin: auto;
+}
+
+.filters-container {
+    position: relative;
+    height: 80%;
+    width: 90%;
+    left: 0;
+    right: 0;
+    top: calc(10vh + 33px);
+    bottom: 0;
+    margin: auto;
+}
+
+.mat-trigger-additional-selection {
+    opacity: 0.75;
+    font-size: 0.75em;
+}
+
+.mat-form-field-container {
+    position: relative;
+    display: inline-block;
+    padding-right: 24px;
+    padding-left: 24px;
+}
+
+.btn-mat-field-clear {
+    position: absolute;
+    margin-left: 0px;
+    margin-top: 12px;
+}
+
+.mat-form-field-row-begin {
+    margin-left: 62px;
+}
+
+.action-container {
+    display: inline-block;
+    padding-bottom: 1em;
+    /* keep this same as input */
+    top: -0.84375em;
+    padding-top: 0.84375em;
+}
+
+.btn-filter-flat {
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+@media screen and (max-width: 1810px) {
+    .media-hidden-xl {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1810px) {
+    .media-display-xl {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1713px) {
+    .media-hidden-l {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1480px) {
+    .media-hidden {
+        display: none;
+    }
 }

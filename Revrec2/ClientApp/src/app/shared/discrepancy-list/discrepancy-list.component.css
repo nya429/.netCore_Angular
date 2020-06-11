@@ -87,8 +87,12 @@ mat-spinner {
     width: 100%;
 }
 
-.cell-dispaly {
+.cell-display {
     cursor: pointer;
+}
+
+.cell-display-not-allowed {
+    cursor: not-allowed;
 }
 
 .cell-display-info {
@@ -189,4 +193,17 @@ input[type=number]::-webkit-outer-spin-button {
 .mat-badge-content {
     top: -4px !important;
     right: -16px !important;
+}
+
+.variance-cell {
+    padding: 3px 12px;
+    font-size: 13px;
+    transition: .15s;
+}
+
+.variance-cell-highlighted {
+    background: #31708e;
+    color: #fff;
+    border-radius: 20px;
+    /* font-weight: bolder; */
 }

@@ -1,0 +1,10 @@
+.productivity-container {
+    background: white;
+    width: 600px;
+    position: relative;
+    padding-top: 24px;
+}
+
+.productivity-container-filter {
+    padding: 0 24px;
+}

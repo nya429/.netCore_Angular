@@ -16,10 +16,10 @@ export class SidenavListComponent implements OnInit, OnDestroy {
   listPermissionDiscrepancy: string = '0000';
 
   ngOnInit() {
-    console.log('here')
+    // console.log('SidenavListComponent.ngOnInit')
 
     this.authService.endpointroleSettingReady.subscribe(() => {
-      console.log('here')
+      // console.log('SidenavListComponent endpointroleSettingReady')
       this.listPermissionDiscrepancy = this.authService.getRoleMappingSettingByNames('discrepancy', 'GetDiscrepancyRecordListByConAsync');
       this.listPermissionMember = this.authService.getRoleMappingSettingByNames('member', 'GetMemberListByConAsync');
     })

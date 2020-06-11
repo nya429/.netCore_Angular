@@ -4,6 +4,10 @@ import { Injectable } from '@angular/core';
 import { SettingService } from './setting/setting.service';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { take, first } from 'rxjs/operators';
+import { Link, EndpointSetting, LinkEndpointMap, LinkSettings, LinkReports } from './auth/auth.endpoint';
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +17,16 @@ export class AppService {
   public optionInited = new Subject<any>();
 
   /** Setting Authorization */
-  listPermissionsRateCard: string;
-  listPermissionsRateCellMap: string;
-  listPermissionsRegionMap: string;
-  listPermissionsDiscrepancyStatus: string;
-  listPermissionsDiscrepancyCategory: string;
-  listPermissionsUser: string;
-  settingLinks = [];
+  // listPermissionsRateCard: string;
+  // listPermissionsRateCellMap: string;
+  // listPermissionsRegionMap: string;
+  // listPermissionsDiscrepancyStatus: string;
+  // listPermissionsDiscrepancyCategory: string;
+  // listPermissionsUser: string;
+
+  private settingLinks = [] as Link[];
+  private reportLinks = [] as Link[];
+
 
   constructor(
     private router: Router,
@@ -52,61 +59,103 @@ export class AppService {
 
     this.authService.endpointroleSettingReady.subscribe(() => {
       this.settingService.initOpionts();
-      this.configWildCardRoute();
+      this.configWildCardRoutes();
     });
-    
-    this.settingService.optionsReady$.subscribe(() => {
+
+    this.settingService.optionsReady$.pipe(first()).subscribe(() => {
       let userId = this.authService.getActionUserId();
-      console.log(userId);
       this.notificationService.subscribeNotification(userId);
       this.optionInited.next();
     })
   }
 
-  configWildCardRoute() {
-    const linkSettings = [{ segment: 'ratecards', description: 'Rate Cards' },
-    { segment: 'ratecell-region-mappings', description: 'Rate Cell & Region Mappings' },
-    { segment: 'discrepancy-statuses', description: 'Discrepancy Statuses' },
-    { segment: 'discrepancy-categories', description: 'Discrepancy Categories' },
-    { segment: 'users', description: 'Users' }];
+  // configWildCardRoute2() {
+  //   const linkSettings = [{ segment: 'ratecards', description: 'Rate Cards' },
+  //   { segment: 'ratecell-region-mappings', description: 'Rate Cell & Region Mappings' },
+  //   { segment: 'discrepancy-statuses', description: 'Discrepancy Statuses' },
+  //   { segment: 'discrepancy-categories', description: 'Discrepancy Categories' },
+  //   { segment: 'users', description: 'Users' }];
 
-    this.listPermissionsRateCard = this.authService.getRoleMappingSettingByNames('ratecard', 'GetRateCardListByConAsync');
-    this.listPermissionsRateCellMap = this.authService.getRoleMappingSettingByNames('ratecellmap', 'GetRateCellMapListByConAsync');
-    this.listPermissionsRegionMap = this.authService.getRoleMappingSettingByNames('regionmap', 'GetRegionMapListByConAsync');
-    this.listPermissionsDiscrepancyStatus = this.authService.getRoleMappingSettingByNames('discrepancyStatues', 'GetDiscrepancyStatusesListByConAsync');
-    this.listPermissionsDiscrepancyCategory = this.authService.getRoleMappingSettingByNames('discrepancyCateogry', 'GetDiscrepancyCategoryListByConAsync');
-    this.listPermissionsUser = this.authService.getRoleMappingSettingByNames('user', 'GetUsersListByConAsync');
-   
-    if (this.authService.isViewAuthorized(this.listPermissionsRateCard)) {
-      this.settingLinks.push(linkSettings[0])
-    }
+  //   const linkReports = [{ segment: 'operational', description: 'Operational' },
+  //   { segment: 'financial', description: 'Financial' },
+  //   { segment: 'productivity', description: 'Productivity' },
+  //   { segment: 'gdp', description: 'Revrec 1.0 Story' }];
 
-    if (this.authService.isViewAuthorized(this.listPermissionsRateCellMap) || this.authService.isViewAuthorized(this.listPermissionsRegionMap)) {
-      this.settingLinks.push(linkSettings[1])
-    }
 
-    if (this.authService.isViewAuthorized(this.listPermissionsDiscrepancyStatus)) {
-      this.settingLinks.push(linkSettings[2])
-    }
+  //   this.listPermissionsRateCard = this.authService.getRoleMappingSettingByNames('ratecard', 'GetRateCardListByConAsync');
+  //   this.listPermissionsRateCellMap = this.authService.getRoleMappingSettingByNames('ratecellmap', 'GetRateCellMapListByConAsync');
+  //   this.listPermissionsRegionMap = this.authService.getRoleMappingSettingByNames('regionmap', 'GetRegionMapListByConAsync');
+  //   this.listPermissionsDiscrepancyStatus = this.authService.getRoleMappingSettingByNames('discrepancyStatues', 'GetDiscrepancyStatusesListByConAsync');
+  //   this.listPermissionsDiscrepancyCategory = this.authService.getRoleMappingSettingByNames('discrepancyCateogry', 'GetDiscrepancyCategoryListByConAsync');
+  //   this.listPermissionsUser = this.authService.getRoleMappingSettingByNames('user', 'GetUsersListByConAsync');
 
-    if (this.authService.isViewAuthorized(this.listPermissionsDiscrepancyCategory)) {
-      this.settingLinks.push(linkSettings[3])
-    }
+  //   if (this.authService.isViewAuthorized(this.listPermissionsRateCard)) {
+  //     this.settingLinks.push(linkSettings[0])
+  //   }
 
-    if (this.authService.isViewAuthorized(this.listPermissionsUser)) {
-      this.settingLinks.push(linkSettings[4])
-    }
+  //   if (this.authService.isViewAuthorized(this.listPermissionsRateCellMap) || this.authService.isViewAuthorized(this.listPermissionsRegionMap)) {
+  //     this.settingLinks.push(linkSettings[1])
+  //   }
 
-    let activeLink = this.settingLinks.length ? this.settingLinks[0].segment : '';
+  //   if (this.authService.isViewAuthorized(this.listPermissionsDiscrepancyStatus)) {
+  //     this.settingLinks.push(linkSettings[2])
+  //   }
+
+  //   if (this.authService.isViewAuthorized(this.listPermissionsDiscrepancyCategory)) {
+  //     this.settingLinks.push(linkSettings[3])
+  //   }
+
+  //   if (this.authService.isViewAuthorized(this.listPermissionsUser)) {
+  //     this.settingLinks.push(linkSettings[4])
+  //   }
+
+  //   let activeLink = this.settingLinks.length ? this.settingLinks[0].segment : '';
+  //   console.log(this.settingLinks)
+  //   return;
+  //   if (activeLink) {
+  //     this.router.config.find(c => c.path === "settings").children.push(
+  //       { path: "", redirectTo: activeLink, pathMatch: 'full' }
+  //     );
+  //   }
+
+  //   console.log(this.router.config)
+  // }
+
+  configWildCardRoutes() {
+    const linkReports = LinkReports;
+    const linkSettings = LinkSettings;
+
+    this.configWildCardRoute(this.reportLinks, linkReports, 'reports')
+    this.configWildCardRoute(this.settingLinks, linkSettings, 'settings')
+
+    console.log(this.router.config)
+  }
+
+  configWildCardRoute(links: Link[], linkMaps: LinkEndpointMap[], modulePath: string) {
+    linkMaps.forEach(linkMap => {
+      let isPermitted = true;
+      if (linkMap.endpointSettings.length > 0)
+        isPermitted = linkMap.endpointSettings.map((endpointPermission: EndpointSetting) => {
+          const roleMappingSetting = this.authService.getRoleMappingSettingByNames(endpointPermission.module, endpointPermission.endpoint)
+          return this.authService.isViewAuthorized(roleMappingSetting);
+        }).reduce((acc, cur) => cur || acc, false);
+
+      if (isPermitted) {
+        links.push(linkMap.link);
+      }
+    });
+
+    const activeLink = links.length ? links[0].segment : '';
 
     if (activeLink) {
-      this.router.config.find(c => c.path === "settings").children.push(
+      this.router.config.find(c => c.path === modulePath).children.push(
         { path: "", redirectTo: activeLink, pathMatch: 'full' }
       );
     }
-
-    console.log( this.router.config)
   }
 
+
   getSettingLinks = () => this.settingLinks;
+
+  getReportLinks = () => this.reportLinks;
 }

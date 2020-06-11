@@ -1,36 +1,121 @@
 <div class="container-fluid report-container">
     <mat-card>
         <div class="row" fxLayout="row" fxLayoutAlign="begin begin" style='padding:15px;'>
-            <div fxFlex="80" class="chart-container col-sm-9">
-                <div #BarChart class='bar-chart' style='height: 500px;'></div>
+            <div fxFlex="100" class="chart-container col-sm-9">
+                <div class="row chart-header">
+                    <!-- <div class="col-sm-9"> -->
+                    <div class="chart-header-title">
+                        Total Discrepancies by Resolved/Unresolved
+                    </div>
+                    <div id="dual-calendar-container">
+                        <app-dual-calendar [timeSpanFetched]='chartState.timeSpanFetched' (dateApplied)='onDateApplied($event)'></app-dual-calendar>
+                    </div>
+                    <!-- </div> -->
+
+                </div>
+                <div class="row chart-header">
+
+                    <!-- <mat-divider [vertical]="true"></mat-divider> -->
+                    <div style="padding:14px 7px">
+                        <span style="font-size: 14px;">
+                                    Visualization:
+                      </span>
+
+                        <button mat-button [matMenuTriggerFor]="menu2" matBadgePosition="after" style="min-width: 110px;max-width: 110px;">{{chartState.schemaActive}}
+                            <mat-icon aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+                        </button>
+                        <mat-menu #menu2="matMenu" [overlapTrigger]="false" yPosition="below" (click)="$event.stopPropagation()">
+                            <mat-radio-group aria-label="Select an option" (change)="onSchemaSelected($event)" [(ngModel)]="chartState.schemaActive">
+                                <mat-radio-button mat-ripple class="menu-item" *ngFor='let option of chartState.schemaOptions' [value]="option" (click)="$event.stopPropagation()">{{option}}</mat-radio-button>
+                            </mat-radio-group>
+                        </mat-menu>
+                    </div>
+                    <div style="padding:14px 7px">
+
+                        <button mat-button [matMenuTriggerFor]="menu1" matBadgePosition="after">Category
+                                <mat-icon aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+                            </button>
+                        <mat-menu #menu1="matMenu" [overlapTrigger]="false" yPosition="below" (click)="$event.stopPropagation()">
+
+                            <mat-checkbox mat-ripple class="menu-item" *ngFor="let key of chartState.keys" (click)="$event.stopPropagation()" [disabled]='isCategoryDisable(key)' (change)="$event ? updateCategory(key) : null" [(ngModel)]="key.active">{{key.name.split("_").join(" ")}}
+                            </mat-checkbox>
+
+                        </mat-menu>
+                    </div>
+                    <div style="padding:14px 7px">
+                        <button mat-button [matMenuTriggerFor]="main_menu" matBadgePosition="after">Month
+                                <mat-icon aria-hidden="true" role="img" class="mat-icon notranslate material-icons mat-icon-no-color">arrow_drop_down</mat-icon>
+                            </button>
+
+                        <mat-menu #main_menu="matMenu" [overlapTrigger]="false" yPosition="below">
+                            <mat-checkbox mat-ripple class="menu-item" (click)="$event.stopPropagation()" (change)="$event ? onMasterToggle() : null" [checked]="isAllSelected()" [indeterminate]="selection.selected.length && !isAllSelected()">(All)
+                            </mat-checkbox>
+
+                            <ng-container *ngFor="let year of objectKeys(monthGrouped)">
+                                <div mat-ripple class="menu-item" mat-menu-item [matMenuTriggerFor]="sub_menu" (click)="$event.stopPropagation()">
+                                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? onYearToggle(year) : null" [checked]="isYearSelected(year)" [indeterminate]="getNumYearSelected(year).length && !isYearSelected(year)">{{ year }}</mat-checkbox>
+                                </div>
+
+                                <mat-menu #sub_menu="matMenu" (click)="$event.stopPropagation()">
+                                    <mat-checkbox *ngFor="let month of monthGrouped[year]" mat-ripple class="menu-item" (click)="$event.stopPropagation()" [value]="month" [checked]="selection.isSelected(month)" (change)="$event ? onMonthSelect(month) : null">{{ month }}</mat-checkbox>
+                                </mat-menu>
+                            </ng-container>
+                        </mat-menu>
+                    </div>
+
+                    <div style="padding:14px 7px">
+
+                        <button mat-icon-button aria-label="Save Filters" matTooltip="Save Filters" (click)='onSaveFilters()'>
+                            <mat-icon class="material-icons-outlined">save</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Download Report" matTooltip="Download Report" (click)="download_csv()">
+                            <mat-icon class="material-icons-outlined">save_alt</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Refresh" matTooltip="Refresh" [disabled]='chartState.transitioning' (click)='onRefresh()'>
+                            <mat-icon class="material-icons-outlined">refresh</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Sort" matTooltip="Sort" [disabled]='chartState.transitioning' [color]="chartState.sorted ? 'primary' : ''" (click)="onSort()">
+                            <mat-icon style="transform: rotate(-90deg) scale(1, -1)" class="material-icons-outlined">sort</mat-icon>
+                        </button>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div #BarChart class='bar-chart'>
+                            <!-- <div class="tooltip" id="tooltip-div" style="height: 100px; width: 200px; left: 0px; top: 0px;"></div> -->
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div fxFlex="20" #Filter class="filter-container col-sm-3">
+            <!-- #Filter  -->
+            <!-- <div *ngIf='false' fxFlex="20" class="filter-container col-sm-3">
                 Filterss
                 <div>
                     <mat-radio-group aria-label="Select an option" (change)="onRadioClicked($event)">
                         <h5>Bar Schema</h5>
                         <mat-radio-button value="stacked">Stacked</mat-radio-button>
                         <mat-radio-button value="grouped">Grouped</mat-radio-button>
-                        <!-- <mat-radio-button value="percent">Percent</mat-radio-button> -->
+              
                     </mat-radio-group>
                     <br>
                     <section class="category-selection">
                         <h5>Category</h5>
                         <mat-checkbox class="row" *ngFor="let key of chartState.keys" [disabled]='isCategoryDisable(key)' (change)="$event ? updateCategory(key) : null" [(ngModel)]="key.active">{{key.name}}
                         </mat-checkbox>
-                        <!-- </form> -->
+                  
                     </section>
                     <section class="month-selection">
                         <h5>Months</h5>
-                        <mat-checkbox class="row" (change)="$event ? masterToggle() : null" [checked]="isAllSelected()">(All)
+                        <mat-checkbox class="row" (change)="$event ? onMasterToggle() : null" [checked]="isAllSelected()">(All)
                         </mat-checkbox>
-                        <mat-checkbox class="row" *ngFor="let month of getMonths()" [value]="month" (change)="$event ? onMonthSelect(month) : null" [checked]="selection.isSelected(month)">{{month}}
+                        <mat-checkbox class="row" *ngFor="let month of months" [value]="month" (change)="$event ? onMonthSelect(month) : null" [checked]="selection.isSelected(month)">{{month}}
                         </mat-checkbox>
-                        <!-- </form> -->
+                     
                     </section>
 
                 </div>
-            </div>
+            </div> -->
         </div>
     </mat-card>
 </div>

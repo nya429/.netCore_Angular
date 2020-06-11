@@ -1,6 +1,8 @@
 import { ReportService } from './../report.service';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Link } from 'src/app/auth/auth.endpoint';
+import { AppService } from 'src/app/app.service';
 
 @Component({
   selector: 'app-report-container',
@@ -8,28 +10,24 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./report-container.component.css']
 })
 export class ReportContainerComponent implements OnInit {
-  links = [{ segment: 'gdp', description: 'Revrec 1.0 Story' },
-  { segment: 'operational', description: 'Operational' },
-  { segment: 'financial', description: 'Financial' },
-  { segment: 'productivity', description: 'Productivity' }
-];
+  links: Link[] = [] as Link[];
   
-
   /** @input */
-  activeLink = this.links[0].segment;
-
+  activeLink: string;
 
   constructor(private router: Router,
     private route: ActivatedRoute,
-    private service: ReportService) { }
+    private appSerivce: AppService,
+    private service: ReportService) { 
+      this.links = this.appSerivce.getReportLinks();
+      this.activeLink = this.router.url.substring(9);
+    }
 
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
-  onNavigate(link) {
+  onNavigate(link: string) {
     this.activeLink = link;
   }
-
   
   @HostListener('window:resize')
   onresize() {

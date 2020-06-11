@@ -82,6 +82,8 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
   }
 
   ngDoCheck() {
+    // 
+    this.calculateCommentListHeight();
   }
 
   ngAfterViewInit() {
@@ -166,7 +168,7 @@ export class CommentaryContainerComponent implements OnInit, OnDestroy, AfterVie
       }
     );
     this.sourceComments = masterComments;
-    this.calculateCommentListHeight();
+    // this.calculateCommentListHeight();
   }
 
   sortComments() {

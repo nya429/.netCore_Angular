@@ -1,8 +1,9 @@
+import { DiscrepancyStatus } from './../../model/setting.model';
 import { Notification } from './../../model/notification.model';
 import { AuthService } from './../../auth/auth.service';
 import { Discrepancy } from './../../model/discrepancy.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnChanges, Output, EventEmitter, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Sort, MatSnackBar, MatDialog, PageEvent, MatSortable, MatSort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -28,7 +29,7 @@ import { switchMap } from 'rxjs/operators';
 
 const moment = _rollupMoment || _moment;
 
-const ColumnsSetting: string[] = [
+const COLUMNS_MAIN: string[] = [
   'select',
   'memberName',
   'mmiS_MMIS_ID',
@@ -46,12 +47,25 @@ const ColumnsSetting: string[] = [
   'mmisPatientPay',
   'mmisPatientSpendDown',
   'variance',
+  'discrepancyStatus',
+  'assigned_UserName',
+  'dueDate',
+  'insertDate',
+  'actions',
+  // 'flag',
+  // 'enrollmentStatus',
+]
+
+const COLUMNS_SUB: string[] = [
+  'select',
+  'memberMonth',
+  'variance',
   'flag',
   'discrepancyStatus',
   'assigned_UserName',
   'dueDate',
   'insertDate',
-  'actions'
+  'actions',
 ]
 
 @Component({
@@ -76,7 +90,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() isSubList: boolean;
   // @Input() mockMSR: boolean;
   @Input('isLookup') containerSourceLookUp: boolean;
-
+  @Input() includeResolved: boolean;
 
   @Output() onDiscrepancyDetailClicked = new EventEmitter<any>();
   @Output() onPagedAndSorted = new EventEmitter<any>();
@@ -84,7 +98,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   @Output() onUpdated = new EventEmitter<Discrepancy[]>();
 
   /** Table Column State */
-  displayedColumns: string[] = ColumnsSetting.slice();
+  displayedColumns: string[];
 
   /** Table Source State: @Input */
   @Input() source: any[];
@@ -95,6 +109,8 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
 
   private _dateSourcePaged: PagedList<Discrepancy>;
   expandedElement: Discrepancy | null;
+
+  highlightVariance: boolean = false;
 
   @Input('sourcePaged')
   set dateSourcePaged(dateSourcePaged: PagedList<Discrepancy>) {
@@ -133,6 +149,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   private dialogClose$: Subscription;
   private notification$: Subscription;
   private router$: Subscription;
+  private containerSearch$: Subscription;
 
   // //MOCK 
   // dataSource = ELEMENT_DATA[0].discrepancies;
@@ -202,7 +219,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   defaultSort: MatSortable = {
     id: '',
     start: 'asc',
-    disableClear: true
+    disableClear: false
   };
 
   /** In-line editing */
@@ -218,6 +235,8 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   bulkUpdatePermissions: string;
   bulkUpdateFilterPermissions: string;
   commentPermissions: string;
+  updateResolvedPermissions: string;
+  bulkUpdateResolvedPermissions: string;
 
   constructor(private route: ActivatedRoute,
     private router: Router,
@@ -233,6 +252,8 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     this.bulkUpdatePermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateMultipleDiscrepanciesByIdListByConAsync');
     this.bulkUpdateFilterPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateMultipleDiscrepanciesByFiltersByConAsync');
     this.commentPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'GetDiscrepancyCommentListByIdByConAsync');
+    this.updateResolvedPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateDiscrepancyResovled');
+    this.bulkUpdateResolvedPermissions = this.authService.getRoleMappingSettingByNames('discrepancy', 'UpdateMultipleDiscrepanciesResovled');
   }
 
   ngOnInit() {
@@ -262,22 +283,25 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     //   this.onNotificationClicked();
     // });
 
-    this.searchForm$ = this.searchForm.valueChanges.subscribe(() => this.onSearch());
+    this.searchForm$ = this.searchForm.valueChanges.subscribe(() => {
+        //  console.log('localformchange'),
+        this.onSearch()
+    });
 
 
     this.router$ = this.route.queryParamMap.pipe(
       switchMap((param: ParamMap) => of(+param.get('discrepancyId'))
       )).subscribe(value => {
-        console.log('router$', value)
-       if(value) {
-        this.showCommentary = true;
-        this.selectDiscrepancyID = value;
-        this.selectMasterPatientID = this.masterPatientId;
-       } else {
-        this.showCommentary = false;
-        this.selectDiscrepancyID = null;
-        this.selectMasterPatientID = null;
-       }
+        // console.log('router$', value)
+        if (value) {
+          this.showCommentary = true;
+          this.selectDiscrepancyID = value;
+          this.selectMasterPatientID = this.masterPatientId;
+        } else {
+          this.showCommentary = false;
+          this.selectDiscrepancyID = null;
+          this.selectMasterPatientID = null;
+        }
       });
 
     // this.discrepancyBulkUpdated$ = this.service.discrepancyBulkUpdated.subscribe((form: {
@@ -317,15 +341,18 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
         DiscrepancyStatus: DiscrepancyStatusOption,
         DiscrepancyComment: string
       }) => this.onBulkUpdated(form));
+
+    this.containerSearch$ = this.service.onContainerSearched.subscribe(() => {
+      this.resetSort(false);
+    })
   }
 
   initColumns() {
     // sub-list will not including member-info
     if (this.masterPatientId && this.isSubList) {
-      this.displayedColumns.splice(1, 4);
-      this.displayedColumns.splice(2, 10);
+      this.displayedColumns = COLUMNS_SUB.slice();
     } else {
-      this.displayedColumns.splice(17, 1);
+      this.displayedColumns = COLUMNS_MAIN.slice();
     }
 
     if (!this.isAuthorized('bulk_update')) {
@@ -423,13 +450,20 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
       Name: new FormControl('', {
         validators: minLenValidator(3)
       }),
-      CCAID: new FormControl('', {
-        validators: execLenValidator(10)
-      }),
-      MMIS_ID: new FormControl('', {
-        validators: execLenValidator(12)
-      }),
-      includeResolved: new FormControl(''),
+      CCAID: new FormControl('', 
+      Validators.compose([
+        execLenValidator(10), 
+        Validators.pattern("^[0-9]*$")
+      ])),
+      MMIS_ID: new FormControl('', 
+        Validators.compose([
+          execLenValidator(12), 
+          Validators.pattern("^[0-9]*$")
+      ])),
+      // test: new FormControl('', {
+      //   validators: execLenValidator(12)
+      // }),
+      includeResolved: new FormControl(this.includeResolved),
       hasComment: new FormControl(''),
     });
   }
@@ -444,12 +478,16 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     this.testSlideState = false;
   }
 
-  onSort(e: Sort): void {
+  onSort(e: Sort, emitEvent?: boolean): void {
+    console.log('onSort', e, this.sort, emitEvent)
     this.isLookup = true;
     this.pageState.sortBy = e.direction ? e.active : null;
     this.pageState.orderBy = e.direction ? (e.direction === 'asc' ? 0 : 1) : null;
     this.pageState.pageIndex = 0;
-    this.onPagedAndSorted.emit(this.pageState);
+
+    if (emitEvent) {
+      this.onPagedAndSorted.emit(this.pageState);
+    }
 
     /** @todo */
     this.testSlideState = false;
@@ -457,7 +495,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
 
   isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
-    const numRows = this.pagedData.length;
+    const numRows = this.pagedData.filter(row => !(this.isDiscrepancyResolvded(row) && !this.isAuthorized('bulk_update_resolved'))).length;
     return numSelected == numRows;
   }
 
@@ -471,7 +509,12 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   masterToggle(): void {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.pagedData.forEach(row => this.selection.select(row));
+      this.pagedData.forEach(row => {
+        if (this.isDiscrepancyResolvded(row) && !this.isAuthorized('bulk_update_resolved'))
+          return;
+
+        this.selection.select(row)
+      });
     // this.memberListService.selectMember(this.selection.selected, this.pagedData.length);
   }
 
@@ -500,6 +543,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onSearch() {
+
     clearTimeout(this.searchTimer)
     if (!this.searchForm.valid) {
       return;
@@ -509,7 +553,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
       this.pageState.pageIndex = 0;
 
       if (this.pageState.sortBy || this.pageState.orderBy) {
-        this.sort.sort(<MatSortable>this.defaultSort);
+        this.resetSort(true);
       } else {
         // console.log({ ...this.searchForm.value, ...this.pageState })
         this.onLocalSearch.emit({ ...this.searchForm.value, ...this.pageState });
@@ -522,9 +566,20 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     }, 1000);
   }
 
+  resetSort(emitEvent: boolean, sortConfig?) {
+
+    /** MatSort.sort will fire sortChangeEvent*/
+    const sortable = sortConfig ? sortConfig : this.defaultSort;
+    // this.sort.sort(<MatSortable>sortable);
+
+    this.sort.direction = 'asc';
+    this.sort.active = '';
+    // this.sort.sortChange.emit({ active: "", direction: "asc" });
+  }
+
   // prevent edit field open state switch when click outside on other fields  
   onDiscrepancyItemFieldClicked(element: Discrepancy, field: string): void {
-    if (!this.isAuthorized('update')) {
+    if (!this.isAuthorized('update') || !this.isAuthorized('update_resolved', element)) {
       return;
     }
 
@@ -666,7 +721,7 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  isAuthorized(view: string) {
+  isAuthorized(view: string, discrepancy?: Discrepancy) {
     switch (view) {
       case "explore":
         return this.authService.isViewAuthorized(this.infoPermissions);
@@ -674,6 +729,11 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
         return this.authService.isViewAuthorized(this.updatePermissions);
       case "bulk_update":
         return this.authService.isViewAuthorized(this.bulkUpdatePermissions);
+      case "update_resolved":
+        return !this.isDiscrepancyResolvded(discrepancy) || this.authService.isViewAuthorized(this.updateResolvedPermissions);
+      case "bulk_update_resolved": {
+        return this.authService.isViewAuthorized(this.bulkUpdateResolvedPermissions)
+      }
       case "bulk_update_filter":
         return this.authService.isViewAuthorized(this.bulkUpdateFilterPermissions);
       case "comment":
@@ -681,6 +741,17 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
       default:
         return false;
     }
+  }
+
+  /**
+   *  Including Complete, Resolved, 
+   * @TODO categeory should include resolved with flag or discrepancy should have category 
+   * 
+   */
+  isDiscrepancyResolvded(discrepancy?: Discrepancy) {
+    const RESOLVED_CATEGORIES = ['Complete', 'Worked', 'Resolved'];
+    // console.log(discrepancy.discrepancyCategory, RESOLVED_CATEGORIES.includes(discrepancy.discrepancyCategory))
+    return RESOLVED_CATEGORIES.includes(discrepancy.discrepancyCategory);
   }
 
   // not been used
@@ -692,11 +763,11 @@ export class DiscrepancyListComponent implements OnInit, OnChanges, OnDestroy {
     console.log('NOTIFICATION OBSERVED', notification);
     switch (notification.NotificationType) {
       case 'comment':
-        // this.on
-        // this.showCommentary = true;
-        // this.selectDiscrepancyID = notification.NotificationObject['DiscrepancyID'];
-        // this.selectMasterPatientID = notification.NotificationObject['MasterPatientID'];
-        // return;
+      // this.on
+      // this.showCommentary = true;
+      // this.selectDiscrepancyID = notification.NotificationObject['DiscrepancyID'];
+      // this.selectMasterPatientID = notification.NotificationObject['MasterPatientID'];
+      // return;
       case 'discrepancy':
         // this.notificationService.onNotificationClick(notification);
         return;

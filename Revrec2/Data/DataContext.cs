@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Revrec2.Models;
 using Microsoft.EntityFrameworkCore;
+using static Revrec2.Models.Report;
 
 namespace Revrec2.Data
 {
@@ -54,7 +55,7 @@ namespace Revrec2.Data
             modelBuilder.Query<RateCellMap>().ToView("vwCCARateCells");
 
             modelBuilder.Query<RateCellMapPaged>();
-           
+
             modelBuilder.Query<CCARegions>().ToView("vwCCARegions ");
 
             modelBuilder.Query<RegionMap>().ToView("vwRegionMap");
@@ -89,7 +90,14 @@ namespace Revrec2.Data
 
             modelBuilder.Query<ExplorerDetails>().ToView("vwExplorerDetails");
 
-#pragma warning restore 612, 618
+            modelBuilder.Query<ReportOperational>();
+
+            modelBuilder.Query<ReportFinancial>();
+
+            modelBuilder.Query<ReportOperationalDetail>();
+
+            modelBuilder.Query<ReportProductivityPaged>();
+
         }
     }
 }

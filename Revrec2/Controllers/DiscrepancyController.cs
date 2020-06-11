@@ -82,6 +82,7 @@ namespace Revrec2.Controllers
             int pageIndex = request.PageIndex.IsNullOrValue(0) ? PageIndex : request.PageIndex.Value;
             string sortBy = String.IsNullOrEmpty(request.SortBy) ? "" : request.SortBy;
             int orderBy = request.OrderBy.GetValueOrDefault(0);
+            int exportAll = request.ExportAll.GetValueOrDefault(0);
 
             int eventUserID = Request.GetUserID();
 
@@ -133,7 +134,16 @@ namespace Revrec2.Controllers
                     new SqlParameter("@discoverDateEnd", !(request.DiscoverDateEnd.HasValue) ? DBNull.Value : (object)request.DiscoverDateEnd),
                     new SqlParameter("@resolutionDateStart", !(request.ResolutionDateStart.HasValue) ? DBNull.Value : (object)request.ResolutionDateStart),
                     new SqlParameter("@resolutionDateEnd", !(request.ResolutionDateEnd.HasValue) ? DBNull.Value : (object)request.ResolutionDateEnd),
+                    new SqlParameter("@varianceSign", !(request.VarianceSign.HasValue) ? DBNull.Value : (object)request.VarianceSign),
                     new SqlParameter("@includeResolved ", includeResolved),
+                    new SqlParameter("@TypeRateCell", !(request.TypeRateCell.HasValue) ? DBNull.Value : (object)request.TypeRateCell),
+                    new SqlParameter("@TypeRegion", !(request.TypeRegion.HasValue) ? DBNull.Value : (object)request.TypeRegion),
+                    new SqlParameter("@TypePatientPay",!(request.TypePatientPay.HasValue) ? DBNull.Value : (object)request.TypePatientPay),
+                    new SqlParameter("@TypePatientSpendDown", !(request.TypePatientSpendDown.HasValue) ? DBNull.Value : (object)request.TypePatientSpendDown),
+                    new SqlParameter("@TypePaymentError", !(request.TypePaymentError.HasValue) ? DBNull.Value : (object)request.TypePaymentError),
+                    new SqlParameter("@memberEnrollmentStatusId", !(request.MemberEnrollmentStatusId.HasValue) ? DBNull.Value : (object)request.MemberEnrollmentStatusId),
+                    new SqlParameter("@memberIsEnrolled", !(request.MemberIsEnrolled.HasValue) ? DBNull.Value : (object)request.MemberIsEnrolled),
+                    new SqlParameter("@exportAll", exportAll),
                     new SqlParameter("@pageIndex", pageIndex),
                     new SqlParameter("@pageSize", pageSize),
                     new SqlParameter("@sortBy", sortBy),
@@ -147,8 +157,8 @@ namespace Revrec2.Controllers
                 Code = Constants.ResponseCode.Success,
                 Message = "Success",
             };
-
-            var query = _context.Query<DiscrepancyRecordPaged>().FromSql($"dbo.spGetDiscrepancyList @eventUserID, @name, @CCAID, @MMIS_ID, @MasterPatientID, @Months, @Programs, @CCARateCellIDs, @DiscrepancyStatusIDs, @AssigneeIDs, @hasComment, @discoverDateStart, @discoverDateEnd, @resolutionDateStart, @resolutionDateEnd, @includeResolved, @pageIndex, @pageSize, @sortBy, @orderBy", parameters);
+      
+            var query = _context.Query<DiscrepancyRecordPaged>().FromSql($"dbo.spGetDiscrepancyList @eventUserID, @name, @CCAID, @MMIS_ID, @MasterPatientID, @Months, @Programs, @CCARateCellIDs, @DiscrepancyStatusIDs, @AssigneeIDs, @hasComment, @discoverDateStart, @discoverDateEnd, @resolutionDateStart, @resolutionDateEnd, @varianceSign, @includeResolved, @TypeRateCell, @TypeRegion, @TypePatientPay, @TypePatientSpendDown, @TypePaymentError, @memberEnrollmentStatusId, @memberIsEnrolled, @exportAll, @pageIndex, @pageSize, @sortBy, @orderBy", parameters);
             var discrepancyRecordList = await query.AsNoTracking().ToArrayAsync();
 
             response.Data = new ResponseDataListPaged<DiscrepancyRecordForListDto>
@@ -484,7 +494,8 @@ namespace Revrec2.Controllers
                     new SqlParameter("@DiscrepancyID", discrepancyId),
                     new SqlParameter("@StartDate", !(request.StartDate.HasValue) ? DBNull.Value : (object)request.StartDate),
                     new SqlParameter("@EndDate", !(request.EndDate.HasValue) ? DBNull.Value : (object)request.EndDate),
-               
+                    //new SqlParameter("@pageIndex", (object)0),
+                    //new SqlParameter("@pageSize", (object)100),
                };
 
             var response = new ResponseData<ResponseDataList<ExplorerDetailsDto>>

@@ -29,18 +29,19 @@ export class NotificationService {
 
   subscribeNotification(userID: number) {
     const url = this.baseUrl + 'sse/subscribe/' + userID;
-
     console.log("SSE Subscribe", url)
+
     const eventSource = new EventSource(url);
 
+    clearInterval(this.SSECheck);
     this.SSECheck = setInterval(() => {
-      console.log('SSE Check...')
+      console.log('SSE Check...', eventSource.readyState)
       if (eventSource.readyState == 1) {
-        console.log('SSE Connecting, get Notification', eventSource)
+        console.log('SSE Connection ready, get Notification')
         this.getNotification();
         clearInterval(this.SSECheck);
       }
-    }, 1000);
+    }, 3000);
 
     return Observable.create(observer => {
       eventSource.addEventListener('alert', (evt: MessageEvent) => {
@@ -49,7 +50,6 @@ export class NotificationService {
 
       const FnGetGUID = (evt: MessageEvent) => {
         this.sseGUID = evt.data.substring(6, 42)
-        console.log(this.sseGUID)
         eventSource.removeEventListener("ping", FnGetGUID);
       }
       eventSource.addEventListener("ping", FnGetGUID);

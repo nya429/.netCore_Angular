@@ -2,13 +2,18 @@ import { MemberName } from './../model/member.model';
 import { Injectable, Inject } from '@angular/core';
 import { HttpHeaders, HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 // import { DisElement } from '../MOCK_DATA';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Response, PagedList, ResponseList } from '../model/response.model';
 import { MemberPaged, Member } from '../model/member.model';
 import { SharedService } from '../shared/shared.service';
 import { UserOption } from '../model/user.model';
 import { DiscrepancyStatusOption } from '../model/setting.model';
 import { switchMap } from 'rxjs/operators';
+import { ReportService } from '../report/report.service';
+import * as _moment from 'moment';
+// tslint:disable-next-line:no-duplicate-imports
+import { default as _rollupMoment, Moment } from 'moment';
+const moment = _rollupMoment || _moment;
 
 @Injectable({
   providedIn: 'root'
@@ -28,8 +33,15 @@ export class MemberService {
 
   public memberDiscrepancyBulkUpdated = new Subject<any>();
 
+  /** Report State*/
+  // public isDownloading: boolean;
+  public isReportDownloading: boolean = false;
+  public memberReport$: Subscription;
+  public memberReportDownloaded = new Subject<any>();
+
   constructor(private http: HttpClient,
     private _sharedService: SharedService,
+    private reportService: ReportService,
     @Inject('BASE_URL') baseUrl: string) {
     this.baseUrl = baseUrl + 'api/';
     this.memebrDetailShowing = true;
@@ -37,6 +49,33 @@ export class MemberService {
 
   get sharedService() {
     return this._sharedService;
+  }
+
+  private _getMembers(con) {
+    const url = this.baseUrl + 'members/GetMemberList'
+    const pageRequest = {
+      // Export Report
+      exportAll: con.exportAll ? 1 : 0,
+      // Pagination
+      pageIndex: con.pageIndex ? con.pageIndex : 0,
+      pageSize: con.pageSize ? con.pageSize : 50,
+      sortBy: con.sortBy ? con.sortBy : '',
+      orderBy: con.orderBy === 0 ? con.orderBy : (con.orderBy ? con.orderBy : 1),
+      // Filters
+      includeZeroDiscrepancy: con.includeZeroDiscrepancy ? 1 : 0,
+      assigneeID: con.assigneeID ? con.assigneeID : null,
+      MMIS_ID: con.MMIS_ID ? con.MMIS_ID : '',
+      CCAID: con.CCAID ? con.CCAID : '',
+      Name: con.Name ? con.Name.trim() : '',
+      MasterPatientID: con.MasterPatientID ? con.MasterPatientID.trim() : '',
+    };
+
+    let requestBody = { ...pageRequest, };
+    console.log("Get Members", url, requestBody)
+    return this.http.post<Response<PagedList<MemberPaged>>>(url, requestBody, {
+      observe: 'body',
+      responseType: 'json'
+    });
   }
 
   onDiscrepancyDetailOpen(e: any): void {
@@ -63,34 +102,30 @@ export class MemberService {
 
 
   getMembers(con) {
-    const url = this.baseUrl + 'members/GetMemberList'
-    const pageRequest = {
-      // Pagination
-      pageIndex: con.pageIndex ? con.pageIndex : 0,
-      pageSize: con.pageSize ? con.pageSize : 50,
-      sortBy: con.sortBy ? con.sortBy : '',
-      orderBy: con.orderBy === 0 ? con.orderBy : (con.orderBy ? con.orderBy : 1),
-      // Filters
-      includeZeroDiscrepancy: con.includeZeroDiscrepancy ? 1 : 0,
-      assigneeID: con.assigneeID ? con.assigneeID : null,
-      MMIS_ID: con.MMIS_ID ? con.MMIS_ID : '',
-      CCAID: con.CCAID ? con.CCAID : '',
-      Name: con.Name ? con.Name.trim() : '',
-      MasterPatientID: con.MasterPatientID ? con.MasterPatientID.trim() : '',
-    };
-
-    let requestBody = { ...pageRequest, };
-    console.log("Get Members", url, requestBody)
-    return this.http.post<Response<PagedList<MemberPaged>>>(url, requestBody, {
-      observe: 'body',
-      responseType: 'json'
-    }).subscribe(result => {
-        if (result.isSuccess) {
-          console.log("Get Members =>", result.data)
-          this.memberListChanged.next(result.data);
-        }
-      });
+    return this._getMembers(con).subscribe(result => {
+      if (result.isSuccess) {
+        console.log("Get Members =>", result.data)
+        this.memberListChanged.next(result.data);
+      }
+    });
   }
+
+  getAllMember(con) {
+    this.isReportDownloading = true;
+    this.memberReport$ = this._getMembers(con).subscribe((result) => {
+      this.memberReportDownloaded.next();
+      this.isReportDownloading = false;
+      const FILENAME = `Revrec2Members_${moment().format('MMM_DD_YYYY_hhmmA')}.csv`;
+      this.reportService.downloadTest(result.data.list, FILENAME);
+    })
+  }
+
+  abortDownload() {
+    if (this.memberReport$)
+      this.memberReport$.unsubscribe();
+    this.isReportDownloading = false;
+  }
+
 
   getMemberByMasterPatientId(con) {
     const url = this.baseUrl + 'members/GetMemberList'

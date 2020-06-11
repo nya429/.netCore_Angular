@@ -58,6 +58,7 @@ namespace Revrec2.Controllers
             string mmisId = String.IsNullOrEmpty(request.MMIS_ID) ? "" : request.MMIS_ID;
             int? includeZeroDiscrepancy = request.IncludeZeroDiscrepancy;
             int? assigneeID = request.AssigneeID;
+            int exportAll = request.ExportAll.GetValueOrDefault(0);
             int pageSize = request.PageSize.IsNullOrValue(0) ? PageSize : request.PageSize.Value;
             int pageIndex = request.PageIndex.IsNullOrValue(0) ? PageIndex : request.PageIndex.Value;
             string sortBy = String.IsNullOrEmpty(request.SortBy) ? "" : request.SortBy;
@@ -73,7 +74,7 @@ namespace Revrec2.Controllers
                 Message = "Success",
             };
 
-            var query = _context.Query<MembersPaged>().FromSql($"dbo.spGetMemberList {eventUserID}, {masterPatientId}, {name}, {ccaId}, {mmisId}, {includeZeroDiscrepancy}, {assigneeID}, {pageIndex}, {pageSize}, {sortBy}, {orderBy}");
+            var query = _context.Query<MembersPaged>().FromSql($"dbo.spGetMemberList {eventUserID}, {masterPatientId}, {name}, {ccaId}, {mmisId}, {includeZeroDiscrepancy}, {assigneeID}, {exportAll},{pageIndex}, {pageSize}, {sortBy}, {orderBy}");
             var memberList = await query.AsNoTracking().ToArrayAsync();
 
             response.Data = new ResponseDataListPaged<MemberForListDto>

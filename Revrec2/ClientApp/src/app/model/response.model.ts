@@ -18,5 +18,6 @@ export interface PagedList<T> {
     errorMessage: string;
     message: string;
     data?: T;
+    extra: any;
   }
   

@@ -17,6 +17,8 @@
     <endpoint name="GetDiscrepancyCommentListByIdByConAsync">1011</endpoint>
     <endpoint name="UpdateDiscrepancyCommentByIDAsync">1011</endpoint>
     <endpoint name="UpdateMultipleDiscrepanciesByFiltersByConAsync">1011</endpoint>
+    <endpoint name="UpdateDiscrepancyResovled">1010</endpoint>
+    <endpoint name="UpdateMultipleDiscrepanciesResovled">1010</endpoint>
   </module>
   <module name="user">
     <endpoint name="CreateNewUserByAsync">1110</endpoint>
@@ -52,5 +54,10 @@
     <endpoint name="CreateDiscreapancyCategoryAsync">1010</endpoint>
     <endpoint name="UpdateDiscrepancyCategoryByIDAsync">1010</endpoint>
     <endpoint name="GetDiscrepancyCategoryOptions">1011</endpoint>
+  </module>
+  <module name="report">
+    <endpoint name="GetReportOperationalList">1010</endpoint>
+    <endpoint name="GetReportOperationalDetail">1010</endpoint>
+    <endpoint name="GetReportFinancialList">1010</endpoint>
   </module>
 </configuration>

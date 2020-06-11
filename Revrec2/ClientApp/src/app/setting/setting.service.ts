@@ -1,8 +1,11 @@
-import { UserOption, User } from './../model/user.model';
+
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { FORM_OPTIONS_MOCK } from './setting-ratecard/setting-ratecard-form-dialog/setting-ratecard-form-dialog.component';
+
 import { Subject, Observable, combineLatest } from 'rxjs';
+
+import { UserOption, User } from './../model/user.model';
+import { FORM_OPTIONS_MOCK } from './setting-ratecard/setting-ratecard-form-dialog/setting-ratecard-form-dialog.component';
 import { PagedList, ResponseList, Response } from '../model/response.model';
 import {
   CCARateCell,
@@ -221,13 +224,15 @@ export class SettingService {
 
     switch (option) {
       case 'rateCell':
-        return product ? this.CCARateCellOptions.filter(rc => rc.product == product) : this.CCARateCellOptions;
+        return product ? this.CCARateCellOptions.filter((rc: CCARateCell) => rc.product == product) : this.CCARateCellOptions;
       case 'region':
-        return product ? this.CCARegionOptions.filter(rc => rc.product == product) : this.CCARegionOptions;
+        return product ? this.CCARegionOptions.filter((re: CCARegion) => re.product == product) : this.CCARegionOptions;
       case 'product':
         return this.productOptions;
       case 'discrepancyStatus':
         return this.discrepancyStatusOptions;
+      case 'discrepancyStatusUpdate':
+        return this.discrepancyStatusOptions.filter((ds: DiscrepancyStatusOption) => ds.discrepancyCategoryAddStatus);
       case 'discrepancyCategory':
         return this.discrepancyCategoryOptions;
       case 'discrepancyStatusType':
@@ -256,8 +261,8 @@ export class SettingService {
 
   getDiscrepancyBulkUpdateFormOptions() {
     return {
-      userOptions: this.userOptions,
-      discrepancyStatusOptions: this.discrepancyStatusOptions,
+      userOptions: this.getOptions("assigned_User"),
+      discrepancyStatusUpdateOptions: this.getOptions("discrepancyStatusUpdate"),
     };
   }
 
@@ -342,7 +347,7 @@ export class SettingService {
       .subscribe(result => {
         if (result.isSuccess) {
           console.log("GET DiscrepancyStatusOptions =>", result.data.list)
-          this.discrepancyStatusOptions = result.data.list;
+          this.discrepancyStatusOptions = result.data.list.sort((a, b) => a.discrepancyCategory.toLowerCase() > b.discrepancyCategory.toLowerCase() ? 1 : -1);
           this.discrepacnyStatusOptionsReady.next();
         }
       });

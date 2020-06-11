@@ -4,10 +4,10 @@ import { Overlay, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overla
 import { ComponentPortal } from '@angular/cdk/portal';
 import { TooltipComponent } from './tooltip/tooltip.component';
 
-@Directive({ selector: '[awesomeTooltip]' })
+@Directive({ selector: '[infoTooltip]' })
 export class TooltipDirective implements OnInit {
   @Input ('toolTipDisplay') isDisplay: boolean = true;
-  @Input('awesomeTooltip') tipInfo: {tipType: string, content: any};
+  @Input('infoTooltip') tipInfo: {tipType: string, tipTitle: string, content: any};
   private overlayRef: OverlayRef;
 
   constructor(private overlay: Overlay,
