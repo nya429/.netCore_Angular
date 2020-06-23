@@ -12,6 +12,7 @@ import { ReportProductivity } from 'src/app/model/report.model';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   public actionUserId;
+  public actionUserRole;
 
   constructor(
     private authService: AuthService,
@@ -24,9 +25,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
   }
+
   ngOnDestroy(): void {
 
   }
 
-
+  isViewAuthorized(permittedRoles?: string): boolean {
+    return this.authService.isViewAuthorized(permittedRoles);
+  }
 }

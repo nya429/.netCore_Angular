@@ -1,0 +1,8 @@
+<div [ngClass]="{'report-app': hideTitle}">
+    <div *ngIf='!hideTitle'>
+        <span id="card-title">Productivity</span>
+    </div>
+    <div>
+        <app-report-productivity></app-report-productivity>
+    </div>
+</div>

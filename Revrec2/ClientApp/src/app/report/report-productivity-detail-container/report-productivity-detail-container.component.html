@@ -1,6 +1,6 @@
 <div class="mat-elevation-z8 productivity-container">
     <div class='productivity-container-filter'>
-        <h6>My Productivity</h6>
+        <a id='card-title'>My Productivity</a>
         <app-dual-calendar [timeSpanFetched]="timeSpanFetched" (dateApplied)='onDateApplied($event)'>
         </app-dual-calendar>
 
@@ -10,4 +10,7 @@
     <app-report-productivity-detail [userID]='userID' [isSubList]='false' [dataSource]='dataSourceDetail ' [TimeSpanApplied]='timeSpanFetched ' [defaultCheckPointType]='defaultCheckPointType.checkPointType' (checkPointTypeChanged)="onCheckPointTypeChanged($event)"
         [containerH]='containerH' (onPagedAndSorted)="onProductivityDetailPaged($event)"></app-report-productivity-detail>
 
+    <div align="end" id="card-actions">
+        <button mat-raised-button color="primary" routerLink="/worklist">My WorkList</button>
+    </div>
 </div>

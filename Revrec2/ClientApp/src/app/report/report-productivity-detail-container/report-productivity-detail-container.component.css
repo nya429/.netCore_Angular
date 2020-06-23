@@ -8,3 +8,17 @@
 .productivity-container-filter {
     padding: 0 24px;
 }
+
+#card-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #777777;
+    padding: 24px 0;
+    display: block;
+}
+
+#card-actions {
+    margin: 0;
+    padding: 12px;
+}

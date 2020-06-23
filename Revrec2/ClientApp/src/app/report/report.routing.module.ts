@@ -6,6 +6,7 @@ import { ReportOperationalComponent } from './report-operational/report-operatio
 import { ReportFinancialComponent } from './report-financial/report-financial.component';
 import { ReportProductivityComponent } from './report-productivity/report-productivity.component';
 import { AuthGuard } from '../auth/auth-guard.service';
+import { ReportProductivityContainerComponent } from './report-productivity-container/report-productivity-container.component';
 
 const reportRoutes: Routes = [
   {
@@ -13,7 +14,7 @@ const reportRoutes: Routes = [
     component: ReportContainerComponent,
     children: [
       {
-        path: 'productivity', component: ReportProductivityComponent,
+        path: 'productivity', component: ReportProductivityContainerComponent,
         canActivate: [AuthGuard],
         data: {
           expectedRoles: '1010'

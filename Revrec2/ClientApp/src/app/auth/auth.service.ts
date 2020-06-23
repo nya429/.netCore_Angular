@@ -37,7 +37,7 @@ export class AuthService {
             if (result.isSuccess) {
                 this.token = result.data['token'];
                 this.actionUser = result.data['userInfo'];
-                this.getActionUserRole();
+                this._getActionUserRole();
                 console.log("GET /auth/login => Authed", result.data)
                 this.signinStateChanged.next('authed')
             } else {
@@ -124,6 +124,10 @@ export class AuthService {
     }
 
     getActionUserRole() {
+        return this.actionUserRole;
+    }
+
+    private _getActionUserRole() {
         try {
             const payload = jwt_decode(this.token);
             this.actionUserRole = payload.role;

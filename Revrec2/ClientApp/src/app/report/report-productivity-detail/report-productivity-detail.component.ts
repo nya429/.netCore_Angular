@@ -27,7 +27,7 @@ export class ReportProductivityDetailComponent implements OnInit {
 
   @Input('dataSource')
   set dataSource(dataSource: PagedList<ReportProductivity>) {
-    if (!dataSource || dataSource === this._dataSource || dataSource.list[0].userID !== this.userID)
+    if (!dataSource || !dataSource.list.length || dataSource === this._dataSource || dataSource.list[0].userID !== this.userID)
       return;
     this._dataSource = dataSource;
     // console.log(this._dataSource)
@@ -67,7 +67,7 @@ export class ReportProductivityDetailComponent implements OnInit {
   ngOnInit() {
     this.initData();
     this.initState();
-    console.log(this.defaultCheckPointType)
+    // console.log(this.defaultCheckPointType)
   }
 
   ngOnDestroy() {

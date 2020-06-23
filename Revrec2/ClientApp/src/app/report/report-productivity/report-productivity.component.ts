@@ -111,7 +111,7 @@ export class ReportProductivityComponent implements OnInit, OnDestroy {
   }
 
   onDateApplied(e) {
-    console.log(e);
+    // console.log(e);
     // this.timeSpanFetched = e;
     this.service.getReportProductivity({ ...e })
   }
@@ -129,7 +129,7 @@ export class ReportProductivityComponent implements OnInit, OnDestroy {
       return orderby ? -order : order;
     })];
 
-    console.log(this.selectedUserID)
+    // console.log(this.selectedUserID)
   }
 
   onProductivityClick(userID: number) {
@@ -150,7 +150,7 @@ export class ReportProductivityComponent implements OnInit, OnDestroy {
   isExpansionDetailRow = (i: number, row: Object) => row.hasOwnProperty('detailRow');
 
   onCheckPointTypeChanged(e) {
-    console.log(e)
+    // console.log(e)
     this.service.getReportProductivityDetail(this.selectedUserID, { ...e })
   }
 

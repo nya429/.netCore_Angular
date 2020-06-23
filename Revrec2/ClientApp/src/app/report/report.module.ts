@@ -1,3 +1,4 @@
+import { ReportProductivity } from './../model/report.model';
 import { MaterialModule } from './../material.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -14,6 +15,7 @@ import { ReportOperationalDetailComponent } from './report-operational-detail/re
 import { SharedModule } from '../shared/shared.module';
 import { ReportProductivityDetailComponent } from './report-productivity-detail/report-productivity-detail.component';
 import { ReportProductivityDetailContainerComponent } from './report-productivity-detail-container/report-productivity-detail-container.component';
+import { ReportProductivityContainerComponent } from './report-productivity-container/report-productivity-container.component';
 
 @NgModule({
   imports: [
@@ -34,11 +36,12 @@ import { ReportProductivityDetailContainerComponent } from './report-productivit
     ReportProductivityComponent,
     ReportProductivityDetailComponent,
     ReportProductivityDetailContainerComponent,
+    ReportProductivityContainerComponent,
     // ReportOperationalDetail2Component
   ],
   exports: [
-    // ReportProductivityComponent,
-    ReportProductivityDetailContainerComponent
+    ReportProductivityDetailContainerComponent,
+    ReportProductivityContainerComponent,
   ]
 
 })

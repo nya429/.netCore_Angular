@@ -1,7 +1,10 @@
 <div class="container-fluid">
     <div class="row">
-        <app-report-productivity-detail-container [userID]="actionUserId"></app-report-productivity-detail-container>
-
+        <div *ngIf="!isViewAuthorized('1010')">
+            <app-report-productivity-detail-container [userID]="actionUserId"></app-report-productivity-detail-container>
+        </div>
+        <div *ngIf="isViewAuthorized('1010')">
+            <app-report-productivity-container [hideTitle]="false"></app-report-productivity-container>
+        </div>
     </div>
-
 </div>
